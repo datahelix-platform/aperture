@@ -3,7 +3,7 @@
 **AI-native data & workflow explorer for the [DataHelix](https://github.com/VA-NCPTSDBB-Bioinformatics/DataHelix) platform.**
 
 Aperture is an **LLM-native interaction layer** over the DataHelix **domain graph** — one typed
-knowledge graph whose runtime is [Mosaic](https://github.com/BU-Neuromics/mosaic) (formerly Hippo, Mosaic ADR-0004 — the platform's
+knowledge graph whose runtime is [Mosaic](https://github.com/datahelix-platform/mosaic) (formerly Hippo, Mosaic ADR-0004 — the platform's
 LinkML runtime / structured domain graph, exposed over GraphQL + REST). Its differentiator is
 the *interaction paradigm*: exploring and transforming scientific data through natural language.
 

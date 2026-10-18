@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-07-06
 - **Deciders:** labadorf (via Phase-4 review/merge, PR #14), dev sprint
-- **Related:** ADR-0017 (data plane vs control plane — refines its reference impl), ADR-0003/0004 (config-as-data), ADR-0029 (honest degradation), N5.4; aperture#17 (recipe), aperture#19 (removal affordance); ownership amendment: aperture#56, BU-Neuromics/mosaic#178 (enforcement)
+- **Related:** ADR-0017 (data plane vs control plane — refines its reference impl), ADR-0003/0004 (config-as-data), ADR-0029 (honest degradation), N5.4; aperture#17 (recipe), aperture#19 (removal affordance); ownership amendment: aperture#56, datahelix-platform/mosaic#178 (enforcement)
 
 ## Context
 
@@ -101,7 +101,7 @@ guarantee — a determined user can still reach the same-origin GraphQL endpoint
 Enforcement belongs to the store. The reference implementation is a Mosaic
 `AuthMiddleware` subclass (`mosaic.core.middleware`, already an ABC with actor extraction
 implemented) that stamps `owner` from the verified actor header on create and rejects updates
-where `owner != actor` — BU-Neuromics/mosaic#178. Until that lands, the partition is advisory
+where `owner != actor` — datahelix-platform/mosaic#178. Until that lands, the partition is advisory
 and the UI says so. **ADR-0008 and ADR-0016 are preserved: Aperture holds no
 authority, and enforcement is never added to it.**
 

@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-11 (ratified 2026-09-17; see aperture#60)
 - **Deciders:** labadorf, design session
-- **Related:** ADR-0021 (defer in-app chat), ADR-0026 (portal-first MVP), ADR-0029 (capability-gated honest degradation), ADR-0031 (app-shell layout library), ADR-0035 (typed `QuerySpec`), ADR-0017 (data plane vs control plane); Mosaic `converse_query_spec` (`BU-Neuromics/mosaic#186`, shipped PR #199) and the `mosaic-demo-small` change `add-aperture-chat-panel`
+- **Related:** ADR-0021 (defer in-app chat), ADR-0026 (portal-first MVP), ADR-0029 (capability-gated honest degradation), ADR-0031 (app-shell layout library), ADR-0035 (typed `QuerySpec`), ADR-0017 (data plane vs control plane); Mosaic `converse_query_spec` (`datahelix-platform/mosaic#186`, shipped PR #199) and the `mosaic-demo-small` change `add-aperture-chat-panel`
 
 ## Context
 

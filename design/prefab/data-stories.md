@@ -6,7 +6,7 @@
 > whose **Outcome** section records the execution; no separate runbook landed).
 >
 > **Canonical home:** Reel `design/prefab/data-stories.md` —
-> <https://github.com/BU-Neuromics/reel/blob/main/design/prefab/data-stories.md>
+> <https://github.com/datahelix-platform/reel/blob/main/design/prefab/data-stories.md>
 
 The keystone probe — a NotebookLM-style conversational exploration of Hippo metadata, the cheapest
 decisive test of *"can an LLM reliably drive a typed declarative artifact through a validator to a

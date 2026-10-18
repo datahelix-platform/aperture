@@ -3,7 +3,7 @@
 **Status:** 🟠 Working — research + candidate design, feeding a Proposed ADR slate (0035+)
 **Date:** 2026-08-18 · **Rev 2** (same day): Mosaic is now in scope for changes — the execution
 design is co-designed with the Mosaic query surface, priced against Mosaic source
-(`BU-Neuromics/mosaic` @ `502991c`, v0.12.1) rather than treating the server as fixed.
+(`datahelix-platform/mosaic` @ `502991c`, v0.12.1) rather than treating the server as fixed.
 **Rev 3 note (2026-08-19, status only — exploration text below unchanged):** the Mosaic side of
 §10 has landed as design artifacts (mosaic PR #159: doc-drift fixes, **Mosaic ADR-0006/0007**
 Proposed — mosaic#153/#154 — and OpenSpec changes `typed-filter-inputs`/`aggregation-and-

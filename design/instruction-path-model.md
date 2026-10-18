@@ -7,7 +7,7 @@
 > whose **Outcome** section records the execution; no separate runbook landed).
 >
 > **Canonical home:** Reel `design/instruction-path-model.md` —
-> <https://github.com/BU-Neuromics/reel/blob/main/design/instruction-path-model.md>
+> <https://github.com/datahelix-platform/reel/blob/main/design/instruction-path-model.md>
 
 This document formalized *what a data story is* as a data structure — source-tagged typed
 instructions reducing to intensional subgraph **states** + materialized **artifacts**, with as-of

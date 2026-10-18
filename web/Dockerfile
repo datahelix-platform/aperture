@@ -18,7 +18,7 @@ ARG REVISION=unknown
 
 LABEL org.opencontainers.image.title="aperture" \
       org.opencontainers.image.description="Aperture — interface layer for the DataHelix platform" \
-      org.opencontainers.image.source="https://github.com/BU-Neuromics/aperture" \
+      org.opencontainers.image.source="https://github.com/datahelix-platform/aperture" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${REVISION}"

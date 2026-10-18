@@ -17,7 +17,7 @@
   ADR-0023 model); `design/cross-class-query.md` (the exploration this ADR distills, Rev 2 —
   co-designed against mosaic @ 502991c/v0.12.1); `design/portal-requirements.md` X1 and
   **X5** (the typed-filter-contract requirement this ADR drives).
-- **Tracking issue:** [#46](https://github.com/BU-Neuromics/aperture/issues/46)
+- **Tracking issue:** [#46](https://github.com/datahelix-platform/aperture/issues/46)
 
 ## Context
 

@@ -9,7 +9,7 @@
 > when the AI-native data-story engine was split out of Aperture (boundary: DataHelix platform ADR-0003 —
 > `datahelix:platform/design/decisions/ADR-0003-reel-data-story-engine-separate-from-portal.md`,
 > whose **Outcome** section records the execution; no separate runbook landed). Its
-> canonical home is now **Reel [ADR-0004](https://github.com/BU-Neuromics/reel/blob/main/design/decisions/ADR-0004-mid-path-edit-recompute-with-suspend.md)**
+> canonical home is now **Reel [ADR-0004](https://github.com/datahelix-platform/reel/blob/main/design/decisions/ADR-0004-mid-path-edit-recompute-with-suspend.md)**
 > (renumbered from this ADR). Kept here as a tombstone per the never-delete convention — **do not
 > edit; edit the Reel ADR.** The body below is the original Aperture text, preserved for history.
 

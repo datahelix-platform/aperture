@@ -4,7 +4,7 @@ name: Release
 #
 # Pushing a `vX.Y.Z` tag — or dispatching this workflow with that tag name,
 # which creates the tag at the dispatched ref — builds the SPA image and
-# publishes it digest-addressed at ghcr.io/bu-neuromics/aperture, attaching an
+# publishes it digest-addressed at ghcr.io/datahelix-platform/aperture, attaching an
 # `image-digest.json` release asset for the DataHelix certification workflow /
 # composition.lock.json bump bot. Endpoint config is injected at container
 # start (web/docker/40-aperture-config.sh), so one image serves any
@@ -70,7 +70,7 @@ jobs:
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ghcr.io/bu-neuromics/aperture
+          images: ghcr.io/datahelix-platform/aperture
           # Explicit version (not type=semver) so workflow_dispatch runs, which
           # aren't on a tag ref, tag the image identically.
           tags: |
@@ -103,11 +103,11 @@ jobs:
           import json
           version = "${{ needs.validate.outputs.version }}"
           digest = "${{ needs.image.outputs.digest }}"
-          image = "ghcr.io/bu-neuromics/aperture"
+          image = "ghcr.io/datahelix-platform/aperture"
           json.dump(
               {
                   "component": "aperture",
-                  "repo": "BU-Neuromics/aperture",
+                  "repo": "datahelix-platform/aperture",
                   "version": version,
                   "image": image,
                   "digest": digest,

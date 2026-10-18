@@ -17,7 +17,7 @@
 > vision for Aperture as a **config-driven data portal**. It **supersedes the
 > CLI-first v0.1 framing** in `sec1`–`sec6` (which remain in this directory as
 > historical reference until the repo split). The plan is to extract Aperture
-> into its own repository (`BU-Neuromics/aperture`) on a **fresh start** that
+> into its own repository (`datahelix-platform/aperture`) on a **fresh start** that
 > keeps only the reusable `src/aperture/backends/` protocol and carries these
 > portal design docs forward. See `proposals/aperture-split.md` for the runbook
 > and `portal-open-questions.md` for the in-progress resolution of §9.
