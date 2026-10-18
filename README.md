@@ -66,6 +66,10 @@ pip install -e ".[dev]"
 pytest -v
 ```
 
+## Acknowledgments
+
+Aperture is part of the DataHelix platform, developed by Adam Labadorf with the National Center for PTSD Brain Bank, U.S. Department of Veterans Affairs.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
