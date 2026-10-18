@@ -43,7 +43,7 @@ description: >-
       directly. To make the rule real, deploy Mosaic behind an authenticating
       proxy with an `AuthMiddleware` that stamps `owner` from the verified
       actor header on create and rejects updates where `owner != actor`
-      (BU-Neuromics/mosaic#178). Until then the partition is advisory and
+      (datahelix-platform/mosaic#178). Until then the partition is advisory and
       Aperture says so.
     - `owner` MUST be treated as immutable after create by whatever enforces
       it. A writable owner is a stealable owner.

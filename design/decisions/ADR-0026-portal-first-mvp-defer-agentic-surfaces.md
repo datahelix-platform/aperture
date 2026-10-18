@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-06-30
 - **Deciders:** labadorf, design session
-- **Related:** ADR-0016 (defer Bridge), ADR-0021 (defer in-app chat); ADR-0013, ADR-0018, ADR-0019, ADR-0020, ADR-0022–0025 (deferred from MVP by this ADR); `vision.md`; `portal-requirements.md` L1/L13/L14; [aperture#2](https://github.com/BU-Neuromics/aperture/issues/2)
+- **Related:** ADR-0016 (defer Bridge), ADR-0021 (defer in-app chat); ADR-0013, ADR-0018, ADR-0019, ADR-0020, ADR-0022–0025 (deferred from MVP by this ADR); `vision.md`; `portal-requirements.md` L1/L13/L14; [aperture#2](https://github.com/datahelix-platform/aperture/issues/2)
 
 ## Context
 
@@ -25,7 +25,7 @@ not built for MVP):
 - **Build-time agent-assisted component authoring** — ADR-0021's near-term coding-agent surface
   (with ADR-0018) is *Deferred from MVP*; MVP components are **hand-authored** (L14).
 - **Embedded schema editing** — the in-app schema-editor (L5/L11/L12) is *Deferred from MVP*,
-  tracked in [aperture#2](https://github.com/BU-Neuromics/aperture/issues/2); MVP schema
+  tracked in [aperture#2](https://github.com/datahelix-platform/aperture/issues/2); MVP schema
   authoring happens upstream via Hippo `recipe_import` (L13).
 
 **Substrate invariants are preserved** so each deferred surface is an additive future, not a

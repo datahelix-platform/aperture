@@ -6,14 +6,14 @@ domain comes from config, not code (ADR-0002).
 
 **Status (2026-07-06):** design **complete and ratified** (Steps 1–6, 31 ADRs).
 **All four MVP build phases are implemented** — the walking skeleton (issues
-[#3](https://github.com/BU-Neuromics/aperture/issues/3)/[#4](https://github.com/BU-Neuromics/aperture/issues/4)/[#5](https://github.com/BU-Neuromics/aperture/issues/5)),
-the **read loop** ([#6](https://github.com/BU-Neuromics/aperture/issues/6)): facets + FTS,
+[#3](https://github.com/datahelix-platform/aperture/issues/3)/[#4](https://github.com/datahelix-platform/aperture/issues/4)/[#5](https://github.com/datahelix-platform/aperture/issues/5)),
+the **read loop** ([#6](https://github.com/datahelix-platform/aperture/issues/6)): facets + FTS,
 detail with cross-links/pivot/history, CSV+JSON export, query-state ⇄ URL; the **Tier-0
-write loop** ([#7](https://github.com/BU-Neuromics/aperture/issues/7)): mutation-derived
+write loop** ([#7](https://github.com/datahelix-platform/aperture/issues/7)): mutation-derived
 forms, server-authoritative validation, partial-merge updates, ref-pickers; the **Tier-1
-guided workflow** ([#8](https://github.com/BU-Neuromics/aperture/issues/8), ADR-0028):
+guided workflow** ([#8](https://github.com/datahelix-platform/aperture/issues/8), ADR-0028):
 stage → continuous dry-run → whole-set validate → one atomic `ingestBatch` with
-client-id-linked intra-batch refs; and the **control plane** ([#9](https://github.com/BU-Neuromics/aperture/issues/9),
+client-id-linked intra-batch refs; and the **control plane** ([#9](https://github.com/datahelix-platform/aperture/issues/9),
 ADR-0017/N5.4): saved views, cross-browser resumable drafts, and config-as-data (workflows)
 as versioned documents on a LinkML-on-Hippo store (co-located by default,
 `VITE_HIPPO_CONTROL_PLANE_URL` to split; honest localStorage fallback). Facet
@@ -32,13 +32,13 @@ until Mosaic `neighbors` lands). Local smoke harness: `web/e2e-smoke.mjs` +
 
 | # | What | Depends on |
 |---|---|---|
-| [#15](https://github.com/BU-Neuromics/aperture/issues/15) | ⚠️ **Live `hippo serve` integration** — confirm the four assumed GraphQL shapes (the v1.0 gate) | — |
-| [#16](https://github.com/BU-Neuromics/aperture/issues/16) | Publish the Aperture→Hippo **contract file** (runs in hippo CI; feeds the DataHelix certified-frontier ledger) | #15 |
-| [#17](https://github.com/BU-Neuromics/aperture/issues/17) | **Control-plane recipe** (the ApertureDocument type as a Hippo recipe) | #15 |
-| [#18](https://github.com/BU-Neuromics/aperture/issues/18) | **Nav/composition overrides** — derive-all + reorder/relabel/hide as config-as-data (R3.1) | — |
-| [#19](https://github.com/BU-Neuromics/aperture/issues/19) | **Write-loop completeness** — W4.4 availability/supersede affordances, field clearing, saved-view removal | #15 |
-| [#20](https://github.com/BU-Neuromics/aperture/issues/20) | **Light up X1-gated capabilities** — sort, facet counts, totalCount, range filters | hippo#96 |
-| [#2](https://github.com/BU-Neuromics/aperture/issues/2) | Embedded schema editing (post-MVP) | X3a/X3b |
+| [#15](https://github.com/datahelix-platform/aperture/issues/15) | ⚠️ **Live `hippo serve` integration** — confirm the four assumed GraphQL shapes (the v1.0 gate) | — |
+| [#16](https://github.com/datahelix-platform/aperture/issues/16) | Publish the Aperture→Hippo **contract file** (runs in hippo CI; feeds the DataHelix certified-frontier ledger) | #15 |
+| [#17](https://github.com/datahelix-platform/aperture/issues/17) | **Control-plane recipe** (the ApertureDocument type as a Hippo recipe) | #15 |
+| [#18](https://github.com/datahelix-platform/aperture/issues/18) | **Nav/composition overrides** — derive-all + reorder/relabel/hide as config-as-data (R3.1) | — |
+| [#19](https://github.com/datahelix-platform/aperture/issues/19) | **Write-loop completeness** — W4.4 availability/supersede affordances, field clearing, saved-view removal | #15 |
+| [#20](https://github.com/datahelix-platform/aperture/issues/20) | **Light up X1-gated capabilities** — sort, facet counts, totalCount, range filters | hippo#96 |
+| [#2](https://github.com/datahelix-platform/aperture/issues/2) | Embedded schema editing (post-MVP) | X3a/X3b |
 
 **Confirmed live shapes (#15, hippo 0.10.3)** — one sentence per seam; full detail in the #15
 issue comments and the committed introspection capture
@@ -86,7 +86,7 @@ aperture's side of it is #16.
 one guided multi-step workflow), over a single pluggable Hippo endpoint, client-side SPA, auth as
 a no-op pass-through (Bridge deferred), hand-authored components in a Worker sandbox.
 
-**Deferred (tracked):** embedded schema editing ([#2](https://github.com/BU-Neuromics/aperture/issues/2));
+**Deferred (tracked):** embedded schema editing ([#2](https://github.com/datahelix-platform/aperture/issues/2));
 agentic surfaces + build-time agent-assist (ADR-0026); faceting aggregation/counts (Hippo X1) and
 server export (X2) → v1.x.
 
@@ -94,13 +94,13 @@ server export (X2) → v1.x.
 
 | # | Phase | Depends on |
 |---|---|---|
-| [#3](https://github.com/BU-Neuromics/aperture/issues/3) | 0.1a — App shell: layout registry + slot contract (ADR-0031) | 0.1 (done) |
-| [#4](https://github.com/BU-Neuromics/aperture/issues/4) | 0.2–0.4 — Layer-D urql adapter + capability negotiation | #3 |
-| [#5](https://github.com/BU-Neuromics/aperture/issues/5) | 0.5–0.7 — schema-derived collection table + URL state *(completes walking skeleton)* | #3, #4 |
-| [#6](https://github.com/BU-Neuromics/aperture/issues/6) | 1 — Read loop: facets, FTS, detail, cross-links, export | #5 |
-| [#7](https://github.com/BU-Neuromics/aperture/issues/7) | 2 — Write loop: Tier 0 generated forms | #6 |
-| [#8](https://github.com/BU-Neuromics/aperture/issues/8) | 3 — Tier 1 guided workflow (stage → validate → atomic commit) | #7 |
-| [#9](https://github.com/BU-Neuromics/aperture/issues/9) | 4 — Control plane: saved views, drafts, config-as-data | #6–#8 |
+| [#3](https://github.com/datahelix-platform/aperture/issues/3) | 0.1a — App shell: layout registry + slot contract (ADR-0031) | 0.1 (done) |
+| [#4](https://github.com/datahelix-platform/aperture/issues/4) | 0.2–0.4 — Layer-D urql adapter + capability negotiation | #3 |
+| [#5](https://github.com/datahelix-platform/aperture/issues/5) | 0.5–0.7 — schema-derived collection table + URL state *(completes walking skeleton)* | #3, #4 |
+| [#6](https://github.com/datahelix-platform/aperture/issues/6) | 1 — Read loop: facets, FTS, detail, cross-links, export | #5 |
+| [#7](https://github.com/datahelix-platform/aperture/issues/7) | 2 — Write loop: Tier 0 generated forms | #6 |
+| [#8](https://github.com/datahelix-platform/aperture/issues/8) | 3 — Tier 1 guided workflow (stage → validate → atomic commit) | #7 |
+| [#9](https://github.com/datahelix-platform/aperture/issues/9) | 4 — Control plane: saved views, drafts, config-as-data | #6–#8 |
 
 ## Cross-component (Hippo) dependencies
 
@@ -111,7 +111,7 @@ server export (X2) → v1.x.
   [BU-Neuromics/hippo#96](https://github.com/BU-Neuromics/hippo/issues/96). Gates facet *counts* in
   Phase 1 (ADR-0029); equality facets + FTS ship without it.
 - **X2** (server bulk export), **X3a/X3b** (schema-apply transport + overlay mode): deferred; X3a/X3b
-  tracked under [#2](https://github.com/BU-Neuromics/aperture/issues/2). See the X-tracker in
+  tracked under [#2](https://github.com/datahelix-platform/aperture/issues/2). See the X-tracker in
   `portal-requirements.md`.
 
 ## Repo layout
@@ -135,6 +135,6 @@ server export (X2) → v1.x.
 
 ## Current state / immediate next action
 
-Design branch and `main` are in sync. Build Phase **0.1a** ([#3](https://github.com/BU-Neuromics/aperture/issues/3)):
+Design branch and `main` are in sync. Build Phase **0.1a** ([#3](https://github.com/datahelix-platform/aperture/issues/3)):
 the `headerNavMain` layout + typed slot contract, translated from `design/design-export/` and styled
 from the tokens.

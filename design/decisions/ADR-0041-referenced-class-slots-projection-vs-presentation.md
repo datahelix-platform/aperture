@@ -18,8 +18,8 @@
   listed blocked on mosaic#204) · `datahelix:platform/design/view-contract.md` (stub; the eventual
   home of the presentation half) · `design/cross-class-query.md` §5, §8 · `mosaic-demo-small`
   `APERTURE_EXON_CONTRACT.md` "Open questions" (explode-vs-`RelatedCondition` scoping)
-- **Tracking issue:** [#65](https://github.com/BU-Neuromics/aperture/issues/65); cross-component
-  umbrella [datahelix#93](https://github.com/BU-Neuromics/datahelix/issues/93) (sequence across
+- **Tracking issue:** [#65](https://github.com/datahelix-platform/aperture/issues/65); cross-component
+  umbrella [datahelix#93](https://github.com/datahelix-platform/datahelix/issues/93) (sequence across
   aperture/mosaic/reel/certification), with mosaic#217 (ratify ADR-0011), mosaic#218 (cut the
   release carrying it), datahelix#92 (certification fixture v1.1.0), reel#2 and
   mosaic-demo-small#1
