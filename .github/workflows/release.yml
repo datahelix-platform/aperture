@@ -94,10 +94,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      payload: ${{ steps.digest.outputs.payload }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Write image-digest.json
+        id: digest
         run: |
           python3 - <<'EOF'
           import json
@@ -118,6 +121,7 @@ jobs:
           )
           EOF
           cat image-digest.json
+          echo "payload=$(jq -c . image-digest.json)" >> "$GITHUB_OUTPUT"
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -127,3 +131,20 @@ jobs:
           name: v${{ needs.validate.outputs.version }}
           generate_release_notes: true
           files: image-digest.json
+
+  notify-datahelix:
+    needs: [release]
+    runs-on: ubuntu-latest
+    # A failed notification must never fail a release: the asset is already
+    # published, and DataHelix can be dispatched by hand from it. Needs the
+    # DATAHELIX_DISPATCH_TOKEN secret (Contents: read & write on
+    # datahelix-platform/datahelix only); without it the step fails harmlessly.
+    continue-on-error: true
+    steps:
+      - name: Dispatch the lock bump to DataHelix
+        env:
+          GH_TOKEN: ${{ secrets.DATAHELIX_DISPATCH_TOKEN }}
+          PAYLOAD: ${{ needs.release.outputs.payload }}
+        run: |
+          jq -c '{event_type: "component-release", client_payload: .}' <<<"$PAYLOAD" > dispatch.json
+          gh api repos/datahelix-platform/datahelix/dispatches --input dispatch.json
