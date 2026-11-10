@@ -1,8 +1,8 @@
 # ADR-0015: Composability and cross-links (hrefs)
 
-- **Status:** Proposed
-- **Date:** 2026-06-13
-- **Deciders:** —
+- **Status:** Accepted in part (cross-links, as built) — ⛔ **Deferred in part** (composition, from MVP with ADR-0010; ADR-0026). See the 2026-11-10 split below.
+- **Date:** 2026-06-13 (split 2026-11-10, decision pass)
+- **Deciders:** labadorf
 - **Related:** raised 2026-06-13 ("composition composability and cross links / hrefs"); depends on ADR-0009, ADR-0010; informed by ADR-0014; Hippo sec4 §4.7, issue #48 (xref)
 
 ## Context
@@ -55,3 +55,39 @@ Hippo gives Aperture strong material to build on:
 - Does composition need a "reference/transclude another named view" primitive, and if so does
   that stay a noun (a `view-ref` primitive) rather than becoming a macro/expression layer
   (ADR-0004 line)?
+
+## Split (2026-11-10 — decision pass)
+
+Decided by labadorf in the 2026-11-10 decision pass. This ADR asked two questions, and they
+resolve differently. It is amended in place rather than renumbered, so existing citations of
+ADR-0015 stay valid.
+
+### Cross-links — Accepted (as built)
+
+Cross-links are derived from the schema and config, never hand-coded (ADR-0002). Checked
+against `web/src/features/collections/EntityDetail.tsx`:
+
+- **Single-valued reference** → navigates to the target collection's detail view via
+  `openIn(targetCollection, refId)`. It is a logical target (collection + id) that the
+  URL-state router turns into a route, which keeps it architecture-neutral as the Notes asked.
+- **Multivalued reference** → shows a count and a `View in <target>` link via
+  `pivotTo(targetCollection, backRefField, entityId)`. The link appears only when the target
+  is filterable by its back-reference (an equality facet). Otherwise only the count shows,
+  which is how the link degrades gracefully.
+- **External identifier** → links out via `xrefUrl(field, value)`, a per-deployment
+  field → URL-template table (`{value}` placeholder), as proposed.
+
+**Known defect:** the external tier is wired in code but not in config. `XREF_TEMPLATES` in
+`web/src/config/xrefs.ts` is a hard-coded `{}` that nothing populates, so external links never
+render. Tracked as a bug: [aperture#96](https://github.com/datahelix-platform/aperture/issues/96).
+The decision stands; only its configuration is missing.
+
+### Composition — ⛔ Deferred from MVP (with ADR-0010)
+
+The composition model (nesting primitives in layout containers, a `view-ref` /
+transclusion primitive) depends on the view-description vocabulary. That is ADR-0010, now
+**Deferred from MVP** and expected to be superseded by the platform View Contract ADR.
+Composition is deferred with it. **Shell-level layout is already settled** by ADR-0031 (a
+library of fixed layouts selected by config, with a typed named-slot contract), so the MVP
+has no open composition question. The candidate framing above is kept as the starting point
+for when ADR-0010's successor lands.

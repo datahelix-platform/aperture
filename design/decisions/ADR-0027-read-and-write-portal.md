@@ -45,3 +45,13 @@ mutation is transactional and provenance-tagged by Hippo.
   deferred agent runtime. Tier 0 + one Tier 1 proves the framework without it.
 - **Client-side validation as authority.** Rejected — server is the only safe authority; client
   checks are UX sugar (Hippo sec9).
+
+## Amendment (2026-11-10 — Tier 1 shipped without the component substrate)
+
+Recorded by labadorf in the 2026-11-10 decision pass. The first Consequences bullet ("Re-activates
+the component substrate … ADR-0010/0011 … The Tier-1 workflow is the first real consumer") did
+not hold. The Tier-1 workflow shipped as **steps-as-data interpreted by a pure reducer engine**
+(ADR-0033), not as a sandboxed Type-B component, and `implementation-plan.md` defers the
+component sandbox. **ADR-0010 and ADR-0011 are Deferred from MVP** (ADR-0026 amendment). The
+write-boundary decision itself (Tier 0 forms + one Tier 1 workflow, server-side validation
+authority) is unchanged.

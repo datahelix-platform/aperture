@@ -1,8 +1,8 @@
 # ADR-0011: Component execution runtime and language
 
-- **Status:** Proposed
-- **Date:** 2026-06-13
-- **Deciders:** —
+- **Status:** Proposed  — ⛔ **Deferred from MVP** (ADR-0026; decided 2026-11-10)
+- **Date:** 2026-06-13 (deferred 2026-11-10, decision pass)
+- **Deciders:** labadorf (deferral)
 - **Related:** handoff §9.1 (open question Q1) + the technology question (JS/TS vs Pyodide/WASM); depends on ADR-0010; constrained by ADR-0006, ADR-0008, ADR-0009
 
 ## Context
@@ -73,3 +73,13 @@ Python-centric user base who would rather write analysis in Python.
 
 Net: WASM rides *inside* the Web Worker boundary (roles 1 and 3); it does not replace it
 (role 2).
+
+## Deferral note (2026-11-10)
+
+Deferred from MVP by labadorf in the 2026-11-10 decision pass, using the same pattern as
+ADR-0013's deferral under ADR-0026. `implementation-plan.md` already lists the component
+sandbox (ADR-0011) as deferred, and the Tier-1 workflow shipped without it: ADR-0033 builds it
+as steps-as-data interpreted by a pure reducer engine, not a sandboxed Type-B component. The
+earlier claim in ADR-0026 and ADR-0027 that this substrate "stays in MVP because the Tier-1
+workflow needs it" is corrected by amendment notes on those ADRs. This ADR stays gated on
+ADR-0010's successor (the platform View Contract).
