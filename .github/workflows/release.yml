@@ -133,23 +133,6 @@ jobs:
           files: image-digest.json
 
   notify-datahelix:
-    needs: [release]
-    runs-on: ubuntu-latest
-    # A failed notification must never fail a release: the asset is already
-    # published, and DataHelix can be dispatched by hand from it. Needs the
-    # DATAHELIX_DISPATCH_TOKEN secret (Contents: read & write on
-    # datahelix-platform/datahelix only); without it the step fails harmlessly.
-    continue-on-error: true
-    steps:
-      - name: Dispatch the lock bump to DataHelix
-        env:
-          GH_TOKEN: ${{ secrets.DATAHELIX_DISPATCH_TOKEN }}
-          PAYLOAD: ${{ needs.release.outputs.payload }}
-        run: |
-          jq -c '{event_type: "component-release", client_payload: .}' <<<"$PAYLOAD" > dispatch.json
-          gh api repos/datahelix-platform/datahelix/dispatches --input dispatch.json
-
-  notify-datahelix:
     # Platform ADR-0001 implementation note (2026-10-27), aperture#90: hand the
     # published image-digest.json to DataHelix as a `component-release`
     # dispatch; its bump-lock workflow then opens the one-pin lock PR. Best
