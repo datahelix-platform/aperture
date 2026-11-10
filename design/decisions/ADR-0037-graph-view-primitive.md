@@ -1,8 +1,8 @@
 # ADR-0037: Graph exploration view (Cytoscape; neighbors-fed with a client fallback)
 
-- **Status:** Proposed
-- **Date:** 2026-08-19
-- **Deciders:** labadorf (pending), design session
+- **Status:** Accepted (as built — fallback tier only; server tier tracked in [aperture#95](https://github.com/datahelix-platform/aperture/issues/95))
+- **Date:** 2026-08-19 (ratified 2026-11-10, decision pass)
+- **Deciders:** labadorf, design session
 - **Related:** ADR-0035 (QuerySpec — a result set seeds the graph), ADR-0029
   (visible budgets/caps, honest degradation), ADR-0009/0010 (views are nouns — see the
   catalog note below), ADR-0002 (style/legend derived per class, no domain nouns);
@@ -67,3 +67,22 @@ describes. This ADR covers the built-in view and its data tiers.
   ADR-0010 ratifies (the §8 design of record).
 - Node-level `asOf` once the server tier lands (time-traveling exploration).
 - Code-split the cytoscape chunk.
+
+## Ratification note (2026-11-10)
+
+Ratified by labadorf in the 2026-11-10 decision pass, **as built**. Checked against the code:
+
+- `web/src/query/GraphView.tsx`: a Cytoscape view with a visible `NODE_BUDGET = 250` and a
+  "not shown" note when the budget is hit. Per-class colours come from the shared
+  `data/typeColor.ts` (ADR-0040), and the legend is derived from the type names.
+- Entry point: `query/QueryBuilderView.tsx` "Explore as graph". It is a second surface, never
+  the default.
+- **Only the fallback tier is built.** Expansion is the client-side one-hop fallback (detail
+  reads plus first-page reverse lookups), and the legend says so. Mosaic's `neighbors(id,
+  depth, asOf)` root has since shipped in **Mosaic v0.13.0**
+  (`src/mosaic/graphql/resolvers.py`, `_neighbors_resolver`). Consuming it as the server tier
+  is follow-up work: [aperture#95](https://github.com/datahelix-platform/aperture/issues/95).
+
+The catalog-promotion step in the Decision's catalog note is waiting on ADR-0010, which is
+now **Deferred from MVP** (see that ADR). Until it lands, the graph stays a built-in portal
+view.

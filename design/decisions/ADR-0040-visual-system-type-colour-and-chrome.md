@@ -1,7 +1,7 @@
 # ADR-0040: A visual system — colour carries type identity, chrome is distinct from content
 
-- **Status:** Proposed
-- **Date:** 2026-09-11
+- **Status:** Accepted (as built)
+- **Date:** 2026-09-11 (ratified 2026-11-10, decision pass)
 - **Deciders:** labadorf, design session
 - **Related:** ADR-0030 (frontend stack — pinned deps), ADR-0031 (app-shell layout library), ADR-0037 (graph exploration view), ADR-0002 (generic source, no domain nouns), ADR-0029 (capability-gated honest degradation)
 
@@ -95,3 +95,17 @@ Concretely:
 - Type colour is not yet applied to reference cells (`cell-ref`) or to the entity-detail header,
   where it would also carry meaning. Deliberate: those surfaces name a *target* type, and
   colouring them needs a rule for which type wins before it is worth doing.
+
+## Ratification note (2026-11-10)
+
+Ratified by labadorf in the 2026-11-10 decision pass, **as built**. Checked against the code:
+`web/src/data/typeColor.ts` is the single palette and hash (`typeColor`, `typeColorStyle`
+setting `--type-color`), and `GraphView` imports it. `styles/tokens.css` carries the
+role-named `--chrome-*` tokens, the `--shadow-*` elevation scale and the `--ease-out` /
+`--dur-*` motion scale. `styles/global.css` holds the shared `rise` keyframe and the single
+global `prefers-reduced-motion` guard.
+
+The Notes condition ("ratify once seen against eight-plus collections") is waived by this
+ratification. Watch for palette collisions on larger deployments, and treat them as follow-up
+work rather than grounds to reopen the decision. The dark-theme follow-on and type colour on
+reference cells remain open, as the Notes describe.

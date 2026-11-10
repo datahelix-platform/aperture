@@ -1,8 +1,8 @@
 # ADR-0010: View-description vocabulary is a typed noun-catalog (keystone)
 
-- **Status:** Proposed
-- **Date:** 2026-06-13
-- **Deciders:** —
+- **Status:** Proposed  — ⛔ **Deferred from MVP** (ADR-0026; decided 2026-11-10) — to be **superseded by the platform View Contract ADR** once `datahelix:platform/design/view-contract.md` is ratified
+- **Date:** 2026-06-13 (deferred 2026-11-10, decision pass)
+- **Deciders:** labadorf (deferral)
 - **Related:** handoff §9.2 (open question Q2), open-questions Q2, ADR-0004, ADR-0009; gates ADR-0011, ADR-0012, ADR-0013
 
 ## Context
@@ -45,3 +45,17 @@ The escape hatch for a missing primitive is "compose primitives," not "raw rende
 - Constraint from Hippo today: GraphQL exposes equality filters + offset pagination only, and
   multivalued slots don't persist in the SQLite adapter — "richer query" stratification may
   be limited until Hippo's CEL-over-GraphQL and linktable support land (sec4 §4.7 limits).
+
+## Deferral note (2026-11-10)
+
+Deferred from MVP by labadorf in the 2026-11-10 decision pass, using the same pattern as
+ADR-0013's deferral under ADR-0026. The MVP shipped without a component view vocabulary. The
+table, detail, form, workflow (ADR-0033) and graph (ADR-0037) views are built-in portal views,
+not catalog primitives.
+
+**Forward pointer:** the typed view vocabulary now belongs to the platform **View Contract**
+(`datahelix:platform/design/view-contract.md`), a rendering standard shared across
+components. Once that document is ratified as a platform ADR, **this ADR is to be marked
+`Superseded by` that platform ADR**. It is not to be ratified here. The survival-curve probe
+moved to Reel with the agentic keystone (see `design/INDEX.md`). ADR-0015's composition half
+and ADR-0037's catalog promotion are deferred with this ADR.

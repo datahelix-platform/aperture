@@ -1,8 +1,8 @@
 # ADR-0036: Global search is a heterogeneous fan-out surface
 
-- **Status:** Proposed
-- **Date:** 2026-08-19
-- **Deciders:** labadorf (pending), design session
+- **Status:** Accepted (forward plan, amended: server tier leads; not yet built)
+- **Date:** 2026-08-19 (ratified 2026-11-10, decision pass)
+- **Deciders:** labadorf, design session
 - **Related:** ADR-0002 (derive-everything), ADR-0029 (capability-honest degradation),
   ADR-0035 (QuerySpec — search results seed its table and the ADR-0037 graph view);
   `design/cross-class-query.md` §6(c)/§7 M4; **Mosaic OpenSpec `heterogeneous-roots`**
@@ -35,3 +35,16 @@ ship first. Not started — this ADR reserves the design so the QuerySpec/graph 
 - A search page per collection only (status quo): keeps the useless default.
 - Waiting for server `searchAll` before any global surface: the fan-out tier is cheap and
   honest; rejected per the capability-degradation posture.
+
+## Ratification note (2026-11-10)
+
+Ratified by labadorf in the 2026-11-10 decision pass, **as a forward plan, amended**:
+
+- **The server tier now leads.** Mosaic's `searchAll` root shipped in **Mosaic v0.13.0**
+  (`src/mosaic/graphql/resolvers.py`, `_search_all_resolver`, exposed as `searchAll`). Build
+  against it first, gated on introspection. The capped per-class client fan-out (+ `findByXref`)
+  is now only the **fallback**, for endpoints older than v0.13.0. It is no longer the tier that
+  "can ship first", so the sequencing in Consequences is superseded by this note.
+- **Still not built in Aperture.** Verified 2026-11-10: there is no global-search surface in
+  `web/src`. `searchAll` appears only in recorded test introspection fixtures. Accepting the ADR
+  makes the design binding. It does not claim the feature exists.

@@ -50,3 +50,14 @@ contract + Worker sandbox (ADR-0010/0011), dry-run validation (ADR-0006/0009).
   pointed to, the same pattern as ADR-0016/0021 deferring whole capabilities.
 - **Build agentic/schema-editing in MVP.** Rejected — not required for the core data-portal
   value and pulls in heavier dependencies (Bridge, Hippo overlay mode, agent runtime).
+
+## Amendment (2026-11-10 — component substrate is deferred, not in MVP)
+
+Recorded by labadorf in the 2026-11-10 decision pass. The Consequences bullet saying "the
+runtime/contract substrate (ADR-0010/0011) stays in MVP because the Tier-1 workflow (ADR-0027)
+needs it" is **incorrect**. `implementation-plan.md` defers the component sandbox (ADR-0011),
+and the Tier-1 workflow shipped without it, as a steps-as-data config run by a pure reducer
+engine (ADR-0033). **ADR-0010 and ADR-0011 are now Deferred from MVP** under this ADR, the same
+way as ADR-0013 was. The Decision's list of preserved substrate invariants still holds: the
+deferral keeps that contract as a future, so it is added later rather than rebuilt. ADR-0013
+is since superseded (Mosaic ADR-0009/0010, Aperture ADR-0039).
