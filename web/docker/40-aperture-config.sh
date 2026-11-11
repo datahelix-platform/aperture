@@ -15,7 +15,7 @@ OUT=/usr/share/nginx/html/config.js
   # dropped at container start (ADR-0034). For the VITE_AUTH_* names that
   # matters twice over — the app would come up looking unauthenticated
   # rather than failing loudly (ADR-0038).
-  for key in VITE_HIPPO_GRAPHQL_URL VITE_HIPPO_CONTROL_PLANE_URL VITE_WORKFLOWS VITE_NAV \
+  for key in VITE_HIPPO_GRAPHQL_URL VITE_HIPPO_CONTROL_PLANE_URL VITE_WORKFLOWS VITE_NAV VITE_XREFS \
              VITE_AUTH_MODE VITE_AUTH_IDENTITY_URL VITE_AUTH_LOGIN_URL VITE_AUTH_LOGOUT_URL \
              VITE_AUTH_IDENTITY_CLAIM VITE_AUTH_DISPLAY_CLAIM; do
     value=$(printenv "$key" 2>/dev/null || true)
