@@ -626,6 +626,16 @@
   margin: 18px 0 8px;
 }
 
+.detail-config-error {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--error-bg);
+  color: var(--error);
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
 .detail-card {
   background: var(--bg-surface);
   border: 1px solid var(--border);

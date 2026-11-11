@@ -25,6 +25,9 @@ import { NavConfigProvider } from './nav/NavConfigContext';
 import type { ResolvedWorkflows } from './workflows/config';
 import { resolveWorkflows } from './workflows/config';
 import { WorkflowsProvider } from './workflows/WorkflowsContext';
+import type { ResolvedXrefs } from './config/xrefs';
+import { resolveXrefConfig } from './config/xrefs';
+import { XrefsProvider } from './config/XrefsContext';
 
 /**
  * The Phase-0 walking skeleton, end to end: endpoint config → Layer-D
@@ -38,6 +41,7 @@ interface AppProps {
   clientFactory?: (url: string) => ScopedDataClient;
   workflows?: ResolvedWorkflows;
   nav?: ResolvedNavConfig;
+  xrefs?: ResolvedXrefs;
   controlUrl?: string | null;
   /**
    * Explicit override for the viewer that owns control-plane documents
@@ -57,6 +61,7 @@ export function App({
   clientFactory,
   workflows = resolveWorkflows(),
   nav = resolveNavConfig(),
+  xrefs = resolveXrefConfig(),
   controlUrl,
   viewer,
   authConfig = resolveAuthConfig(),
@@ -71,6 +76,7 @@ export function App({
           viewer={viewer}
           workflows={workflows}
           nav={nav}
+          xrefs={xrefs}
         />
       </DataSourceProvider>
     </SessionProvider>
@@ -88,9 +94,11 @@ function AppBody({
   viewer,
   workflows,
   nav,
+  xrefs,
 }: Pick<AppProps, 'clientFactory' | 'controlUrl' | 'viewer'> & {
   workflows: ResolvedWorkflows;
   nav: ResolvedNavConfig;
+  xrefs: ResolvedXrefs;
 }) {
   const session = useSession();
   // Browsing a collection and composing a cross-class query are different
@@ -108,6 +116,7 @@ function AppBody({
       <SavedViewsProvider>
         <WorkflowsProvider value={workflows}>
           <NavConfigProvider value={nav}>
+          <XrefsProvider value={xrefs}>
             {/* App-level, not layout chrome — so it needs no new slot (ADR-0031). */}
             <SessionExpiry />
             {/* Above the shell because the composer (aside) and the builder
@@ -130,6 +139,7 @@ function AppBody({
               }}
             />
             </ConversationProvider>
+          </XrefsProvider>
           </NavConfigProvider>
         </WorkflowsProvider>
       </SavedViewsProvider>

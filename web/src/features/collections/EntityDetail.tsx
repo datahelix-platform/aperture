@@ -4,6 +4,8 @@ import { useCapabilities } from '../../data/DataSourceContext';
 import type { HippoSource, HistoryEntry } from '../../data/hippoSource';
 import type { CollectionModel, ColumnModel } from '../../data/schemaModel';
 import { xrefUrl } from '../../config/xrefs';
+import type { XrefTemplates } from '../../config/xrefs';
+import { useXrefs } from '../../config/XrefsContext';
 import { renderCell } from './cells';
 import { useCollectionUrlState } from './urlState';
 import './collections.css';
@@ -33,6 +35,7 @@ export function EntityDetail({
 }) {
   const { closeEntity, openEditForm } = useCollectionUrlState();
   const [state, setState] = useState<DetailState>({ status: 'loading' });
+  const xrefs = useXrefs();
 
   const load = useCallback(
     (cancelledRef?: { current: boolean }, fresh?: boolean) => {
@@ -121,12 +124,22 @@ export function EntityDetail({
       {state.status === 'ready' && (
         <div className="detail-body">
           <div className="detail-section-label">Fields</div>
+          {/* Cross-link config problems are surfaced, not swallowed (ADR-0029). */}
+          {xrefs.error && (
+            <div className="detail-config-error" role="alert">
+              {xrefs.error}
+            </div>
+          )}
           <div className="detail-card">
             {fieldColumns.map((column) => (
               <div key={column.field} className="detail-field-row">
                 <span className="detail-field-label">{column.label}</span>
                 <span className="detail-field-value">
-                  <FieldValue column={column} value={state.entity[column.field]} />
+                  <FieldValue
+                    column={column}
+                    value={state.entity[column.field]}
+                    templates={xrefs.templates}
+                  />
                 </span>
               </div>
             ))}
@@ -305,8 +318,16 @@ function LifecycleActions({
   );
 }
 
-function FieldValue({ column, value }: { column: ColumnModel; value: unknown }) {
-  const external = xrefUrl(column.field, value);
+function FieldValue({
+  column,
+  value,
+  templates,
+}: {
+  column: ColumnModel;
+  value: unknown;
+  templates: XrefTemplates;
+}) {
+  const external = xrefUrl(column.field, value, templates);
   if (external) {
     return (
       <a className="detail-xref" href={external} target="_blank" rel="noreferrer">

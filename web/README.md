@@ -57,7 +57,7 @@ match `web/package.json`'s version).
 The published image is **deployment-agnostic**: endpoint config is injected at container
 start, not baked at build. The entrypoint (`docker/40-aperture-config.sh`) writes recognized
 env vars (`VITE_HIPPO_GRAPHQL_URL`, `VITE_HIPPO_CONTROL_PLANE_URL`, `VITE_WORKFLOWS`,
-`VITE_NAV`, and the `VITE_AUTH_*` set below) into `config.js`, which `index.html` loads before
+`VITE_NAV`, `VITE_XREFS`, and the `VITE_AUTH_*` set below) into `config.js`, which `index.html` loads before
 the bundle
 (`src/config/runtime.ts`); runtime values override build-time ones.
 
@@ -113,6 +113,15 @@ the only change from pure derive-all is that Aperture's own control-plane docume
 is hidden from browse; listing it in `order` opts it back in. Hidden collections stay
 deep-linkable (hidden ≠ inaccessible), and config referencing unknown collection ids is
 surfaced in the nav, never swallowed (ADR-0029).
+
+## External cross-link config (ADR-0015)
+
+The detail view renders a field as an external link when a **cross-link template** names it:
+a control-plane `config/xrefs` document (versioned envelope, like `config/nav`), falling back
+to the `VITE_XREFS` env var. The config is data — `{ "<field>": "https://…/{value}" }`
+(`src/config/xrefs.ts`); each template must be an absolute http(s) URL containing the
+`{value}` placeholder, which is replaced with the URL-encoded field value. An invalid
+document falls back to the env config and the error is shown on the detail view (ADR-0029).
 
 ## Layout (current)
 
