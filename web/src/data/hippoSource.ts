@@ -3,6 +3,8 @@ import type { BatchModel, BatchOperation, BatchResult } from './batch';
 import { buildIngestBatch, deriveBatchModel, normalizeBatchResult } from './batch';
 import type { ConversationModel, ConverseRequest, ConverseResponse } from './conversation';
 import { buildConverseMutation, deriveConversationModel, normalizeConverseResult } from './conversation';
+import type { Neighborhood, NeighborsModel } from './neighbors';
+import { buildNeighborsQuery, deriveNeighborsModel, normalizeNeighborhood } from './neighbors';
 import type {
   IntrospectionData,
   IntrospectionSchema,
@@ -184,6 +186,10 @@ export interface HippoSource {
    * request, not merely stop rendering it (ADR-0039 / design Decision 10).
    */
   converse(request: ConverseRequest, signal?: AbortSignal): Promise<ConverseResponse>;
+  /** The introspected `neighbors` traversal root, when usable (ADR-0037 server tier). */
+  neighbors?: NeighborsModel;
+  /** The one-hop neighborhood of an entity, in one request (ADR-0037 server tier). */
+  getNeighbors(id: string): Promise<Neighborhood>;
 }
 
 function selectionFor(column: ColumnModel): string {
@@ -542,6 +548,7 @@ export async function connectHippoSource(client: ScopedDataClient): Promise<Hipp
   const history = deriveHistory(schema);
   const batch = deriveBatchModel(schema);
   const conversation = deriveConversationModel(schema);
+  const neighbors = deriveNeighborsModel(schema);
 
   const collectionFor = (collectionId: string): CollectionModel => {
     const collection = collections.find((c) => c.id === collectionId);
@@ -555,6 +562,21 @@ export async function connectHippoSource(client: ScopedDataClient): Promise<Hipp
     history,
     batch,
     conversation,
+    neighbors,
+
+    async getNeighbors(id) {
+      if (!neighbors) {
+        throw new Error('The endpoint does not advertise a `neighbors` traversal');
+      }
+      const built = buildNeighborsQuery(neighbors, id);
+      const result = await client.query<Record<string, unknown>>(built.document, built.variables);
+      if (result.error || result.data == null) {
+        throw new Error(
+          `Could not load the neighborhood: ${result.error?.message ?? 'empty response'}`,
+        );
+      }
+      return normalizeNeighborhood(neighbors, result.data[neighbors.field]);
+    },
 
     async converse(request, signal) {
       if (!conversation) {

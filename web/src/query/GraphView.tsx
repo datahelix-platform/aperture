@@ -3,27 +3,27 @@ import cytoscape from 'cytoscape';
 import type { Core, NodeSingular } from 'cytoscape';
 import type { HippoSource } from '../data/hippoSource';
 import type { CollectionModel, ColumnModel } from '../data/schemaModel';
-import { slotName } from '../data/schemaModel';
 import { useCollectionUrlState } from '../features/collections/urlState';
 import { runQuerySpec } from './planner';
 import { resolveAnchor, canonicalizeQuerySpec } from './querySpec';
 import { readGraphTheme, useGraphTheme, type GraphTheme } from './graphTheme';
 import { typeColor } from '../data/typeColor';
+import { expandNode, graphTier, tierLegend } from './graphExpansion';
 import './query.css';
 
 /**
  * The graph exploration view (ADR-0037, Proposed): a Cytoscape canvas seeded
  * from the current QuerySpec's results (or the active collection's first
- * page), expanded one hop per click. Until the server advertises a
- * `neighbors` root (Mosaic OpenSpec heterogeneous-roots), expansion is the
- * documented client-side fallback — per-entity detail reads for forward
- * reference edges plus filtered reverse lookups — exact but slower, and the
- * legend says so (ADR-0029). Node budget is visible, never silent.
+ * page), expanded one hop per click. When the endpoint advertises a
+ * `neighbors` root (Mosaic v0.13.0+), each expansion is one server call;
+ * otherwise it is the documented client-side fallback — per-entity detail
+ * reads for forward reference edges plus filtered reverse lookups — exact but
+ * slower. The legend names the tier in use (ADR-0029); the node budget is
+ * visible, never silent, in both (see `graphExpansion.ts`).
  */
 
 export const NODE_BUDGET = 250;
 const SEED_LIMIT = 50;
-const EXPAND_LIMIT = 25;
 
 /**
  * The Cytoscape stylesheet for a given resolved palette. Kept out of the mount
@@ -143,64 +143,34 @@ export function GraphView({ source }: { source: HippoSource }) {
     cy.add({ group: 'edges', data: { id: edgeId, source: from, target: to, label } });
   }, []);
 
-  /** One-hop expansion: forward reference edges + reverse lookups (fallback tier). */
-  const expandNode = useCallback(
+  const tier = graphTier(capabilities, source);
+
+  /** One-hop expansion through whichever data tier the endpoint supports. */
+  const expand = useCallback(
     async (node: GraphNodeData) => {
       const cy = cyRef.current;
-      const collection = byId.get(node.collectionId);
-      if (!cy || !collection) return;
+      if (!cy) return;
       setBusy(true);
       try {
-        // Forward: the entity's own reference fields, from a detail read.
-        if (collection.detail) {
-          const entity = await source.getEntity(collection.id, node.entityId);
-          if (entity) {
-            for (const column of collection.detailColumns) {
-              if (column.kind !== 'ref' && column.kind !== 'refList') continue;
-              const target = column.targetType && byType.get(column.targetType);
-              if (!target || !column.targetIdField) continue;
-              const raw = entity[column.field];
-              const values = Array.isArray(raw) ? raw : raw == null ? [] : [raw];
-              for (const v of values) {
-                const targetId = (v as Record<string, unknown>)?.[column.targetIdField];
-                if (targetId == null) continue;
-                const added = addEntity(cy, target, String(targetId));
-                if (added) addEdge(cy, node.id, added, column.label);
-              }
-            }
-          }
-        }
-        // Reverse: collections whose reference column points at this type
-        // (full field set — the table budget truncates reference columns).
-        for (const other of collections) {
-          for (const column of other.detailColumns) {
-            if (column.kind !== 'ref' || column.targetType !== node.typeName) continue;
-            const result = await source.listEntities(other.id, {
-              page: 1,
-              pageSize: EXPAND_LIMIT,
-              conditions: [{ field: slotName(column.field), value: node.entityId }],
-            });
-            if (result.mayHaveMore) {
-              setNote(
-                `${other.label} referencing this ${node.typeName} exceed ${EXPAND_LIMIT} — ` +
-                  `showing the first page only.`,
-              );
-            }
-            for (const row of result.rows) {
-              const id = row[other.idColumn ?? ''];
-              if (id == null) continue;
-              const added = addEntity(cy, other, String(id), row);
-              if (added) addEdge(cy, added, node.id, column.label);
-            }
-          }
-        }
+        await expandNode(
+          tier,
+          { source, collections, byType, byId },
+          node,
+          {
+            addEntity: (collection, entityId, row) => addEntity(cy, collection, entityId, row),
+            addEdge: (from, to, label) => addEdge(cy, from, to, label),
+            note: setNote,
+          },
+        );
         cy.getElementById(node.id).data('expanded', true);
         cy.layout({ name: 'cose', animate: false }).run();
+      } catch (error) {
+        setNote(`Could not expand this node: ${(error as Error).message}`);
       } finally {
         setBusy(false);
       }
     },
-    [addEdge, addEntity, byId, byType, collections, source],
+    [addEdge, addEntity, byId, byType, collections, source, tier],
   );
 
   // Mount cytoscape once.
@@ -299,9 +269,7 @@ export function GraphView({ source }: { source: HippoSource }) {
         </div>
       </div>
       <p className="query-graph-honesty" role="note">
-        Client-side one-hop expansion ({nodeCount}/{NODE_BUDGET} nodes
-        {busy ? ', loading…' : ''}) — the endpoint does not advertise a server-side
-        `neighbors` traversal yet, so edges appear as you expand nodes, first pages only.
+        {tierLegend(tier, nodeCount, NODE_BUDGET, busy)}
       </p>
       {note && (
         <div className="query-notes" role="status">
@@ -336,7 +304,7 @@ export function GraphView({ source }: { source: HippoSource }) {
                   type="button"
                   className="action-button"
                   disabled={busy}
-                  onClick={() => void expandNode(selected)}
+                  onClick={() => void expand(selected)}
                 >
                   Expand neighbors
                 </button>
