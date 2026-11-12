@@ -1,6 +1,6 @@
 # ADR-0037: Graph exploration view (Cytoscape; neighbors-fed with a client fallback)
 
-- **Status:** Accepted (as built — fallback tier only; server tier tracked in [aperture#95](https://github.com/datahelix-platform/aperture/issues/95))
+- **Status:** Accepted (as built — both tiers; server `neighbors` tier added by [aperture#95](https://github.com/datahelix-platform/aperture/issues/95), 2026-11-12)
 - **Date:** 2026-08-19 (ratified 2026-11-10, decision pass)
 - **Deciders:** labadorf, design session
 - **Related:** ADR-0035 (QuerySpec — a result set seeds the graph), ADR-0029
@@ -77,11 +77,14 @@ Ratified by labadorf in the 2026-11-10 decision pass, **as built**. Checked agai
   `data/typeColor.ts` (ADR-0040), and the legend is derived from the type names.
 - Entry point: `query/QueryBuilderView.tsx` "Explore as graph". It is a second surface, never
   the default.
-- **Only the fallback tier is built.** Expansion is the client-side one-hop fallback (detail
-  reads plus first-page reverse lookups), and the legend says so. Mosaic's `neighbors(id,
-  depth, asOf)` root has since shipped in **Mosaic v0.13.0**
-  (`src/mosaic/graphql/resolvers.py`, `_neighbors_resolver`). Consuming it as the server tier
-  is follow-up work: [aperture#95](https://github.com/datahelix-platform/aperture/issues/95).
+- **Both tiers are built.** When introspection advertises a usable `neighbors(id, depth)`
+  root (Mosaic v0.13.0+, `_neighbors_resolver`), each expansion is one `neighbors` call with
+  `depth: 1` (`data/neighbors.ts`, capability `neighborsTraversal`); otherwise it is the
+  client-side one-hop fallback (detail reads plus first-page reverse lookups). Tier selection
+  and both expansions live in `query/graphExpansion.ts`; the legend names the tier in use, and
+  the node budget, server `notices` and unresolved-type disclosures surface in both
+  ([aperture#95](https://github.com/datahelix-platform/aperture/issues/95)). Node-level `asOf`
+  is still not consumed (a later step).
 
 The catalog-promotion step in the Decision's catalog note is waiting on ADR-0010, which is
 now **Deferred from MVP** (see that ADR). Until it lands, the graph stays a built-in portal

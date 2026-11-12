@@ -51,6 +51,12 @@ export interface Capabilities {
    * what comes back, so absence simply means no chat affordance at all.
    */
   conversationalQuery: boolean;
+  /**
+   * A usable server-side `neighbors(id, depth)` traversal root is advertised
+   * (ADR-0037 server tier; Mosaic v0.13.0+). Absent → the graph view expands
+   * through the client-side one-hop fallback.
+   */
+  neighborsTraversal: boolean;
 }
 
 export const NO_CAPABILITIES: Capabilities = {
@@ -67,4 +73,5 @@ export const NO_CAPABILITIES: Capabilities = {
   filterOps: [],
   whereFilter: false,
   conversationalQuery: false,
+  neighborsTraversal: false,
 };

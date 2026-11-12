@@ -543,6 +543,7 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
       whereFilter: false,
       // No converse mutation on this surface — the chat panel stays off.
       conversationalQuery: false,
+      neighborsTraversal: false,
     });
   });
 
@@ -820,6 +821,7 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
       filterOps: [],
       whereFilter: false,
       conversationalQuery: false,
+      neighborsTraversal: false,
     });
   });
 });

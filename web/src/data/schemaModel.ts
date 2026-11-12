@@ -10,6 +10,7 @@ import { findType, isListType, namedType, typeRefToSDL } from './introspection';
 import type { Capabilities } from './capabilities';
 import { deriveBatchModel } from './batch';
 import { deriveConversationModel } from './conversation';
+import { deriveNeighborsModel } from './neighbors';
 
 /**
  * The schema-derived binding model (the novel bet, `prior-art.md`): browsable
@@ -1368,5 +1369,7 @@ export function deriveCapabilities(
     // Same standard as batchWrite: the mutation must introspect to a shape the
     // panel can actually drive, not merely carry the right name (ADR-0039).
     conversationalQuery: deriveConversationModel(schema) != null,
+    // The graph view's server tier (ADR-0037): shape-checked, not name-matched.
+    neighborsTraversal: deriveNeighborsModel(schema) != null,
   };
 }

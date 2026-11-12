@@ -353,6 +353,23 @@
           "type": "ID"
         }
       ]
+    },
+    {
+      "id": "graph-neighbors-root",
+      "description": "ADR-0037 graph view server tier: deriveNeighborsModel() (data/neighbors.ts) binds to this root and the graph view falls back to client-side one-hop expansion without it. Shipped in Mosaic v0.13.0 (issue #158). GATED - endpoints predating it are a valid deployment; the shape is pinned for when it is present. asOf is not yet consumed.",
+      "kind": "queryField",
+      "gated": true,
+      "field": "neighbors",
+      "args": [
+        {
+          "name": "id",
+          "type": "ID!"
+        },
+        {
+          "name": "depth",
+          "type": "Int!"
+        }
+      ]
     }
   ]
 }
