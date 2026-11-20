@@ -69,7 +69,7 @@ describe('FieldsPanel', () => {
   });
 
   it('degrades without slot enrichment', async () => {
-    // An endpoint advertising no `hippoSchema` has no per-field descriptions. The panel
+    // An endpoint advertising no `mosaicSchema` has no per-field descriptions. The panel
     // must still list every field from the generic type surface (ADR-0029).
     renderApp(<App endpoint={endpoint} clientFactory={client} />, '?view=query');
     await screen.findByTestId('fields-panel');

@@ -11,7 +11,7 @@ import { createHippoStore, createLocalStore, findDocumentCollection } from './st
 /**
  * Resolves the control-plane store once per session (N5.4): the control
  * endpoint defaults to the data-plane endpoint (co-located for MVP;
- * `VITE_HIPPO_CONTROL_PLANE_URL` points elsewhere when split). If the
+ * `VITE_CONTROL_PLANE_URL` points elsewhere when split). If the
  * endpoint's schema advertises an Aperture document type, documents live
  * there; otherwise persistence falls back to this browser's localStorage —
  * and the UI says so (ADR-0029).
@@ -35,7 +35,7 @@ const ControlPlaneContext = createContext<ControlPlaneState>({
 export function resolveControlPlaneUrl(
   env: Record<string, unknown> = runtimeEnv(),
 ): string | null {
-  const raw = env['VITE_HIPPO_CONTROL_PLANE_URL'];
+  const raw = env['VITE_CONTROL_PLANE_URL'];
   return typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : null;
 }
 

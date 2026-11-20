@@ -117,7 +117,7 @@ onto our LinkML-schema (data shape) + view-description (layout) separation. Cond
   coupled to one fixed schema**, **not** a runtime component adapting to any introspected
   endpoint. **Verdict: BUILD.** Aperture's "generic over any LinkML+GraphQL endpoint **at
   runtime**" requirement (Layer D, ADR-0002/0017) is not served by codegen-time tooling — consume
-  `__schema` (or Hippo's `hippoSchema`) **live at runtime**. Reconfirms the `prior-art.md`
+  `__schema` (or Mosaic's `mosaicSchema`) **live at runtime**. Reconfirms the `prior-art.md`
   finding: derived runtime binding is our novel bet.
 - *(Apollo vs urql vs Relay vs graphql-request comparison for the live-introspection client —
   not verified this round; open question.)*

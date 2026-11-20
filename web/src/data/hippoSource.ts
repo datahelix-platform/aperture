@@ -13,7 +13,7 @@ import type {
 } from './introspection';
 import {
   findType,
-  HIPPO_SCHEMA_QUERY,
+  MOSAIC_SCHEMA_QUERY,
   indexSlotEnrichment,
   INTROSPECTION_QUERY,
 } from './introspection';
@@ -499,7 +499,7 @@ export function buildSupersedeMutation(
 }
 
 /**
- * Read `hippoSchema` when the endpoint advertises it.
+ * Read `mosaicSchema` when the endpoint advertises it.
  *
  * Gated on the same presence check `deriveCapabilities` uses for
  * `schemaIntrospection`, so an endpoint that does not expose the field is never asked for
@@ -511,9 +511,9 @@ async function fetchSlotEnrichment(
   schema: IntrospectionSchema,
 ): Promise<SlotEnrichment | undefined> {
   const queryType = findType(schema, schema.queryType.name);
-  if (!(queryType?.fields ?? []).some((f) => f.name === 'hippoSchema')) return undefined;
+  if (!(queryType?.fields ?? []).some((f) => f.name === 'mosaicSchema')) return undefined;
   try {
-    const result = await client.query<SlotEnrichmentData>(HIPPO_SCHEMA_QUERY);
+    const result = await client.query<SlotEnrichmentData>(MOSAIC_SCHEMA_QUERY);
     if (result.error) return undefined;
     return indexSlotEnrichment(result.data);
   } catch {
@@ -538,7 +538,7 @@ export async function connectHippoSource(client: ScopedDataClient): Promise<Hipp
   // slot — the thing that lets a user's own vocabulary find a field whose name shares none
   // of their words — is only reachable here.
   //
-  // Issued once, at connect. A failure is NOT fatal: an endpoint without `hippoSchema` has
+  // Issued once, at connect. A failure is NOT fatal: an endpoint without `mosaicSchema` has
   // to keep working exactly as it did, so this degrades to `undefined` and every consumer
   // treats the enrichment as optional (ADR-0029).
   const enrichment = await fetchSlotEnrichment(client, schema);

@@ -7082,7 +7082,7 @@
      }
     },
     {
-     "name": "hippoSchema",
+     "name": "mosaicSchema",
      "description": null,
      "args": [],
      "type": {
@@ -7104,7 +7104,7 @@
      }
     },
     {
-     "name": "hippoEntityType",
+     "name": "mosaicEntityType",
      "description": null,
      "args": [
       {
@@ -8233,7 +8233,7 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "FilterInput",
-   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `hippoSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected \u2014 absence is asked with IS_NULL, never with EQ null.",
+   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `mosaicSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected \u2014 absence is asked with IS_NULL, never with EQ null.",
    "fields": null,
    "inputFields": [
     {
@@ -16283,7 +16283,7 @@
   {
    "kind": "OBJECT",
    "name": "XrefMatch",
-   "description": "Entity resolved from an external reference (system, value) pair via the hippo_external_xref reverse-lookup index (issue #48). Generic envelope shape \u2014 the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "Entity resolved from an external reference (system, value) pair via the mosaic_external_xref reverse-lookup index (issue #48). Generic envelope shape \u2014 the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",

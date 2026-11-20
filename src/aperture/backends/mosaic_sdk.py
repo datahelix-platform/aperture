@@ -10,7 +10,7 @@ from typing import Any
 class MosaicSdkBackend:
     """Backend that uses the Mosaic SDK directly for local mode."""
 
-    def __init__(self, config_path: str = "./hippo.yaml") -> None:
+    def __init__(self, config_path: str = "./mosaic.yaml") -> None:
         # Lazy import to avoid mandatory dependency
         from mosaic import MosaicClient
         from mosaic.config.loader import load_mosaic_config

@@ -3,8 +3,8 @@
  *
  * Verified against a live Mosaic while building this: `__schema` returns a description on
  * each TYPE and `null` on every FIELD, so the prose a curator wrote about a slot is only
- * reachable through `hippoSchema`. These tests pin the join and, more importantly, pin
- * that an endpoint without `hippoSchema` is completely unaffected.
+ * reachable through `mosaicSchema`. These tests pin the join and, more importantly, pin
+ * that an endpoint without `mosaicSchema` is completely unaffected.
  */
 import { describe, it, expect } from 'vitest';
 import { indexSlotEnrichment } from './introspection';
@@ -15,7 +15,7 @@ import realIntrospection from './testing/realIntrospection.json';
 import type { IntrospectionSchema } from './introspection';
 
 const ENRICHMENT: SlotEnrichmentData = {
-  hippoSchema: [
+  mosaicSchema: [
     {
       name: 'Book',
       accessorName: 'books',
@@ -64,11 +64,11 @@ describe('deriveCollections with enrichment', () => {
 
   it('joins across the camelCase/snake_case boundary', () => {
     // The case that matters against a real endpoint: `ColumnModel.field` is the GraphQL
-    // field (`isAvailable`), hippoSchema speaks LinkML (`is_available`). Joining on field
+    // field (`isAvailable`), mosaicSchema speaks LinkML (`is_available`). Joining on field
     // name alone would silently miss every compound name — verified live, where every
     // Donor field arrives camelCased and every slot snake_cased.
     const enriched = indexSlotEnrichment({
-      hippoSchema: [
+      mosaicSchema: [
         {
           name: 'Book',
           accessorName: 'books',
@@ -99,7 +99,7 @@ describe('deriveCollections with enrichment', () => {
   });
 
   it('leaves every column untouched when there is no enrichment', () => {
-    // The whole point of ADR-0029 degradation: an endpoint without hippoSchema must take
+    // The whole point of ADR-0029 degradation: an endpoint without mosaicSchema must take
     // the same code path it always did.
     const plain = deriveCollections(capableSchema());
     const book = plain.find((c) => c.typeName === 'Book')!;

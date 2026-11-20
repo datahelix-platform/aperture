@@ -47,7 +47,7 @@ export interface ColumnModel {
    */
   orderField?: string;
 
-  // ── Slot enrichment (`hippoSchema`) ──────────────────────────────────────
+  // ── Slot enrichment (`mosaicSchema`) ──────────────────────────────────────
   // All optional, all absent on an endpoint that does not advertise it. Nothing
   // downstream may require them: the table, facets and detail view predate this
   // and must keep working unchanged.
@@ -171,7 +171,7 @@ export interface CollectionModel {
    * The schema author's description of the entity type.
    *
    * `__schema` has always returned this and derivation has always dropped it. Unlike the
-   * per-FIELD description (which `__schema` reports as null and only `hippoSchema`
+   * per-FIELD description (which `__schema` reports as null and only `mosaicSchema`
    * carries), this one needs no enrichment query.
    */
   description?: string;
@@ -985,11 +985,11 @@ function attachOrderFields(columns: ColumnModel[], enumType: IntrospectionType |
  *
  * A separate pass rather than a parameter threaded through `columnFor`: derivation is
  * driven by the GraphQL surface and should stay that way, and enrichment is optional data
- * that decorates the result. Keeping them apart means an endpoint without `hippoSchema`
+ * that decorates the result. Keeping them apart means an endpoint without `mosaicSchema`
  * takes literally the same code path it always did.
  *
  * **Joined on SLOT name, not field name.** `ColumnModel.field` is the GraphQL field
- * (`historyOfRhi`); `hippoSchema` speaks LinkML (`history_of_rhi`). `specProse` already
+ * (`historyOfRhi`); `mosaicSchema` speaks LinkML (`history_of_rhi`). `specProse` already
  * resolves this same mismatch the same way.
  */
 function enrichColumn(column: ColumnModel, slots: ReadonlyMap<string, SlotInfo>): ColumnModel {
@@ -1168,7 +1168,7 @@ export function deriveCollections(
   }
 
   // An endpoint that advertises page envelopes is envelope-shaped: its bare
-  // lists are auxiliary surfaces (search twins, hippoSchema, …), never
+  // lists are auxiliary surfaces (search twins, mosaicSchema, …), never
   // standalone collections.
   const envelopeMode = collections.length > 0;
 
@@ -1274,7 +1274,7 @@ export function deriveCollections(
   }
 
   // The entity description comes from `__schema` and needs no enrichment, so it is filled
-  // whether or not `hippoSchema` is advertised.
+  // whether or not `mosaicSchema` is advertised.
   const described = collections.map((c) => {
     const entityType = findType(schema, c.typeName);
     return entityType?.description ? { ...c, description: entityType.description } : c;
@@ -1322,7 +1322,7 @@ export function deriveCapabilities(
   collections: CollectionModel[],
 ): Capabilities {
   const queryType = findType(schema, schema.queryType.name);
-  const hasHippoSchema = (queryType?.fields ?? []).some((f) => f.name === 'hippoSchema');
+  const hasMosaicSchema = (queryType?.fields ?? []).some((f) => f.name === 'mosaicSchema');
 
   const some = (pick: (c: CollectionModel) => unknown) => collections.some((c) => Boolean(pick(c)));
 
@@ -1342,7 +1342,7 @@ export function deriveCapabilities(
         : [];
 
   return {
-    schemaIntrospection: hasHippoSchema ? 'hippo' : 'graphql',
+    schemaIntrospection: hasMosaicSchema ? 'mosaic' : 'graphql',
     offsetPagination: some((c) => c.args.limit && c.args.offset),
     equalityFacets: some((c) => c.args.filter),
     fullTextSearch:

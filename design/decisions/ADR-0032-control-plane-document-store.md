@@ -142,3 +142,5 @@ platform-spec judgment, not a free consequence of this ADR.
 - **Keep `(kind, name)` and prefix the name with the owner.** No schema change, but the owner
   is then unfilterable, unvalidatable, and forgeable by anyone who can type a name with a
   colon in it. Rejected as a false economy.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** The env var named here is renamed `VITE_HIPPO_CONTROL_PLANE_URL` → `VITE_CONTROL_PLANE_URL` (Q5; aperture#35). The recipe schema now imports `mosaic_core` and uses `mosaic_index`, and its manifest key is `mosaic_version` (Q9). The decision itself is unchanged.

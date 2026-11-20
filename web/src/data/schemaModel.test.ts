@@ -77,7 +77,7 @@ describe('deriveCollections', () => {
   });
 
   it('skips non-list, singular-detail, history, and introspection fields', () => {
-    const collections = deriveCollections(capableSchema({ hippoSchema: true }));
+    const collections = deriveCollections(capableSchema({ mosaicSchema: true }));
     expect(collections.map((c) => c.id)).toEqual(['books', 'authors']);
   });
 
@@ -112,7 +112,7 @@ describe('deriveCollections (live Hippo shapes — #15)', () => {
   const collections = deriveCollections(realIntrospection);
   const books = collections.find((c) => c.id === 'books')!;
 
-  it('derives exactly the page-envelope collections — no search twins, no hippoSchema', () => {
+  it('derives exactly the page-envelope collections — no search twins, no mosaicSchema', () => {
     expect(collections.map((c) => c.id)).toEqual([
       'apertureDocuments',
       'authors',
@@ -525,10 +525,10 @@ describe('deriveHistory (R3.7)', () => {
 
 describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
   it('detects the full Hippo-like surface', () => {
-    const schema = capableSchema({ hippoSchema: true });
+    const schema = capableSchema({ mosaicSchema: true });
     const caps = deriveCapabilities(schema, deriveCollections(schema));
     expect(caps).toEqual({
-      schemaIntrospection: 'hippo',
+      schemaIntrospection: 'mosaic',
       offsetPagination: true,
       equalityFacets: true,
       fullTextSearch: true,
@@ -547,7 +547,7 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
     });
   });
 
-  it('reports standard introspection when hippoSchema is not advertised', () => {
+  it('reports standard introspection when mosaicSchema is not advertised', () => {
     const schema = capableSchema();
     const caps = deriveCapabilities(schema, deriveCollections(schema));
     expect(caps.schemaIntrospection).toBe('graphql');
@@ -555,7 +555,7 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
 
   it('negotiates the live Hippo surface (envelope pages + search twins)', () => {
     const caps = deriveCapabilities(realIntrospection, deriveCollections(realIntrospection));
-    expect(caps.schemaIntrospection).toBe('hippo');
+    expect(caps.schemaIntrospection).toBe('mosaic');
     expect(caps.offsetPagination).toBe(true);
     expect(caps.equalityFacets).toBe(true);
     expect(caps.fullTextSearch).toBe(true);

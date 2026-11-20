@@ -20,7 +20,7 @@ import yaml
 DEFAULT_CONFIG: dict = {
     "mosaic": {
         "mode": "sdk",
-        "config": "./hippo.yaml",
+        "config": "./mosaic.yaml",
         "url": "http://localhost:8000",
     },
     "logging": {
@@ -139,4 +139,4 @@ class ApertureConfig:
 
     @property
     def mosaic_config(self) -> str:
-        return self.get("mosaic.config", "./hippo.yaml")
+        return self.get("mosaic.config", "./mosaic.yaml")

@@ -18,7 +18,7 @@ surface, not by re-running CI (typecheck/lint/test/build are `.github/workflows/
    `batchPut` mutation — that lights up the negotiated capabilities the UI gates on.
    Serve ~60 rows so pagination has 3 pages.
 
-2. **Dev server:** `cd web && VITE_HIPPO_GRAPHQL_URL=http://localhost:4000/ npm run dev -- --port 5173 --strictPort`
+2. **Dev server:** `cd web && VITE_GRAPHQL_URL=http://localhost:4000/ npm run dev -- --port 5173 --strictPort`
 
 3. **Browser:** `npm install playwright-core` in a scratch dir;
    `chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' })`
@@ -34,7 +34,7 @@ surface, not by re-running CI (typecheck/lint/test/build are `.github/workflows/
   "Back to first page".
 - Kill the stub → boot shows the connect-error panel; mid-session death shows the table error
   state; restart stub + Retry recovers.
-- No `VITE_HIPPO_GRAPHQL_URL` → "No data-plane endpoint configured" guidance panel.
+- No `VITE_GRAPHQL_URL` → "No data-plane endpoint configured" guidance panel.
 
 Phase-1 read loop (give the stub `filter`/`search` args, singular `book(id)`/`author(id)`
 fields, and `entityHistory(entityId)`; see `stub-hippo.mjs` in a session scratchpad or rebuild

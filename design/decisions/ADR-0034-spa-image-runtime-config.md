@@ -42,3 +42,5 @@ of names, two arrival times.
   certification).
 - **Server-side templating of `index.html`:** rejected — same effect as `config.js` but
   mutates the HTML shell, which is harder to reason about with hashed-asset caching.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** The env vars named here are renamed `VITE_HIPPO_GRAPHQL_URL` / `VITE_HIPPO_CONTROL_PLANE_URL` → `VITE_GRAPHQL_URL` / `VITE_CONTROL_PLANE_URL` (Q5; aperture#35). The old names are not read. The decision itself is unchanged.

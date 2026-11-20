@@ -18,7 +18,7 @@ def test_config_defaults():
     config = ApertureConfig()
     assert config.mosaic_mode == "sdk"
     assert config.mosaic_url == "http://localhost:8000"
-    assert config.mosaic_config == "./hippo.yaml"
+    assert config.mosaic_config == "./mosaic.yaml"
 
 
 def test_env_override(monkeypatch):

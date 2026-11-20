@@ -27,6 +27,11 @@ import certIntrospectionJson from './certIntrospection.json';
  * with required `q`, the generic `[FilterInput!]` + FilterMode filter pair —
  * and the real write shapes: `create<T>(data:)`/`update<T>(id, data:)` plus
  * the `ingestBatch`/`validateBatch` batch unit-of-work.
+ *
+ * This capture and the two below are hand-edited for platform ADR-0007 (Q3): the
+ * `hippoSchema` / `hippoEntityType` root fields are renamed to `mosaicSchema` /
+ * `mosaicEntityType` (Mosaic v0.16.0), and `hippo_*` identifiers in descriptions to
+ * `mosaic_*`. Everything else is as captured.
  */
 export const realIntrospection = realIntrospectionJson as unknown as IntrospectionSchema;
 
@@ -134,7 +139,7 @@ const listArgs = [
 /** A capable, Hippo-like endpoint: pagination, filters, FTS, detail, history, batch write. */
 export function capableSchema(
   options: {
-    hippoSchema?: boolean;
+    mosaicSchema?: boolean;
     authorDetail?: boolean;
     authorWrite?: boolean;
     /** Adds the Aperture control-plane document collection (Phase 4, N5.4). */
@@ -166,8 +171,8 @@ export function capableSchema(
       arg('entityId', nonNull(scalar('ID'))),
     ]),
   ];
-  if (options.hippoSchema) {
-    queryFields.push(field('hippoSchema', object('HippoSchema')));
+  if (options.mosaicSchema) {
+    queryFields.push(field('mosaicSchema', object('MosaicSchema')));
   }
   if (options.authorDetail) {
     queryFields.push(field('author', object('Author'), [arg('id', nonNull(scalar('ID')))]));
@@ -417,7 +422,7 @@ export function capableSchema(
       objectType('Book', bookFields),
       objectType('Author', authorFields),
       objectType('Review', [field('id', nonNull(scalar('ID'))), field('rating', scalar('Int'))]),
-      objectType('HippoSchema', [field('version', scalar('String'))]),
+      objectType('MosaicSchema', [field('version', scalar('String'))]),
       enumType('BookFormat', ['HARDCOVER', 'PAPERBACK', 'EBOOK']),
       ...typeExtras,
     ],

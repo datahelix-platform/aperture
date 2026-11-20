@@ -91,3 +91,5 @@ Composition is deferred with it. **Shell-level layout is already settled** by AD
 library of fixed layouts selected by config, with a typed named-slot contract), so the MVP
 has no open composition question. The candidate framing above is kept as the starting point
 for when ADR-0010's successor lands.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** Mosaic v0.16.0 renamed the annotation key named here: `hippo_external_xref` → `mosaic_external_xref`. The decision itself is unchanged.

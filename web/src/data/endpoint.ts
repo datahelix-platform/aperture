@@ -19,7 +19,7 @@ export interface EndpointConfig {
 export function resolveEndpoint(
   env: Record<string, unknown> = runtimeEnv(),
 ): EndpointConfig {
-  const raw = env['VITE_HIPPO_GRAPHQL_URL'];
+  const raw = env['VITE_GRAPHQL_URL'];
   const url = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : null;
   return { url };
 }

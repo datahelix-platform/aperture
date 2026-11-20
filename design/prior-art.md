@@ -52,7 +52,7 @@ not a foundation.
   auto-derives GraphQL binding from schema.** GraphQL providers *code* binding (`buildQuery`);
   DataHarmonizer derives UI from LinkML annotations but only offline. → **De-risk with a Hippo
   introspection → derived-binding prototype**, and **do not depend on live standard `__schema`
-  in production** (commonly gated); Hippo's *custom* `hippoSchema` query sidesteps this if it
+  in production** (commonly gated); Mosaic's *custom* `mosaicSchema` query sidesteps this if it
   can be auth-gated rather than disabled.
 - **Noun-catalog view vocabulary (ADR-0010):** Vega-Lite is the **design template** — a closed
   set of typed primitives + a smart-defaults compiler is exactly how to grow the catalog
@@ -88,7 +88,7 @@ not a foundation.
 
 ## Recommended follow-ups
 
-1. **De-risk the novel bet:** prototype Hippo `hippoSchema` introspection → **derived binding**
+1. **De-risk the novel bet:** prototype Mosaic `mosaicSchema` introspection → **derived binding**
    (the thing nobody has done) — directly feeds core-loop Step 2/3.
 2. **Prototype config validation** against **Gen3's `gitops.json` model** (config-as-data
    validated against the backend schema), translated to LinkML-validated config.

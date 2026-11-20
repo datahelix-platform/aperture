@@ -153,7 +153,7 @@ feature to what the active endpoint declares — the UI never fakes a capability
 
 | Req | Requirement | Tag |
 |---|---|---|
-| R3.1 | **Collection nav** — derive browsable collections from `hippoSchema`; admin config reorders/relabels/hides (derive-all + override). | (a) |
+| R3.1 | **Collection nav** — derive browsable collections from `mosaicSchema`; admin config reorders/relabels/hides (derive-all + override). | (a) |
 | R3.2 | **Collection table** — config-curated columns; cell renderers keyed by LinkML slot kind; loading/empty/error states. | (a) |
 | R3.3 | **Filtering** — equality facets (enum→checklist, bool, ref-id) with AND/OR; FTS box. | (a) |
 | R3.3r | **Range filters** (numeric/date facets). | (b) |
@@ -260,10 +260,10 @@ L12 (recipe + dry-run; X3a transport ask).
 
 | Req | Requirement | Tag |
 |---|---|---|
-| S4b.1 | **Schema browser** — render the active schema (entity types, slots, enums, relationships) from `hippoSchema` introspection; the editor's read side reuses the read-loop detail renderers. | (a) |
+| S4b.1 | **Schema browser** — render the active schema (entity types, slots, enums, relationships) from `mosaicSchema` introspection; the editor's read side reuses the read-loop detail renderers. | (a) |
 | S4b.2 | **Additive authoring (L11)** — structured UI to **add** a new entity type, add a slot to a new type, add an enum, or **subclass** an existing type (`is_a:`); slot kinds map to LinkML ranges (scalar/enum/ref/date/bool). Editing/removing existing elements is **disabled with an explanatory affordance** (gated on Hippo overlay mode, X3b). | (a)+(c) |
 | S4b.3 | **Raw-LinkML escape hatch** — power users can author/paste the LinkML fragment directly; the structured editor and raw view are two views of the same fragment (Formily-style inter-convertibility, per `library-survey.md`). | (c) |
-| S4b.4 | **Recipe packaging (L12)** — the editor emits a recipe (`recipe.yaml` manifest + `schema.yaml` fragment): id, version, `hippo_version` constraint, prefix. Aperture owns the UI→recipe translation. | (c) |
+| S4b.4 | **Recipe packaging (L12)** — the editor emits a recipe (`recipe.yaml` manifest + `schema.yaml` fragment): id, version, `mosaic_version` constraint, prefix. Aperture owns the UI→recipe translation. | (c) |
 | S4b.5 | **Dry-run preview (L12)** — run `recipe_import(dry_run=True)` and show the would-apply result (classes/slots added, prefix-collision / no-override / version-compat / LinkML-validity outcomes) **before** committing. The same stage→validate→apply shape as the write loop (L9). | (b: X3a) |
 | S4b.6 | **Apply** — on confirm, `recipe_import(dry_run=False)` applies atomically; surface the `recipe_imported` provenance event and the new `schema_version`. | (b: X3a) |
 | S4b.7 | **Schema-change history** — list installed recipes (`installed_recipes`) + their provenance as an audit trail; offer lockfile export for reproducibility. | (a)/(b) |
@@ -278,7 +278,7 @@ dry-run is the source of truth for what will happen, never a client-side guess.
 schema = in-memory `SchemaRegistry`; live changes only via `client.recipe_import(source,
 dry_run=)` → `SchemaManager.merge_fragment` → `set_registry` (no restart), schema-merge +
 `recipe_imported` provenance in **one transaction**. Dry-run validates (manifest, LinkML, prefix
-collision, digest, `hippo_version`, no-in-place-override) with **no writes**. `schema_version`
+collision, digest, `mosaic_version`, no-in-place-override) with **no writes**. `schema_version`
 rides on every provenance record; `installed_recipes` + lockfile give reproducibility. **No**
 `POST/PUT /schemas` and **no** `client.apply_schema()` — recipe import is the only seam, and it's
 SDK/CLI-only. **Bootstrap-only/additive** merging; overlay (modify existing + 3-way merge + data
@@ -294,7 +294,7 @@ constraint set; the few genuine MVP stances are flagged. Each constraint cites i
 
 | # | Constraint | MVP stance | Source |
 |---|---|---|---|
-| N5.1 | **Capability negotiation (Layer D).** The source adapter **declares** what the endpoint supports (FTS, equality facets, offset pagination, sort, aggregation/counts, relationship traversal, batch write/validate, schema introspection); the UI **gates** features on it and **never fakes** a capability (L7). Baseline = GraphQL `__schema` + Hippo's `hippoSchema`/`hippoEntityType` enrichment. | In MVP. Hippo's current surface = FTS + equality facets + offset pages + relationship traversal + the #84 batch write/validate; counts/sort/range gated off until X1. | ADR-0002/0017; arch Layer D; L7 |
+| N5.1 | **Capability negotiation (Layer D).** The source adapter **declares** what the endpoint supports (FTS, equality facets, offset pagination, sort, aggregation/counts, relationship traversal, batch write/validate, schema introspection); the UI **gates** features on it and **never fakes** a capability (L7). Baseline = GraphQL `__schema` + Mosaic's `mosaicSchema`/`mosaicEntityType` enrichment. | In MVP. Hippo's current surface = FTS + equality facets + offset pages + relationship traversal + the #84 batch write/validate; counts/sort/range gated off until X1. | ADR-0002/0017; arch Layer D; L7 |
 | N5.2 | **One active data-plane endpoint (pluggable).** Exactly one source at a time; swapping Hippo→Bridge/Cappella is a **config change**, not a refactor. No cross-source federation. | In MVP: Hippo, direct. | L2; ADR-0017 |
 | N5.3 | **Auth seam = no-op pass-through for MVP (Bridge deferred).** Authorization lives in **Bridge** (PEP/PDP), not Aperture or Hippo. Aperture injects a **capability-scoped data client**; for MVP it's a transparent pass-through (local Hippo, no auth / max permissions). Bridge drops in later by swapping that client — **no Aperture change**. Aperture holds **no authority** itself. | In MVP: pass-through; admin/role gating is nominal locally. | ADR-0008/0016; arch §security |
 | N5.4 | **Control plane vs data plane.** Aperture's own config + user state (saved views, query-state, **drafts L10**) live in a **control-plane store** (LinkML-on-Hippo reference impl), distinct from the browsed data plane. | In MVP: a Hippo control-plane store (may be the same instance as the data plane). | ADR-0017; L10 |

@@ -139,7 +139,7 @@ export function workflowAvailability(
 
 /**
  * A stable fingerprint of the derived schema (types + fields), pinned into
- * drafts so resume can detect drift (L10). Interim until the hippoSchema
+ * drafts so resume can detect drift (L10). Interim until the mosaicSchema
  * enrichment exposes a real schema_version.
  */
 export function schemaFingerprint(source: HippoSource): string {
