@@ -28,18 +28,18 @@ import certIntrospectionJson from './certIntrospection.json';
  * and the real write shapes: `create<T>(data:)`/`update<T>(id, data:)` plus
  * the `ingestBatch`/`validateBatch` batch unit-of-work.
  *
- * This capture and the two below are hand-edited for platform ADR-0007 (Q3): the
- * `hippoSchema` / `hippoEntityType` root fields are renamed to `mosaicSchema` /
- * `mosaicEntityType` (Mosaic v0.16.0), and `hippo_*` identifiers in descriptions to
- * `mosaic_*`. This one's `Hippo{EntityType,Slot,Reference}Info` object types are also
- * renamed to the `Mosaic*` names later versions emit. Everything else is as captured.
+ * Kept unchanged as a record of that server, so it still advertises the enrichment as
+ * `hippoSchema`. Aperture reads only `mosaicSchema` since platform ADR-0007 (Q3), so this
+ * capture negotiates `schemaIntrospection: 'graphql'`. The two captures below are current
+ * and exercise the `mosaicSchema` path.
  */
 export const realIntrospection = realIntrospectionJson as unknown as IntrospectionSchema;
 
 /**
- * The captured `__schema` of **mosaic v0.13.0** — the version
- * `datahelix:certification/composition.lock.json` pins — over
- * `mosaic-demo-small`'s fifteen-collection demo schema.
+ * The captured `__schema` of **mosaic v0.16.0** (pre-release: mosaic PR #284 at
+ * `1423eb1`, the platform ADR-0007 identifier rename) over `mosaic-demo-small`'s
+ * fifteen-collection demo schema **as of `7f98e3c`**, with only that repo's ADR-0007
+ * rename (`6a679bb`) applied. First captured from v0.13.0, then refreshed to v0.14.0.
  *
  * Added beside `realIntrospection` rather than replacing it. The two answer
  * different questions and both are needed: `realIntrospection` is the capture
@@ -59,21 +59,22 @@ export const realIntrospection = realIntrospectionJson as unknown as Introspecti
  * - **the typed filter surface** — `<Type>Filter` inputs with `and`/`or`/`not`
  *   and `SampleEdgeQuantifiers { some, none }` relationship predicates.
  *
- * Captured from **v0.13.0 deliberately, not from `main`**: `main` is 40 commits
- * ahead and advertises surfaces (the MCP boundary, `converseQuerySpec`, reverse
- * edges via `inverse:`) that no certifiable deployment serves yet, so a capture
- * taken there would let tests assert capabilities that gate off in production.
+ * The schema is pinned **before demo-small `3843214`** on purpose. That commit declares
+ * four reverse edges (`Donor.samples`, `Donor.diagnoses`, `Sample.aliquots`,
+ * `Workflow.datasets`), and this fixture is the half of the pair that has none.
  *
- * It therefore has **no reverse edges** — `Donor` has no `samples` field and
- * `DonorFilter` no `samples` predicate — which is the honest picture today and
- * is what the reverse-edge gating is tested against.
+ * It therefore has **no reverse edges**: `Donor` has no `samples` field and
+ * `DonorFilter` has no `samples` predicate. The reverse-edge gating is tested
+ * against that.
  */
 export const demoIntrospection = demoIntrospectionJson as unknown as IntrospectionSchema;
 
 /**
- * The captured `__schema` of **mosaic v0.14.0** over DataHelix's certification
- * fixture schema (`portal_schema.yaml`, fixture **1.1.0**) — the exact pair
- * `composition.lock.json` pins and the golden-path scenarios run against.
+ * The captured `__schema` of **mosaic v0.16.0** (pre-release: mosaic PR #284 at
+ * `1423eb1`) over DataHelix's certification fixture schema (`portal_schema.yaml`,
+ * fixture **1.2.0**). The fixture's `hippo_*` keys and its `hippo_core` import were
+ * renamed to `mosaic_*` for the capture, which is the change datahelix#57 makes. First
+ * captured from v0.14.0 over fixture 1.1.0.
  *
  * This is the fixture that carries **reverse edges as a real schema feature**
  * rather than a simulation, because fixture 1.1.0 was bumped to declare them:

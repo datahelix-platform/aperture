@@ -894,7 +894,7 @@
      }
     },
     {
-     "name": "mosaicSchema",
+     "name": "hippoSchema",
      "description": null,
      "args": [],
      "type": {
@@ -908,7 +908,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "MosaicEntityTypeInfo",
+         "name": "HippoEntityTypeInfo",
          "ofType": null
         }
        }
@@ -916,7 +916,7 @@
      }
     },
     {
-     "name": "mosaicEntityType",
+     "name": "hippoEntityType",
      "description": null,
      "args": [
       {
@@ -934,7 +934,7 @@
      ],
      "type": {
       "kind": "OBJECT",
-      "name": "MosaicEntityTypeInfo",
+      "name": "HippoEntityTypeInfo",
       "ofType": null
      }
     }
@@ -1736,7 +1736,7 @@
   {
    "kind": "OBJECT",
    "name": "ExternalID",
-   "description": "DEPRECATED (since 0.6.0, issue #48): use the `ExternalReference` value type on a domain slot (optionally annotated `mosaic_external_xref` for reverse lookup) instead. ExternalID remains for backward compatibility only and will be removed from mosaic_core in a future major release; the SDK methods (`register_external_id`, `get_by_external_id`, `list_external_ids`, mapping-level `supersede`) and the `/external-ids` REST endpoints emit DeprecationWarning / are marked deprecated in OpenAPI.\nA stable cross-system identifier linking a Hippo entity to an ID managed by an external source system (e.g., STARLIMS barcode, HALO sample ID, Donor DB donor number). Lifecycle-tracked: each ExternalID instance is created, superseded, and retired via the normal entity machinery — same write path, same provenance, same query semantics as any other entity class. See sec3 §3.4 and the β-refactor handoff (sec9 PR 1.1) for context.\nNote on lifecycle flags: `is_available` (inherited from Entity) is the standard entity-lifecycle flag that reflects soft-delete / supersede / archived state. `is_active` is a narrower flag meaning \"this external-system mapping is currently in use\". An ExternalID may be `is_available: true` (entity-level: not deleted) but `is_active: false` (mapping-level: superseded by a newer mapping).\n`(source_system, value)` must be unique within active records (`is_active = true`). The uniqueness constraint is declared here as a logical `unique_keys` block; the partial-index enforcement against `is_active = true` is wired in the DDL wrapper (PR 1.2).",
+   "description": "DEPRECATED (since 0.6.0, issue #48): use the `ExternalReference` value type on a domain slot (optionally annotated `hippo_external_xref` for reverse lookup) instead. ExternalID remains for backward compatibility only and will be removed from hippo_core in a future major release; the SDK methods (`register_external_id`, `get_by_external_id`, `list_external_ids`, mapping-level `supersede`) and the `/external-ids` REST endpoints emit DeprecationWarning / are marked deprecated in OpenAPI.\nA stable cross-system identifier linking a Hippo entity to an ID managed by an external source system (e.g., STARLIMS barcode, HALO sample ID, Donor DB donor number). Lifecycle-tracked: each ExternalID instance is created, superseded, and retired via the normal entity machinery — same write path, same provenance, same query semantics as any other entity class. See sec3 §3.4 and the β-refactor handoff (sec9 PR 1.1) for context.\nNote on lifecycle flags: `is_available` (inherited from Entity) is the standard entity-lifecycle flag that reflects soft-delete / supersede / archived state. `is_active` is a narrower flag meaning \"this external-system mapping is currently in use\". An ExternalID may be `is_available: true` (entity-level: not deleted) but `is_active: false` (mapping-level: superseded by a newer mapping).\n`(source_system, value)` must be unique within active records (`is_active = true`). The uniqueness constraint is declared here as a logical `unique_keys` block; the partial-index enforcement against `is_active = true` is wired in the DDL wrapper (PR 1.2).",
    "fields": [
     {
      "name": "value",
@@ -2330,7 +2330,7 @@
   {
    "kind": "OBJECT",
    "name": "XrefMatch",
-   "description": "Entity resolved from an external reference (system, value) pair via the mosaic_external_xref reverse-lookup index (issue #48). Generic envelope shape — the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "Entity resolved from an external reference (system, value) pair via the hippo_external_xref reverse-lookup index (issue #48). Generic envelope shape — the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",
@@ -2410,7 +2410,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "MosaicEntityTypeInfo",
+   "name": "HippoEntityTypeInfo",
    "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Hippo's *domain* schema introspection — the LinkML type model the GraphQL surface itself is generated from.",
    "fields": [
     {
@@ -2466,7 +2466,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "MosaicSlotInfo",
+         "name": "HippoSlotInfo",
          "ofType": null
         }
        }
@@ -2488,7 +2488,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "MosaicReferenceInfo",
+         "name": "HippoReferenceInfo",
          "ofType": null
         }
        }
@@ -2501,7 +2501,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "MosaicSlotInfo",
+   "name": "HippoSlotInfo",
    "description": "One slot of an entity type, as classified by the shared LinkML type model (hippo.core.schema_typing).",
    "fields": [
     {
@@ -2660,7 +2660,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "MosaicReferenceInfo",
+   "name": "HippoReferenceInfo",
    "description": "One relationship of an entity type (mirrors REST GET /schemas/{type}/references).",
    "fields": [
     {

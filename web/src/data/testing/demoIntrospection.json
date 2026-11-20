@@ -7137,34 +7137,6 @@
    "description": "A sub-divided portion of a sample, tracked individually because freeze-thaw cycles and volume are per-portion rather than per-sample.",
    "fields": [
     {
-     "name": "name",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "volumeUl",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "containerType",
      "description": null,
      "args": [],
@@ -7174,20 +7146,6 @@
       "ofType": {
        "kind": "ENUM",
        "name": "ContainerTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "thawCount",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Int",
        "ofType": null
       }
      }
@@ -7207,6 +7165,20 @@
      }
     },
     {
+     "name": "name",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
      "name": "notes",
      "description": null,
      "args": [],
@@ -7214,6 +7186,34 @@
       "kind": "SCALAR",
       "name": "String",
       "ofType": null
+     }
+    },
+    {
+     "name": "thawCount",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Int",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "volumeUl",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Float",
+       "ofType": null
+      }
      }
     },
     {
@@ -7315,16 +7315,6 @@
      }
     },
     {
-     "name": "sample",
-     "description": "Resolved Sample for `sample` (graph traversal; batched per request).",
-     "args": [],
-     "type": {
-      "kind": "OBJECT",
-      "name": "Sample",
-      "ofType": null
-     }
-    },
-    {
      "name": "location",
      "description": "Resolved StorageLocation for `location` (graph traversal; batched per request).",
      "args": [],
@@ -7333,24 +7323,18 @@
       "name": "StorageLocation",
       "ofType": null
      }
+    },
+    {
+     "name": "sample",
+     "description": "Resolved Sample for `sample` (graph traversal; batched per request).",
+     "args": [],
+     "type": {
+      "kind": "OBJECT",
+      "name": "Sample",
+      "ofType": null
+     }
     }
    ],
-   "inputFields": null,
-   "enumValues": null
-  },
-  {
-   "kind": "SCALAR",
-   "name": "String",
-   "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": null
-  },
-  {
-   "kind": "SCALAR",
-   "name": "Float",
-   "description": "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).",
-   "fields": null,
    "inputFields": null,
    "enumValues": null
   },
@@ -7368,12 +7352,28 @@
      "name": "microtube"
     },
     {
-     "name": "plate_well"
+     "name": "paraffin_block"
     },
     {
-     "name": "paraffin_block"
+     "name": "plate_well"
     }
    ]
+  },
+  {
+   "kind": "SCALAR",
+   "name": "Boolean",
+   "description": "The `Boolean` scalar type represents `true` or `false`.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": null
+  },
+  {
+   "kind": "SCALAR",
+   "name": "String",
+   "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": null
   },
   {
    "kind": "SCALAR",
@@ -7385,8 +7385,8 @@
   },
   {
    "kind": "SCALAR",
-   "name": "Boolean",
-   "description": "The `Boolean` scalar type represents `true` or `false`.",
+   "name": "Float",
+   "description": "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).",
    "fields": null,
    "inputFields": null,
    "enumValues": null
@@ -7409,9 +7409,61 @@
   },
   {
    "kind": "OBJECT",
-   "name": "Sample",
-   "description": "A biological specimen collected from a single donor. Linked to its donor via a single-valued reference (a plain FK column, filterable in both directions by equality).",
+   "name": "StorageLocation",
+   "description": "A physical storage position — a freezer, shelf and rack within a facility. A small dimension collection: many aliquots share few locations.",
    "fields": [
+    {
+     "name": "capacitySlots",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "facilityType",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "FacilityTypeEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "freezerId",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isAtCapacity",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
     {
      "name": "name",
      "description": null,
@@ -7427,15 +7479,167 @@
      }
     },
     {
-     "name": "sampleType",
+     "name": "shelf",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "temperatureCelsius",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "ENUM",
-       "name": "SampleTypeEnum",
+       "kind": "SCALAR",
+       "name": "Float",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "id",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isAvailable",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "version",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "createdAt",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "updatedAt",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "schemaVersion",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "createdBy",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "updatedBy",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "supersededBy",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
+      "ofType": null
+     }
+    }
+   ],
+   "inputFields": null,
+   "enumValues": null
+  },
+  {
+   "kind": "ENUM",
+   "name": "FacilityTypeEnum",
+   "description": "Kind of facility a storage location sits in.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": [
+    {
+     "name": "ambient_archive"
+    },
+    {
+     "name": "liquid_nitrogen"
+    },
+    {
+     "name": "offsite_repository"
+    },
+    {
+     "name": "onsite_freezer"
+    }
+   ]
+  },
+  {
+   "kind": "OBJECT",
+   "name": "Sample",
+   "description": "A biological specimen collected from a single donor. Linked to its donor via a single-valued reference (a plain FK column, filterable in both directions by equality).",
+   "fields": [
+    {
+     "name": "accession",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -7451,15 +7655,25 @@
      }
     },
     {
-     "name": "storageCondition",
+     "name": "collectedAt",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "ENUM",
-       "name": "StorageConditionEnum",
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -7479,15 +7693,29 @@
      }
     },
     {
-     "name": "accession",
+     "name": "sampleType",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
+       "kind": "ENUM",
+       "name": "SampleTypeEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "storageCondition",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "StorageConditionEnum",
        "ofType": null
       }
      }
@@ -7508,16 +7736,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "collectedAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
      }
     },
     {
@@ -7634,67 +7852,22 @@
   },
   {
    "kind": "ENUM",
-   "name": "SampleTypeEnum",
-   "description": "Kind of biological material a sample represents.",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": [
-    {
-     "name": "blood"
-    },
-    {
-     "name": "tissue"
-    },
-    {
-     "name": "csf"
-    },
-    {
-     "name": "urine"
-    },
-    {
-     "name": "saliva"
-    }
-   ]
-  },
-  {
-   "kind": "ENUM",
    "name": "BrainRegionEnum",
    "description": "Anatomical brain region a tissue sample was collected from.",
    "fields": null,
    "inputFields": null,
    "enumValues": [
     {
-     "name": "hippocampus"
-    },
-    {
-     "name": "frontal_cortex"
+     "name": "brainstem"
     },
     {
      "name": "cerebellum"
     },
     {
-     "name": "brainstem"
-    }
-   ]
-  },
-  {
-   "kind": "ENUM",
-   "name": "StorageConditionEnum",
-   "description": "Physical storage condition of a sample.",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": [
-    {
-     "name": "frozen"
+     "name": "frontal_cortex"
     },
     {
-     "name": "fresh"
-    },
-    {
-     "name": "fixed"
-    },
-    {
-     "name": "ambient"
+     "name": "hippocampus"
     }
    ]
   },
@@ -7707,12 +7880,57 @@
    "enumValues": null
   },
   {
+   "kind": "ENUM",
+   "name": "SampleTypeEnum",
+   "description": "Kind of biological material a sample represents.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": [
+    {
+     "name": "blood"
+    },
+    {
+     "name": "csf"
+    },
+    {
+     "name": "saliva"
+    },
+    {
+     "name": "tissue"
+    },
+    {
+     "name": "urine"
+    }
+   ]
+  },
+  {
+   "kind": "ENUM",
+   "name": "StorageConditionEnum",
+   "description": "Physical storage condition of a sample.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": [
+    {
+     "name": "ambient"
+    },
+    {
+     "name": "fixed"
+    },
+    {
+     "name": "fresh"
+    },
+    {
+     "name": "frozen"
+    }
+   ]
+  },
+  {
    "kind": "OBJECT",
    "name": "Donor",
    "description": "An individual who contributed one or more biological samples.",
    "fields": [
     {
-     "name": "name",
+     "name": "ageAtDeath",
      "description": null,
      "args": [],
      "type": {
@@ -7720,9 +7938,19 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
+       "name": "Int",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "causeOfDeath",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
@@ -7735,34 +7963,6 @@
       "ofType": {
        "kind": "ENUM",
        "name": "CohortEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "sex",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "SexEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "ageAtDeath",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Int",
        "ofType": null
       }
      }
@@ -7782,13 +7982,17 @@
      }
     },
     {
-     "name": "causeOfDeath",
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
      }
     },
     {
@@ -7799,6 +8003,20 @@
       "kind": "SCALAR",
       "name": "String",
       "ofType": null
+     }
+    },
+    {
+     "name": "sex",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "SexEnum",
+       "ofType": null
+      }
      }
     },
     {
@@ -7911,13 +8129,13 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "control"
+     "name": "at_risk"
     },
     {
      "name": "case"
     },
     {
-     "name": "at_risk"
+     "name": "control"
     }
    ]
   },
@@ -7929,231 +8147,13 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "male"
-    },
-    {
      "name": "female"
     },
     {
+     "name": "male"
+    },
+    {
      "name": "unknown"
-    }
-   ]
-  },
-  {
-   "kind": "OBJECT",
-   "name": "StorageLocation",
-   "description": "A physical storage position \u2014 a freezer, shelf and rack within a facility. A small dimension collection: many aliquots share few locations.",
-   "fields": [
-    {
-     "name": "name",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "facilityType",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "FacilityTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "freezerId",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "shelf",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "temperatureCelsius",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "capacitySlots",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isAtCapacity",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "id",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "ID",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "isAvailable",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "version",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "createdAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "updatedAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "schemaVersion",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "createdBy",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "updatedBy",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "supersededBy",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
-      "ofType": null
-     }
-    }
-   ],
-   "inputFields": null,
-   "enumValues": null
-  },
-  {
-   "kind": "ENUM",
-   "name": "FacilityTypeEnum",
-   "description": "Kind of facility a storage location sits in.",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": [
-    {
-     "name": "onsite_freezer"
-    },
-    {
-     "name": "offsite_repository"
-    },
-    {
-     "name": "liquid_nitrogen"
-    },
-    {
-     "name": "ambient_archive"
     }
    ]
   },
@@ -8233,7 +8233,7 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "FilterInput",
-   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `mosaicSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected \u2014 absence is asked with IS_NULL, never with EQ null.",
+   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `mosaicSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected — absence is asked with IS_NULL, never with EQ null.",
    "fields": null,
    "inputFields": [
     {
@@ -8322,11 +8322,43 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "AliquotFilter",
-   "description": "Typed filter for Aliquot (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Aliquot (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
+     "name": "containerType",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "ContainerTypeEnumFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isDepleted",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "location",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StorageLocationFilter",
+      "ofType": null
+     }
+    },
+    {
      "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "notes",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -8342,30 +8374,6 @@
      }
     },
     {
-     "name": "location",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StorageLocationFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "volumeUl",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "FloatFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "containerType",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "ContainerTypeEnumFilterOps",
-      "ofType": null
-     }
-    },
-    {
      "name": "thawCount",
      "type": {
       "kind": "INPUT_OBJECT",
@@ -8374,18 +8382,10 @@
      }
     },
     {
-     "name": "isDepleted",
+     "name": "volumeUl",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "notes",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "FloatFilterOps",
       "ofType": null
      }
     },
@@ -8442,6 +8442,339 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "AliquotFilter",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "ContainerTypeEnumFilterOps",
+   "description": "Operators on ContainerTypeEnum-ranged slots.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "ENUM",
+      "name": "ContainerTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "ENUM",
+      "name": "ContainerTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "ENUM",
+        "name": "ContainerTypeEnum",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "BooleanFilterOps",
+   "description": "Operators on boolean-ranged slots.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "StorageLocationFilter",
+   "description": "Typed filter for StorageLocation (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "capacitySlots",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "IntFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "facilityType",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "FacilityTypeEnumFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "freezerId",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isAtCapacity",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "shelf",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "temperatureCelsius",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "FloatFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "id",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isAvailable",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "and",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "INPUT_OBJECT",
+        "name": "StorageLocationFilter",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "or",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "INPUT_OBJECT",
+        "name": "StorageLocationFilter",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "not",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StorageLocationFilter",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "IntFilterOps",
+   "description": "Operators on integer-ranged slots (typed comparisons).",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "SCALAR",
+        "name": "Int",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "gt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "gte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "FacilityTypeEnumFilterOps",
+   "description": "Operators on FacilityTypeEnum-ranged slots.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "ENUM",
+      "name": "FacilityTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "ENUM",
+      "name": "FacilityTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "ENUM",
+        "name": "FacilityTypeEnum",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
       "ofType": null
      }
     }
@@ -8507,31 +8840,96 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "SampleFilter",
-   "description": "Typed filter for Sample (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "name": "FloatFilterOps",
+   "description": "Operators on float/double/decimal-ranged slots.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "SCALAR",
+        "name": "Float",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "gt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "gte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "SampleFilter",
+   "description": "Typed filter for Sample (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "accession",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "donor",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DonorFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "sampleType",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "SampleTypeEnumFilterOps",
       "ofType": null
      }
     },
@@ -8544,10 +8942,26 @@
      }
     },
     {
-     "name": "storageCondition",
+     "name": "collectedAt",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "StorageConditionEnumFilterOps",
+      "name": "DateFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "donor",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DonorFilter",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -8560,10 +8974,18 @@
      }
     },
     {
-     "name": "accession",
+     "name": "sampleType",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "SampleTypeEnumFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "storageCondition",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StorageConditionEnumFilterOps",
       "ofType": null
      }
     },
@@ -8572,14 +8994,6 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "ListFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "collectedAt",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
       "ofType": null
      }
     },
@@ -8644,12 +9058,150 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "DonorFilter",
-   "description": "Typed filter for Donor (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "name": "BrainRegionEnumFilterOps",
+   "description": "Operators on BrainRegionEnum-ranged slots.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "eq",
+     "type": {
+      "kind": "ENUM",
+      "name": "BrainRegionEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "ENUM",
+      "name": "BrainRegionEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "ENUM",
+        "name": "BrainRegionEnum",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "DateFilterOps",
+   "description": "Operators on date-ranged slots (ISO-8601 ordering).",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "SCALAR",
+        "name": "Date",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "gt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "gte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "DonorFilter",
+   "description": "Typed filter for Donor (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "ageAtDeath",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "IntFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "causeOfDeath",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -8665,22 +9217,6 @@
      }
     },
     {
-     "name": "sex",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "SexEnumFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "ageAtDeath",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "IntFilterOps",
-      "ofType": null
-     }
-    },
-    {
      "name": "historyOfRhi",
      "type": {
       "kind": "INPUT_OBJECT",
@@ -8689,7 +9225,7 @@
      }
     },
     {
-     "name": "causeOfDeath",
+     "name": "name",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -8701,6 +9237,14 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "sex",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "SexEnumFilterOps",
       "ofType": null
      }
     },
@@ -8863,120 +9407,6 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "IntFilterOps",
-   "description": "Operators on integer-ranged slots (typed comparisons).",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "SCALAR",
-        "name": "Int",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "gt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "gte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "BooleanFilterOps",
-   "description": "Operators on boolean-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
    "name": "SampleTypeEnumFilterOps",
    "description": "Operators on SampleTypeEnum-ranged slots.",
    "fields": null,
@@ -9008,55 +9438,6 @@
        "ofType": {
         "kind": "ENUM",
         "name": "SampleTypeEnum",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "BrainRegionEnumFilterOps",
-   "description": "Operators on BrainRegionEnum-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "ENUM",
-      "name": "BrainRegionEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "ENUM",
-      "name": "BrainRegionEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "ENUM",
-        "name": "BrainRegionEnum",
         "ofType": null
        }
       }
@@ -9125,7 +9506,7 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ListFilterOps",
-   "description": "Operators on inline multivalued slots: whole-list equality only (membership testing is deferred \u2014 ADR-0006).",
+   "description": "Operators on inline multivalued slots: whole-list equality only (membership testing is deferred — ADR-0006).",
    "fields": null,
    "inputFields": [
     {
@@ -9134,387 +9515,6 @@
       "kind": "SCALAR",
       "name": "JSON",
       "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "DateFilterOps",
-   "description": "Operators on date-ranged slots (ISO-8601 ordering).",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "SCALAR",
-        "name": "Date",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "gt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "gte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "StorageLocationFilter",
-   "description": "Typed filter for StorageLocation (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "facilityType",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "FacilityTypeEnumFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "freezerId",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "shelf",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "temperatureCelsius",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "FloatFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "capacitySlots",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "IntFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isAtCapacity",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "id",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isAvailable",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "and",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "INPUT_OBJECT",
-        "name": "StorageLocationFilter",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "or",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "INPUT_OBJECT",
-        "name": "StorageLocationFilter",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "not",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StorageLocationFilter",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "FacilityTypeEnumFilterOps",
-   "description": "Operators on FacilityTypeEnum-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "ENUM",
-      "name": "FacilityTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "ENUM",
-      "name": "FacilityTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "ENUM",
-        "name": "FacilityTypeEnum",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "FloatFilterOps",
-   "description": "Operators on float/double/decimal-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "SCALAR",
-        "name": "Float",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "gt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "gte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "ContainerTypeEnumFilterOps",
-   "description": "Operators on ContainerTypeEnum-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "ENUM",
-      "name": "ContainerTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "ENUM",
-      "name": "ContainerTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "ENUM",
-        "name": "ContainerTypeEnum",
-        "ofType": null
-       }
-      }
      }
     },
     {
@@ -9551,22 +9551,22 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "VOLUME_UL"
-    },
-    {
      "name": "CONTAINER_TYPE"
-    },
-    {
-     "name": "THAW_COUNT"
     },
     {
      "name": "IS_DEPLETED"
     },
     {
+     "name": "NAME"
+    },
+    {
      "name": "NOTES"
+    },
+    {
+     "name": "THAW_COUNT"
+    },
+    {
+     "name": "VOLUME_UL"
     },
     {
      "name": "ID"
@@ -9594,7 +9594,7 @@
   {
    "kind": "OBJECT",
    "name": "FacetCount",
-   "description": "One facet bucket: a stored value of the requested field and how many matching entities carry it (ADR-0007). Entities with no stored value are not counted \u2014 query absence with IS_NULL. Availability-consistent: buckets sum over exactly the entities the list query would return under the same filters.",
+   "description": "One facet bucket: a stored value of the requested field and how many matching entities carry it (ADR-0007). Entities with no stored value are not counted — query absence with IS_NULL. Availability-consistent: buckets sum over exactly the entities the list query would return under the same filters.",
    "fields": [
     {
      "name": "value",
@@ -9663,72 +9663,6 @@
    "description": "A cognitive or clinical assessment administered to a donor during life.",
    "fields": [
     {
-     "name": "name",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "instrumentName",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "AssessmentInstrumentEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "rawScore",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "percentileRank",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isBaseline",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "administeredAt",
      "description": null,
      "args": [],
@@ -9746,6 +9680,72 @@
       "kind": "SCALAR",
       "name": "String",
       "ofType": null
+     }
+    },
+    {
+     "name": "instrumentName",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "AssessmentInstrumentEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isBaseline",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "percentileRank",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "rawScore",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Float",
+       "ofType": null
+      }
      }
     },
     {
@@ -9863,21 +9863,21 @@
   {
    "kind": "ENUM",
    "name": "AssessmentInstrumentEnum",
-   "description": "Standardised clinical instrument administered. A questionnaire, not laboratory hardware \u2014 see InstrumentPlatformEnum for the latter.",
+   "description": "Standardised clinical instrument administered. A questionnaire, not laboratory hardware — see InstrumentPlatformEnum for the latter.",
    "fields": null,
    "inputFields": null,
    "enumValues": [
-    {
-     "name": "mmse"
-    },
-    {
-     "name": "moca"
-    },
     {
      "name": "cdr"
     },
     {
      "name": "gds"
+    },
+    {
+     "name": "mmse"
+    },
+    {
+     "name": "moca"
     },
     {
      "name": "npi"
@@ -9960,11 +9960,19 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "AssessmentFilter",
-   "description": "Typed filter for Assessment (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Assessment (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "administeredAt",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DateFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "administeredBy",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -9988,10 +9996,18 @@
      }
     },
     {
-     "name": "rawScore",
+     "name": "isBaseline",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "FloatFilterOps",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -10004,26 +10020,10 @@
      }
     },
     {
-     "name": "isBaseline",
+     "name": "rawScore",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "administeredAt",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "administeredBy",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "FloatFilterOps",
       "ofType": null
      }
     },
@@ -10143,25 +10143,25 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "ADMINISTERED_AT"
+    },
+    {
+     "name": "ADMINISTERED_BY"
     },
     {
      "name": "INSTRUMENT_NAME"
     },
     {
-     "name": "RAW_SCORE"
+     "name": "IS_BASELINE"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "PERCENTILE_RANK"
     },
     {
-     "name": "IS_BASELINE"
-    },
-    {
-     "name": "ADMINISTERED_AT"
-    },
-    {
-     "name": "ADMINISTERED_BY"
+     "name": "RAW_SCORE"
     },
     {
      "name": "ID"
@@ -10174,8 +10174,22 @@
   {
    "kind": "OBJECT",
    "name": "ConsentRecord",
-   "description": "A donor's recorded research consent, including withdrawal. Governance data \u2014 it constrains what may be done with the donor's samples and datasets rather than describing them.",
+   "description": "A donor's recorded research consent, including withdrawal. Governance data — it constrains what may be done with the donor's samples and datasets rather than describing them.",
    "fields": [
+    {
+     "name": "isActive",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
     {
      "name": "name",
      "description": null,
@@ -10188,6 +10202,16 @@
        "name": "String",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "restrictions",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
@@ -10225,30 +10249,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isActive",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "restrictions",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
       "ofType": null
      }
     },
@@ -10461,9 +10461,25 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ConsentRecordFilter",
-   "description": "Typed filter for ConsentRecord (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for ConsentRecord (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
+    {
+     "name": "donor",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DonorFilter",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isActive",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
     {
      "name": "name",
      "type": {
@@ -10473,10 +10489,10 @@
      }
     },
     {
-     "name": "donor",
+     "name": "restrictions",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "DonorFilter",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -10501,22 +10517,6 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "DateFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isActive",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "restrictions",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -10636,7 +10636,13 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "IS_ACTIVE"
+    },
+    {
      "name": "NAME"
+    },
+    {
+     "name": "RESTRICTIONS"
     },
     {
      "name": "SCOPE"
@@ -10646,12 +10652,6 @@
     },
     {
      "name": "WITHDRAWN_AT"
-    },
-    {
-     "name": "IS_ACTIVE"
-    },
-    {
-     "name": "RESTRICTIONS"
     },
     {
      "name": "ID"
@@ -10667,34 +10667,6 @@
    "description": "A data artifact produced by exactly one workflow run. Linked to its producing workflow via a single-valued reference (a plain FK column).",
    "fields": [
     {
-     "name": "name",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "datasetType",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "DatasetTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "accessLevel",
      "description": null,
      "args": [],
@@ -10709,15 +10681,15 @@
      }
     },
     {
-     "name": "isPublic",
+     "name": "datasetType",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
+       "kind": "ENUM",
+       "name": "DatasetTypeEnum",
        "ofType": null
       }
      }
@@ -10740,6 +10712,34 @@
       "kind": "SCALAR",
       "name": "Float",
       "ofType": null
+     }
+    },
+    {
+     "name": "isPublic",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
      }
     },
     {
@@ -10866,6 +10866,24 @@
   },
   {
    "kind": "ENUM",
+   "name": "AccessLevelEnum",
+   "description": "Data governance tier controlling who may access a dataset.",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": [
+    {
+     "name": "controlled"
+    },
+    {
+     "name": "public"
+    },
+    {
+     "name": "restricted"
+    }
+   ]
+  },
+  {
+   "kind": "ENUM",
    "name": "DatasetTypeEnum",
    "description": "Kind of data artifact.",
    "fields": null,
@@ -10875,39 +10893,55 @@
      "name": "bam"
     },
     {
-     "name": "vcf"
-    },
-    {
      "name": "counts_matrix"
     },
     {
      "name": "report"
-    }
-   ]
-  },
-  {
-   "kind": "ENUM",
-   "name": "AccessLevelEnum",
-   "description": "Data governance tier controlling who may access a dataset.",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": [
-    {
-     "name": "public"
     },
     {
-     "name": "controlled"
-    },
-    {
-     "name": "restricted"
+     "name": "vcf"
     }
    ]
   },
   {
    "kind": "OBJECT",
    "name": "Workflow",
-   "description": "A computational or laboratory pipeline run that consumes one or more samples and produces a dataset. Consumes samples via a multivalued reference \u2014 stored in Mosaic's `relationships` table, forward-resolved only (no reverse \"which workflows consumed this sample\" query exists).",
+   "description": "A computational or laboratory pipeline run that consumes one or more samples and produces a dataset. Consumes samples via a multivalued reference — stored in Mosaic's `relationships` table, forward-resolved only (no reverse \"which workflows consumed this sample\" query exists).",
    "fields": [
+    {
+     "name": "completedAt",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "durationHours",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "inputSamplesCount",
+     "description": "Cardinality of `input_samples` without resolving its member objects — a single indexed COUNT(*) over the relationship edges (issue #132).",
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Int",
+       "ofType": null
+      }
+     }
+    },
     {
      "name": "name",
      "description": null,
@@ -10923,15 +10957,15 @@
      }
     },
     {
-     "name": "inputSamplesCount",
-     "description": "Cardinality of `input_samples` without resolving its member objects \u2014 a single indexed COUNT(*) over the relationship edges (issue #132).",
+     "name": "startedAt",
+     "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Int",
+       "name": "DateTime",
        "ofType": null
       }
      }
@@ -10962,40 +10996,6 @@
        "name": "WorkflowTypeEnum",
        "ofType": null
       }
-     }
-    },
-    {
-     "name": "startedAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "DateTime",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "completedAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "durationHours",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
      }
     },
     {
@@ -11130,19 +11130,19 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "cancelled"
+    },
+    {
      "name": "completed"
     },
     {
      "name": "failed"
     },
     {
-     "name": "running"
-    },
-    {
      "name": "queued"
     },
     {
-     "name": "cancelled"
+     "name": "running"
     }
    ]
   },
@@ -11157,9 +11157,6 @@
      "name": "alignment"
     },
     {
-     "name": "variant_calling"
-    },
-    {
      "name": "qc"
     },
     {
@@ -11167,6 +11164,9 @@
     },
     {
      "name": "rna_seq"
+    },
+    {
+     "name": "variant_calling"
     }
    ]
   },
@@ -11246,33 +11246,9 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "DatasetFilter",
-   "description": "Typed filter for Dataset (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Dataset (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
-    {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "producedBy",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "WorkflowFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "datasetType",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DatasetTypeEnumFilterOps",
-      "ofType": null
-     }
-    },
     {
      "name": "accessLevel",
      "type": {
@@ -11282,10 +11258,10 @@
      }
     },
     {
-     "name": "isPublic",
+     "name": "datasetType",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
+      "name": "DatasetTypeEnumFilterOps",
       "ofType": null
      }
     },
@@ -11302,6 +11278,30 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "FloatFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isPublic",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "producedBy",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "WorkflowFilter",
       "ofType": null
      }
     },
@@ -11374,10 +11374,132 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "WorkflowFilter",
-   "description": "Typed filter for Workflow (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "name": "AccessLevelEnumFilterOps",
+   "description": "Operators on AccessLevelEnum-ranged slots.",
    "fields": null,
    "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "ENUM",
+      "name": "AccessLevelEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "ENUM",
+      "name": "AccessLevelEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "ENUM",
+        "name": "AccessLevelEnum",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "DatasetTypeEnumFilterOps",
+   "description": "Operators on DatasetTypeEnum-ranged slots.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "ENUM",
+      "name": "DatasetTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "ENUM",
+      "name": "DatasetTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "ENUM",
+        "name": "DatasetTypeEnum",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "WorkflowFilter",
+   "description": "Typed filter for Workflow (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "completedAt",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DateTimeFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "durationHours",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "FloatFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "inputSamples",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "SampleEdgeQuantifiers",
+      "ofType": null
+     }
+    },
     {
      "name": "name",
      "type": {
@@ -11387,10 +11509,10 @@
      }
     },
     {
-     "name": "inputSamples",
+     "name": "startedAt",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "SampleEdgeQuantifiers",
+      "name": "DateTimeFilterOps",
       "ofType": null
      }
     },
@@ -11407,30 +11529,6 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "WorkflowTypeEnumFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "startedAt",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateTimeFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "completedAt",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateTimeFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "durationHours",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "FloatFilterOps",
       "ofType": null
      }
     },
@@ -11487,6 +11585,87 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "WorkflowFilter",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "DateTimeFilterOps",
+   "description": "Operators on datetime-ranged slots (ISO-8601 ordering).",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "neq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "SCALAR",
+        "name": "DateTime",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "gt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "gte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "lte",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
       "ofType": null
      }
     }
@@ -11618,185 +11797,6 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "DateTimeFilterOps",
-   "description": "Operators on datetime-ranged slots (ISO-8601 ordering).",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "SCALAR",
-        "name": "DateTime",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "gt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "gte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "lte",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "DatasetTypeEnumFilterOps",
-   "description": "Operators on DatasetTypeEnum-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "ENUM",
-      "name": "DatasetTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "ENUM",
-      "name": "DatasetTypeEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "ENUM",
-        "name": "DatasetTypeEnum",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
-   "name": "AccessLevelEnumFilterOps",
-   "description": "Operators on AccessLevelEnum-ranged slots.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "eq",
-     "type": {
-      "kind": "ENUM",
-      "name": "AccessLevelEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "neq",
-     "type": {
-      "kind": "ENUM",
-      "name": "AccessLevelEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "in",
-     "type": {
-      "kind": "LIST",
-      "name": null,
-      "ofType": {
-       "kind": "NON_NULL",
-       "name": null,
-       "ofType": {
-        "kind": "ENUM",
-        "name": "AccessLevelEnum",
-        "ofType": null
-       }
-      }
-     }
-    },
-    {
-     "name": "isNull",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
    "name": "JsonFilterOps",
    "description": "Operators on inline structured-value slots: whole-value equality/membership only.",
    "fields": null,
@@ -11844,22 +11844,22 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "DATASET_TYPE"
-    },
-    {
      "name": "ACCESS_LEVEL"
     },
     {
-     "name": "IS_PUBLIC"
+     "name": "DATASET_TYPE"
     },
     {
      "name": "DESCRIPTION"
     },
     {
      "name": "FILE_SIZE_BYTES"
+    },
+    {
+     "name": "IS_PUBLIC"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "ID"
@@ -11875,15 +11875,25 @@
    "description": "A neuropathological diagnosis assigned to a donor. A donor may carry several, of which at most one is marked primary.",
    "fields": [
     {
-     "name": "name",
+     "name": "braakStage",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "certainty",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
+       "kind": "ENUM",
+       "name": "DiagnosisCertaintyEnum",
        "ofType": null
       }
      }
@@ -11903,26 +11913,12 @@
      }
     },
     {
-     "name": "certainty",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "DiagnosisCertaintyEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "braakStage",
+     "name": "diagnosedAt",
      "description": null,
      "args": [],
      "type": {
       "kind": "SCALAR",
-      "name": "Int",
+      "name": "Date",
       "ofType": null
      }
     },
@@ -11941,13 +11937,17 @@
      }
     },
     {
-     "name": "diagnosedAt",
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
      }
     },
     {
@@ -12073,10 +12073,10 @@
      "name": "definite"
     },
     {
-     "name": "probable"
+     "name": "possible"
     },
     {
-     "name": "possible"
+     "name": "probable"
     },
     {
      "name": "ruled_out"
@@ -12159,30 +12159,14 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "DiagnosisFilter",
-   "description": "Typed filter for Diagnosis (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Diagnosis (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "braakStage",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "donor",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DonorFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "conditionName",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "IntFilterOps",
       "ofType": null
      }
     },
@@ -12195,10 +12179,26 @@
      }
     },
     {
-     "name": "braakStage",
+     "name": "conditionName",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "IntFilterOps",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "diagnosedAt",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DateFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "donor",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DonorFilter",
       "ofType": null
      }
     },
@@ -12211,10 +12211,10 @@
      }
     },
     {
-     "name": "diagnosedAt",
+     "name": "name",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -12334,22 +12334,22 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "CONDITION_NAME"
+     "name": "BRAAK_STAGE"
     },
     {
      "name": "CERTAINTY"
     },
     {
-     "name": "BRAAK_STAGE"
+     "name": "CONDITION_NAME"
+    },
+    {
+     "name": "DIAGNOSED_AT"
     },
     {
      "name": "IS_PRIMARY"
     },
     {
-     "name": "DIAGNOSED_AT"
+     "name": "NAME"
     },
     {
      "name": "ID"
@@ -12440,25 +12440,25 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "COHORT"
-    },
-    {
-     "name": "SEX"
-    },
-    {
      "name": "AGE_AT_DEATH"
-    },
-    {
-     "name": "HISTORY_OF_RHI"
     },
     {
      "name": "CAUSE_OF_DEATH"
     },
     {
+     "name": "COHORT"
+    },
+    {
+     "name": "HISTORY_OF_RHI"
+    },
+    {
+     "name": "NAME"
+    },
+    {
      "name": "NOTES"
+    },
+    {
+     "name": "SEX"
     },
     {
      "name": "ID"
@@ -12474,7 +12474,17 @@
    "description": "A piece of laboratory hardware that workflow runs execute on. A small dimension collection.",
    "fields": [
     {
-     "name": "name",
+     "name": "commissionedOn",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isDecommissioned",
      "description": null,
      "args": [],
      "type": {
@@ -12482,21 +12492,7 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "platform",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "InstrumentPlatformEnum",
+       "name": "Boolean",
        "ofType": null
       }
      }
@@ -12530,7 +12526,7 @@
      }
     },
     {
-     "name": "serialNumber",
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
@@ -12544,30 +12540,6 @@
      }
     },
     {
-     "name": "commissionedOn",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isDecommissioned",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "notes",
      "description": null,
      "args": [],
@@ -12575,6 +12547,34 @@
       "kind": "SCALAR",
       "name": "String",
       "ofType": null
+     }
+    },
+    {
+     "name": "platform",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "InstrumentPlatformEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "serialNumber",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
      }
     },
     {
@@ -12690,16 +12690,16 @@
      "name": "illumina"
     },
     {
-     "name": "pacbio"
+     "name": "mass_spec"
+    },
+    {
+     "name": "microscope"
     },
     {
      "name": "nanopore"
     },
     {
-     "name": "mass_spec"
-    },
-    {
-     "name": "microscope"
+     "name": "pacbio"
     }
    ]
   },
@@ -12779,22 +12779,22 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "InstrumentFilter",
-   "description": "Typed filter for Instrument (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Instrument (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "commissionedOn",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "DateFilterOps",
       "ofType": null
      }
     },
     {
-     "name": "platform",
+     "name": "isDecommissioned",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "InstrumentPlatformEnumFilterOps",
+      "name": "BooleanFilterOps",
       "ofType": null
      }
     },
@@ -12815,7 +12815,7 @@
      }
     },
     {
-     "name": "serialNumber",
+     "name": "name",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -12823,23 +12823,23 @@
      }
     },
     {
-     "name": "commissionedOn",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isDecommissioned",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
      "name": "notes",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "platform",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "InstrumentPlatformEnumFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "serialNumber",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -12962,10 +12962,10 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "COMMISSIONED_ON"
     },
     {
-     "name": "PLATFORM"
+     "name": "IS_DECOMMISSIONED"
     },
     {
      "name": "MANUFACTURER"
@@ -12974,16 +12974,16 @@
      "name": "MODEL_NAME"
     },
     {
-     "name": "SERIAL_NUMBER"
-    },
-    {
-     "name": "COMMISSIONED_ON"
-    },
-    {
-     "name": "IS_DECOMMISSIONED"
+     "name": "NAME"
     },
     {
      "name": "NOTES"
+    },
+    {
+     "name": "PLATFORM"
+    },
+    {
+     "name": "SERIAL_NUMBER"
     },
     {
      "name": "ID"
@@ -12999,36 +12999,18 @@
    "description": "A published paper that used one or more of this bank's datasets. Cites datasets through a multivalued reference. A small dimension collection.",
    "fields": [
     {
-     "name": "name",
+     "name": "abstractText",
      "description": null,
      "args": [],
      "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "title",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
      "name": "datasetsCount",
-     "description": "Cardinality of `datasets` without resolving its member objects \u2014 a single indexed COUNT(*) over the relationship edges (issue #132).",
+     "description": "Cardinality of `datasets` without resolving its member objects — a single indexed COUNT(*) over the relationship edges (issue #132).",
      "args": [],
      "type": {
       "kind": "NON_NULL",
@@ -13055,7 +13037,35 @@
      }
     },
     {
+     "name": "isOpenAccess",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
      "name": "journal",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
@@ -13093,7 +13103,7 @@
      }
     },
     {
-     "name": "isOpenAccess",
+     "name": "title",
      "description": null,
      "args": [],
      "type": {
@@ -13101,19 +13111,9 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
-     }
-    },
-    {
-     "name": "abstractText",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
      }
     },
     {
@@ -13248,6 +13248,9 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "conference_abstract"
+    },
+    {
      "name": "journal_article"
     },
     {
@@ -13255,9 +13258,6 @@
     },
     {
      "name": "review"
-    },
-    {
-     "name": "conference_abstract"
     }
    ]
   },
@@ -13337,19 +13337,11 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "PublicationFilter",
-   "description": "Typed filter for Publication (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Publication (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "title",
+     "name": "abstractText",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -13373,7 +13365,23 @@
      }
     },
     {
+     "name": "isOpenAccess",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
      "name": "journal",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -13397,15 +13405,7 @@
      }
     },
     {
-     "name": "isOpenAccess",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "abstractText",
+     "name": "title",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -13553,16 +13553,19 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "TITLE"
+     "name": "ABSTRACT_TEXT"
     },
     {
      "name": "DOI"
     },
     {
+     "name": "IS_OPEN_ACCESS"
+    },
+    {
      "name": "JOURNAL"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "PUBLICATION_TYPE"
@@ -13571,10 +13574,7 @@
      "name": "PUBLISHED_ON"
     },
     {
-     "name": "IS_OPEN_ACCESS"
-    },
-    {
-     "name": "ABSTRACT_TEXT"
+     "name": "TITLE"
     },
     {
      "name": "ID"
@@ -13587,20 +13587,16 @@
   {
    "kind": "OBJECT",
    "name": "QcFlag",
-   "description": "A quality-control problem raised against a dataset. Contrast with `Dataset.quality_metrics`, which is an inlined value object holding measurements \u2014 a flag is its own entity because it has a lifecycle.",
+   "description": "A quality-control problem raised against a dataset. Contrast with `Dataset.quality_metrics`, which is an inlined value object holding measurements — a flag is its own entity because it has a lifecycle.",
    "fields": [
     {
-     "name": "name",
+     "name": "detail",
      "description": null,
      "args": [],
      "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
@@ -13618,15 +13614,29 @@
      }
     },
     {
-     "name": "severity",
+     "name": "isResolved",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "ENUM",
-       "name": "QcSeverityEnum",
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -13656,27 +13666,17 @@
      }
     },
     {
-     "name": "isResolved",
+     "name": "severity",
      "description": null,
      "args": [],
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
+       "kind": "ENUM",
+       "name": "QcSeverityEnum",
        "ofType": null
       }
-     }
-    },
-    {
-     "name": "detail",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
      }
     },
     {
@@ -13799,19 +13799,19 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "low_coverage"
+     "name": "adapter_contamination"
+    },
+    {
+     "name": "failed_calibration"
     },
     {
      "name": "high_duplication"
     },
     {
-     "name": "adapter_contamination"
+     "name": "low_coverage"
     },
     {
      "name": "sample_swap_suspected"
-    },
-    {
-     "name": "failed_calibration"
     }
    ]
   },
@@ -13823,13 +13823,13 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "critical"
+    },
+    {
      "name": "info"
     },
     {
      "name": "warning"
-    },
-    {
-     "name": "critical"
     }
    ]
   },
@@ -13909,22 +13909,22 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "QcFlagFilter",
-   "description": "Typed filter for QcFlag (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for QcFlag (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
-    {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
     {
      "name": "dataset",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "DatasetFilter",
+      "ofType": null
+     }
+    },
+    {
+     "name": "detail",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -13937,10 +13937,18 @@
      }
     },
     {
-     "name": "severity",
+     "name": "isResolved",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "QcSeverityEnumFilterOps",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -13961,18 +13969,10 @@
      }
     },
     {
-     "name": "isResolved",
+     "name": "severity",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "detail",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "QcSeverityEnumFilterOps",
       "ofType": null
      }
     },
@@ -14141,13 +14141,16 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "DETAIL"
     },
     {
      "name": "FLAG_CODE"
     },
     {
-     "name": "SEVERITY"
+     "name": "IS_RESOLVED"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "RAISED_AT"
@@ -14156,10 +14159,7 @@
      "name": "RESOLVED_AT"
     },
     {
-     "name": "IS_RESOLVED"
-    },
-    {
-     "name": "DETAIL"
+     "name": "SEVERITY"
     },
     {
      "name": "ID"
@@ -14175,7 +14175,7 @@
    "description": "A single manufactured lot of a laboratory reagent. Tracked because lot variation is a known source of batch effects.",
    "fields": [
     {
-     "name": "name",
+     "name": "expiresOn",
      "description": null,
      "args": [],
      "type": {
@@ -14183,7 +14183,21 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
+       "name": "Date",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isExpired",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
        "ofType": null
       }
      }
@@ -14203,7 +14217,7 @@
      }
     },
     {
-     "name": "vendor",
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
@@ -14245,7 +14259,7 @@
      }
     },
     {
-     "name": "expiresOn",
+     "name": "vendor",
      "description": null,
      "args": [],
      "type": {
@@ -14253,21 +14267,7 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Date",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "isExpired",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
      }
@@ -14382,19 +14382,19 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "calibration"
+    },
+    {
+     "name": "extraction"
+    },
+    {
      "name": "library_prep"
     },
     {
      "name": "sequencing"
     },
     {
-     "name": "extraction"
-    },
-    {
      "name": "staining"
-    },
-    {
-     "name": "calibration"
     }
    ]
   },
@@ -14474,14 +14474,22 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ReagentLotFilter",
-   "description": "Typed filter for ReagentLot (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for ReagentLot (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "expiresOn",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
+      "name": "DateFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isExpired",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
       "ofType": null
      }
     },
@@ -14494,7 +14502,7 @@
      }
     },
     {
-     "name": "vendor",
+     "name": "name",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "StringFilterOps",
@@ -14518,18 +14526,10 @@
      }
     },
     {
-     "name": "expiresOn",
+     "name": "vendor",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isExpired",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -14649,13 +14649,16 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "EXPIRES_ON"
+    },
+    {
+     "name": "IS_EXPIRED"
     },
     {
      "name": "LOT_NUMBER"
     },
     {
-     "name": "VENDOR"
+     "name": "NAME"
     },
     {
      "name": "REAGENT_KIND"
@@ -14664,10 +14667,7 @@
      "name": "RECEIVED_ON"
     },
     {
-     "name": "EXPIRES_ON"
-    },
-    {
-     "name": "IS_EXPIRED"
+     "name": "VENDOR"
     },
     {
      "name": "ID"
@@ -14683,7 +14683,17 @@
    "description": "The hardware, reagents and software a workflow run was executed with. Separate from `Workflow` because the same pipeline is re-run on different instruments and reagent lots over time.",
    "fields": [
     {
-     "name": "name",
+     "name": "computeHours",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isReproducible",
      "description": null,
      "args": [],
      "type": {
@@ -14691,27 +14701,13 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
+       "name": "Boolean",
        "ofType": null
       }
      }
     },
     {
-     "name": "reagentLotsCount",
-     "description": "Cardinality of `reagent_lots` without resolving its member objects \u2014 a single indexed COUNT(*) over the relationship edges (issue #132).",
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Int",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "softwareVersion",
+     "name": "name",
      "description": null,
      "args": [],
      "type": {
@@ -14739,17 +14735,21 @@
      }
     },
     {
-     "name": "computeHours",
-     "description": null,
+     "name": "reagentLotsCount",
+     "description": "Cardinality of `reagent_lots` without resolving its member objects — a single indexed COUNT(*) over the relationship edges (issue #132).",
      "args": [],
      "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Int",
+       "ofType": null
+      }
      }
     },
     {
-     "name": "isReproducible",
+     "name": "softwareVersion",
      "description": null,
      "args": [],
      "type": {
@@ -14757,7 +14757,7 @@
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
      }
@@ -14861,16 +14861,6 @@
      }
     },
     {
-     "name": "workflow",
-     "description": "Resolved Workflow for `workflow` (graph traversal; batched per request).",
-     "args": [],
-     "type": {
-      "kind": "OBJECT",
-      "name": "Workflow",
-      "ofType": null
-     }
-    },
-    {
      "name": "instrument",
      "description": "Resolved Instrument for `instrument` (graph traversal; batched per request).",
      "args": [],
@@ -14901,6 +14891,16 @@
        }
       }
      }
+    },
+    {
+     "name": "workflow",
+     "description": "Resolved Workflow for `workflow` (graph traversal; batched per request).",
+     "args": [],
+     "type": {
+      "kind": "OBJECT",
+      "name": "Workflow",
+      "ofType": null
+     }
     }
    ],
    "inputFields": null,
@@ -14917,10 +14917,10 @@
      "name": "default"
     },
     {
-     "name": "high_sensitivity"
+     "name": "fast"
     },
     {
-     "name": "fast"
+     "name": "high_sensitivity"
     },
     {
      "name": "legacy"
@@ -15003,9 +15003,33 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "RunConfigurationFilter",
-   "description": "Typed filter for RunConfiguration (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for RunConfiguration (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
+    {
+     "name": "computeHours",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "FloatFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "instrument",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "InstrumentFilter",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isReproducible",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
     {
      "name": "name",
      "type": {
@@ -15015,18 +15039,10 @@
      }
     },
     {
-     "name": "workflow",
+     "name": "parameterPreset",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "WorkflowFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "instrument",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "InstrumentFilter",
+      "name": "ParameterPresetEnumFilterOps",
       "ofType": null
      }
     },
@@ -15047,26 +15063,10 @@
      }
     },
     {
-     "name": "parameterPreset",
+     "name": "workflow",
      "type": {
       "kind": "INPUT_OBJECT",
-      "name": "ParameterPresetEnumFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "computeHours",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "FloatFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isReproducible",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
+      "name": "WorkflowFilter",
       "ofType": null
      }
     },
@@ -15131,31 +15131,6 @@
   },
   {
    "kind": "INPUT_OBJECT",
-   "name": "ReagentLotEdgeQuantifiers",
-   "description": "some/none quantifiers over a multivalued reference edge targeting ReagentLot (ADR-0006 M5b). Both set AND together.",
-   "fields": null,
-   "inputFields": [
-    {
-     "name": "some",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "ReagentLotFilter",
-      "ofType": null
-     }
-    },
-    {
-     "name": "none",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "ReagentLotFilter",
-      "ofType": null
-     }
-    }
-   ],
-   "enumValues": null
-  },
-  {
-   "kind": "INPUT_OBJECT",
    "name": "ParameterPresetEnumFilterOps",
    "description": "Operators on ParameterPresetEnum-ranged slots.",
    "fields": null,
@@ -15204,6 +15179,31 @@
    "enumValues": null
   },
   {
+   "kind": "INPUT_OBJECT",
+   "name": "ReagentLotEdgeQuantifiers",
+   "description": "some/none quantifiers over a multivalued reference edge targeting ReagentLot (ADR-0006 M5b). Both set AND together.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "some",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "ReagentLotFilter",
+      "ofType": null
+     }
+    },
+    {
+     "name": "none",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "ReagentLotFilter",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
    "kind": "ENUM",
    "name": "RunConfigurationOrderField",
    "description": "Orderable stored columns of RunConfiguration (ADR-0007). Computed temporal fields (createdAt/updatedAt) are provenance-derived, not columns, and are not orderable.",
@@ -15211,19 +15211,19 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "COMPUTE_HOURS"
     },
     {
-     "name": "SOFTWARE_VERSION"
+     "name": "IS_REPRODUCIBLE"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "PARAMETER_PRESET"
     },
     {
-     "name": "COMPUTE_HOURS"
-    },
-    {
-     "name": "IS_REPRODUCIBLE"
+     "name": "SOFTWARE_VERSION"
     },
     {
      "name": "ID"
@@ -15314,25 +15314,25 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
-    },
-    {
-     "name": "SAMPLE_TYPE"
+     "name": "ACCESSION"
     },
     {
      "name": "BRAIN_REGION"
     },
     {
-     "name": "STORAGE_CONDITION"
+     "name": "COLLECTED_AT"
+    },
+    {
+     "name": "NAME"
     },
     {
      "name": "REPLICATE_NUMBER"
     },
     {
-     "name": "ACCESSION"
+     "name": "SAMPLE_TYPE"
     },
     {
-     "name": "COLLECTED_AT"
+     "name": "STORAGE_CONDITION"
     },
     {
      "name": "ID"
@@ -15423,7 +15423,7 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "CAPACITY_SLOTS"
     },
     {
      "name": "FACILITY_TYPE"
@@ -15432,16 +15432,16 @@
      "name": "FREEZER_ID"
     },
     {
+     "name": "IS_AT_CAPACITY"
+    },
+    {
+     "name": "NAME"
+    },
+    {
      "name": "SHELF"
     },
     {
      "name": "TEMPERATURE_CELSIUS"
-    },
-    {
-     "name": "CAPACITY_SLOTS"
-    },
-    {
-     "name": "IS_AT_CAPACITY"
     },
     {
      "name": "ID"
@@ -15454,8 +15454,32 @@
   {
    "kind": "OBJECT",
    "name": "ToxicologyReport",
-   "description": "A post-mortem toxicology screen run on a single donor. Not every donor has one \u2014 screens are ordered selectively, so this collection is deliberately sparser than its parent.",
+   "description": "A post-mortem toxicology screen run on a single donor. Not every donor has one — screens are ordered selectively, so this collection is deliberately sparser than its parent.",
    "fields": [
+    {
+     "name": "findingsSummary",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isPositive",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
     {
      "name": "name",
      "description": null,
@@ -15482,6 +15506,16 @@
        "name": "ToxPanelTypeEnum",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "reportedAt",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
      }
     },
     {
@@ -15514,40 +15548,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "isPositive",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "reportedAt",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "findingsSummary",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
      }
     },
     {
@@ -15676,10 +15676,10 @@
      "name": "expanded_screen"
     },
     {
-     "name": "targeted_confirmation"
+     "name": "heavy_metals"
     },
     {
-     "name": "heavy_metals"
+     "name": "targeted_confirmation"
     }
    ]
   },
@@ -15694,16 +15694,16 @@
      "name": "blood"
     },
     {
-     "name": "urine"
-    },
-    {
-     "name": "vitreous_humour"
+     "name": "hair"
     },
     {
      "name": "liver_tissue"
     },
     {
-     "name": "hair"
+     "name": "urine"
+    },
+    {
+     "name": "vitreous_humour"
     }
    ]
   },
@@ -15783,17 +15783,9 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ToxicologyReportFilter",
-   "description": "Typed filter for ToxicologyReport (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for ToxicologyReport (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
-    {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
     {
      "name": "donor",
      "type": {
@@ -15803,10 +15795,42 @@
      }
     },
     {
+     "name": "findingsSummary",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isPositive",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
+    {
      "name": "panelType",
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "ToxPanelTypeEnumFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "reportedAt",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "DateFilterOps",
       "ofType": null
      }
     },
@@ -15823,30 +15847,6 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "ListFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isPositive",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "BooleanFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "reportedAt",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "DateFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "findingsSummary",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -16015,22 +16015,22 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "FINDINGS_SUMMARY"
+    },
+    {
+     "name": "IS_POSITIVE"
+    },
+    {
      "name": "NAME"
     },
     {
      "name": "PANEL_TYPE"
     },
     {
-     "name": "SPECIMEN_MATRIX"
-    },
-    {
-     "name": "IS_POSITIVE"
-    },
-    {
      "name": "REPORTED_AT"
     },
     {
-     "name": "FINDINGS_SUMMARY"
+     "name": "SPECIMEN_MATRIX"
     },
     {
      "name": "ID"
@@ -16121,22 +16121,22 @@
    "inputFields": null,
    "enumValues": [
     {
+     "name": "COMPLETED_AT"
+    },
+    {
+     "name": "DURATION_HOURS"
+    },
+    {
      "name": "NAME"
+    },
+    {
+     "name": "STARTED_AT"
     },
     {
      "name": "STATUS"
     },
     {
      "name": "WORKFLOW_TYPE"
-    },
-    {
-     "name": "STARTED_AT"
-    },
-    {
-     "name": "COMPLETED_AT"
-    },
-    {
-     "name": "DURATION_HOURS"
     },
     {
      "name": "ID"
@@ -16149,7 +16149,7 @@
   {
    "kind": "OBJECT",
    "name": "ProvenanceEntry",
-   "description": "One provenance log entry for an entity (append-only audit trail; see sec6/sec9 \u00a79.6).",
+   "description": "One provenance log entry for an entity (append-only audit trail; see sec6/sec9 §9.6).",
    "fields": [
     {
      "name": "operationId",
@@ -16283,7 +16283,7 @@
   {
    "kind": "OBJECT",
    "name": "XrefMatch",
-   "description": "Entity resolved from an external reference (system, value) pair via the mosaic_external_xref reverse-lookup index (issue #48). Generic envelope shape \u2014 the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "Entity resolved from an external reference (system, value) pair via the mosaic_external_xref reverse-lookup index (issue #48). Generic envelope shape — the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",
@@ -16364,7 +16364,7 @@
   {
    "kind": "OBJECT",
    "name": "RelatedEntity",
-   "description": "An entity that references the queried entity through a relationships-table-backed multivalued slot (ADR-0002) \u2014 the reverse of forward multivalued-reference resolution (issue #146). Generic envelope shape \u2014 the referencing entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "An entity that references the queried entity through a relationships-table-backed multivalued slot (ADR-0002) — the reverse of forward multivalued-reference resolution (issue #146). Generic envelope shape — the referencing entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",
@@ -16459,7 +16459,7 @@
   {
    "kind": "OBJECT",
    "name": "SearchHit",
-   "description": "One cross-class search hit (issue #158): a heterogeneous JSON envelope \u2014 the matching entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal. `score` is the FTS rank, normalized to [0, 1] per index (comparable in relative terms across classes).",
+   "description": "One cross-class search hit (issue #158): a heterogeneous JSON envelope — the matching entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal. `score` is the FTS rank, normalized to [0, 1] per index (comparable in relative terms across classes).",
    "fields": [
     {
      "name": "entityId",
@@ -16554,7 +16554,7 @@
   {
    "kind": "OBJECT",
    "name": "NeighborhoodGraph",
-   "description": "A depth-bounded subgraph around one entity (issue #158): renderable without further queries. `edgeSources` names the edge stores covered by this response; `notices` discloses any bound hit (node budget) or scoped-out coverage (column edges under asOf) \u2014 the graph is never silently partial.",
+   "description": "A depth-bounded subgraph around one entity (issue #158): renderable without further queries. `edgeSources` names the edge stores covered by this response; `notices` discloses any bound hit (node budget) or scoped-out coverage (column edges under asOf) — the graph is never silently partial.",
    "fields": [
     {
      "name": "nodes",
@@ -16651,7 +16651,7 @@
   {
    "kind": "OBJECT",
    "name": "GraphNode",
-   "description": "One node of a neighborhood subgraph (issue #158) \u2014 the same heterogeneous JSON envelope as SearchHit/XrefMatch.",
+   "description": "One node of a neighborhood subgraph (issue #158) — the same heterogeneous JSON envelope as SearchHit/XrefMatch.",
    "fields": [
     {
      "name": "entityId",
@@ -16718,7 +16718,7 @@
   {
    "kind": "OBJECT",
    "name": "GraphEdge",
-   "description": "One directed edge of a neighborhood subgraph. `type` is the referencing slot / relationship type; `edgeSource` names the store it came from \u2014 LINK_TABLE (relationship-backed multivalued references, ADR-0002) or COLUMN (single-valued reference slots).",
+   "description": "One directed edge of a neighborhood subgraph. `type` is the referencing slot / relationship type; `edgeSource` names the store it came from — LINK_TABLE (relationship-backed multivalued references, ADR-0002) or COLUMN (single-valued reference slots).",
    "fields": [
     {
      "name": "source",
@@ -16783,7 +16783,7 @@
   {
    "kind": "OBJECT",
    "name": "MosaicEntityTypeInfo",
-   "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Mosaic's *domain* schema introspection \u2014 the LinkML type model the GraphQL surface itself is generated from.",
+   "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Mosaic's *domain* schema introspection — the LinkML type model the GraphQL surface itself is generated from.",
    "fields": [
     {
      "name": "name",
@@ -16861,6 +16861,52 @@
         "ofType": {
          "kind": "OBJECT",
          "name": "MosaicReferenceInfo",
+         "ofType": null
+        }
+       }
+      }
+     }
+    },
+    {
+     "name": "abstract",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "parent",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "kinds",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "LIST",
+       "name": null,
+       "ofType": {
+        "kind": "NON_NULL",
+        "name": null,
+        "ofType": {
+         "kind": "SCALAR",
+         "name": "String",
          "ofType": null
         }
        }
@@ -20628,6 +20674,42 @@
    "fields": null,
    "inputFields": [
     {
+     "name": "containerType",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "ContainerTypeEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isDepleted",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "location",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
      "name": "name",
      "type": {
       "kind": "NON_NULL",
@@ -20652,42 +20734,6 @@
      }
     },
     {
-     "name": "location",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "ID",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "volumeUl",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "containerType",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "ContainerTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "thawCount",
      "type": {
       "kind": "NON_NULL",
@@ -20700,13 +20746,13 @@
      }
     },
     {
-     "name": "isDepleted",
+     "name": "volumeUl",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "Float",
        "ofType": null
       }
      }
@@ -20745,7 +20791,39 @@
    "fields": null,
    "inputFields": [
     {
+     "name": "containerType",
+     "type": {
+      "kind": "ENUM",
+      "name": "ContainerTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isDepleted",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "location",
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
+      "ofType": null
+     }
+    },
+    {
      "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "notes",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -20761,30 +20839,6 @@
      }
     },
     {
-     "name": "location",
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
-      "ofType": null
-     }
-    },
-    {
-     "name": "volumeUl",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "containerType",
-     "type": {
-      "kind": "ENUM",
-      "name": "ContainerTypeEnum",
-      "ofType": null
-     }
-    },
-    {
      "name": "thawCount",
      "type": {
       "kind": "SCALAR",
@@ -20793,18 +20847,10 @@
      }
     },
     {
-     "name": "isDepleted",
+     "name": "volumeUl",
      "type": {
       "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "notes",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
+      "name": "Float",
       "ofType": null
      }
     },
@@ -20830,7 +20876,7 @@
   {
    "kind": "OBJECT",
    "name": "AvailabilityResult",
-   "description": "Result of an availability transition. Mosaic never hard-deletes; lifecycle status drivers (active/archived/superseded/deleted/distributed/removed) are recorded in provenance (sec3, sec9 \u00a79.5).",
+   "description": "Result of an availability transition. Mosaic never hard-deletes; lifecycle status drivers (active/archived/superseded/deleted/distributed/removed) are recorded in provenance (sec3, sec9 §9.5).",
    "fields": [
     {
      "name": "entityId",
@@ -20867,7 +20913,7 @@
   {
    "kind": "OBJECT",
    "name": "BulkAvailabilityResult",
-   "description": "Summary of a bulk availability change (mirrors REST POST /entities/{type}/bulk-availability): per-record error isolation \u2014 failures never roll back sibling successes.",
+   "description": "Summary of a bulk availability change (mirrors REST POST /entities/{type}/bulk-availability): per-record error isolation — failures never roll back sibling successes.",
    "fields": [
     {
      "name": "total",
@@ -21040,18 +21086,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "donor",
      "type": {
       "kind": "NON_NULL",
@@ -21076,18 +21110,6 @@
      }
     },
     {
-     "name": "rawScore",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "isBaseline",
      "type": {
       "kind": "NON_NULL",
@@ -21100,11 +21122,27 @@
      }
     },
     {
-     "name": "percentileRank",
+     "name": "name",
      "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "rawScore",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Float",
+       "ofType": null
+      }
      }
     },
     {
@@ -21120,6 +21158,14 @@
      "type": {
       "kind": "SCALAR",
       "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "percentileRank",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
       "ofType": null
      }
     },
@@ -21149,7 +21195,15 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "administeredAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "administeredBy",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -21173,10 +21227,18 @@
      }
     },
     {
-     "name": "rawScore",
+     "name": "isBaseline",
      "type": {
       "kind": "SCALAR",
-      "name": "Float",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -21189,26 +21251,10 @@
      }
     },
     {
-     "name": "isBaseline",
+     "name": "rawScore",
      "type": {
       "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "administeredAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "administeredBy",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
+      "name": "Float",
       "ofType": null
      }
     },
@@ -21238,18 +21284,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "donor",
      "type": {
       "kind": "NON_NULL",
@@ -21257,6 +21291,30 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isActive",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -21286,15 +21344,11 @@
      }
     },
     {
-     "name": "isActive",
+     "name": "restrictions",
      "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
@@ -21302,14 +21356,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "restrictions",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
       "ofType": null
      }
     },
@@ -21339,6 +21385,22 @@
    "fields": null,
    "inputFields": [
     {
+     "name": "donor",
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isActive",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
      "name": "name",
      "type": {
       "kind": "SCALAR",
@@ -21347,10 +21409,10 @@
      }
     },
     {
-     "name": "donor",
+     "name": "restrictions",
      "type": {
       "kind": "SCALAR",
-      "name": "ID",
+      "name": "String",
       "ofType": null
      }
     },
@@ -21375,22 +21437,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isActive",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "restrictions",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
       "ofType": null
      }
     },
@@ -21420,6 +21466,42 @@
    "fields": null,
    "inputFields": [
     {
+     "name": "accessLevel",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "AccessLevelEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "datasetType",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "DatasetTypeEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isPublic",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
      "name": "name",
      "type": {
       "kind": "NON_NULL",
@@ -21439,42 +21521,6 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "ID",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "datasetType",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "DatasetTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "accessLevel",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "AccessLevelEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "isPublic",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
        "ofType": null
       }
      }
@@ -21529,30 +21575,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "producedBy",
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
-      "ofType": null
-     }
-    },
-    {
-     "name": "datasetType",
-     "type": {
-      "kind": "ENUM",
-      "name": "DatasetTypeEnum",
-      "ofType": null
-     }
-    },
-    {
      "name": "accessLevel",
      "type": {
       "kind": "ENUM",
@@ -21561,10 +21583,10 @@
      }
     },
     {
-     "name": "isPublic",
+     "name": "datasetType",
      "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
+      "kind": "ENUM",
+      "name": "DatasetTypeEnum",
       "ofType": null
      }
     },
@@ -21581,6 +21603,30 @@
      "type": {
       "kind": "SCALAR",
       "name": "Float",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isPublic",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "producedBy",
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
       "ofType": null
      }
     },
@@ -21618,7 +21664,19 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "certainty",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "DiagnosisCertaintyEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "conditionName",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -21642,30 +21700,6 @@
      }
     },
     {
-     "name": "conditionName",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "certainty",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "DiagnosisCertaintyEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "isPrimary",
      "type": {
       "kind": "NON_NULL",
@@ -21673,6 +21707,18 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -21719,26 +21765,10 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "braakStage",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "donor",
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
-      "ofType": null
-     }
-    },
-    {
-     "name": "conditionName",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
+      "name": "Int",
       "ofType": null
      }
     },
@@ -21751,10 +21781,26 @@
      }
     },
     {
-     "name": "braakStage",
+     "name": "conditionName",
      "type": {
       "kind": "SCALAR",
-      "name": "Int",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "diagnosedAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "donor",
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
       "ofType": null
      }
     },
@@ -21767,10 +21813,10 @@
      }
     },
     {
-     "name": "diagnosedAt",
+     "name": "name",
      "type": {
       "kind": "SCALAR",
-      "name": "Date",
+      "name": "String",
       "ofType": null
      }
     },
@@ -21800,13 +21846,13 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "ageAtDeath",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
+       "name": "Int",
        "ofType": null
       }
      }
@@ -21824,30 +21870,6 @@
      }
     },
     {
-     "name": "sex",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "SexEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "ageAtDeath",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Int",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "historyOfRhi",
      "type": {
       "kind": "NON_NULL",
@@ -21855,6 +21877,30 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "sex",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "SexEnum",
        "ofType": null
       }
      }
@@ -21901,7 +21947,15 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "ageAtDeath",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "causeOfDeath",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -21917,22 +21971,6 @@
      }
     },
     {
-     "name": "sex",
-     "type": {
-      "kind": "ENUM",
-      "name": "SexEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "ageAtDeath",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
      "name": "historyOfRhi",
      "type": {
       "kind": "SCALAR",
@@ -21941,7 +21979,7 @@
      }
     },
     {
-     "name": "causeOfDeath",
+     "name": "name",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -21953,6 +21991,14 @@
      "type": {
       "kind": "SCALAR",
       "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "sex",
+     "type": {
+      "kind": "ENUM",
+      "name": "SexEnum",
       "ofType": null
      }
     },
@@ -21982,25 +22028,13 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "isDecommissioned",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "platform",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "ENUM",
-       "name": "InstrumentPlatformEnum",
+       "name": "Boolean",
        "ofType": null
       }
      }
@@ -22030,7 +22064,7 @@
      }
     },
     {
-     "name": "serialNumber",
+     "name": "name",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -22042,13 +22076,25 @@
      }
     },
     {
-     "name": "isDecommissioned",
+     "name": "platform",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "ENUM",
+       "name": "InstrumentPlatformEnum",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "serialNumber",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
      }
@@ -22095,18 +22141,18 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "commissionedOn",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
+      "name": "Date",
       "ofType": null
      }
     },
     {
-     "name": "platform",
+     "name": "isDecommissioned",
      "type": {
-      "kind": "ENUM",
-      "name": "InstrumentPlatformEnum",
+      "kind": "SCALAR",
+      "name": "Boolean",
       "ofType": null
      }
     },
@@ -22127,7 +22173,7 @@
      }
     },
     {
-     "name": "serialNumber",
+     "name": "name",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22135,23 +22181,23 @@
      }
     },
     {
-     "name": "commissionedOn",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isDecommissioned",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
      "name": "notes",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "platform",
+     "type": {
+      "kind": "ENUM",
+      "name": "InstrumentPlatformEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "serialNumber",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22184,30 +22230,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "title",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "doi",
      "type": {
       "kind": "NON_NULL",
@@ -22220,7 +22242,31 @@
      }
     },
     {
+     "name": "isOpenAccess",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
      "name": "journal",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -22244,15 +22290,23 @@
      }
     },
     {
-     "name": "isOpenAccess",
+     "name": "title",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "abstractText",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
      }
     },
     {
@@ -22276,14 +22330,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "abstractText",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
       "ofType": null
      }
     },
@@ -22313,15 +22359,7 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "title",
+     "name": "abstractText",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22353,7 +22391,23 @@
      }
     },
     {
+     "name": "isOpenAccess",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
      "name": "journal",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22377,15 +22431,7 @@
      }
     },
     {
-     "name": "isOpenAccess",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "abstractText",
+     "name": "title",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22418,18 +22464,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "dataset",
      "type": {
       "kind": "NON_NULL",
@@ -22454,13 +22488,25 @@
      }
     },
     {
-     "name": "severity",
+     "name": "isResolved",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "ENUM",
-       "name": "QcSeverityEnum",
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -22478,23 +22524,15 @@
      }
     },
     {
-     "name": "isResolved",
+     "name": "severity",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
+       "kind": "ENUM",
+       "name": "QcSeverityEnum",
        "ofType": null
       }
-     }
-    },
-    {
-     "name": "resolvedAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
-      "ofType": null
      }
     },
     {
@@ -22502,6 +22540,14 @@
      "type": {
       "kind": "SCALAR",
       "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "resolvedAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "DateTime",
       "ofType": null
      }
     },
@@ -22531,18 +22577,18 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
      "name": "dataset",
      "type": {
       "kind": "SCALAR",
       "name": "ID",
+      "ofType": null
+     }
+    },
+    {
+     "name": "detail",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -22555,10 +22601,18 @@
      }
     },
     {
-     "name": "severity",
+     "name": "isResolved",
      "type": {
-      "kind": "ENUM",
-      "name": "QcSeverityEnum",
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -22579,18 +22633,10 @@
      }
     },
     {
-     "name": "isResolved",
+     "name": "severity",
      "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "detail",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
+      "kind": "ENUM",
+      "name": "QcSeverityEnum",
       "ofType": null
      }
     },
@@ -22620,13 +22666,25 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "expiresOn",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "String",
+       "name": "Date",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isExpired",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
        "ofType": null
       }
      }
@@ -22644,7 +22702,7 @@
      }
     },
     {
-     "name": "vendor",
+     "name": "name",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -22680,25 +22738,13 @@
      }
     },
     {
-     "name": "expiresOn",
+     "name": "vendor",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Date",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "isExpired",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
      }
@@ -22729,10 +22775,18 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "expiresOn",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isExpired",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
       "ofType": null
      }
     },
@@ -22745,7 +22799,7 @@
      }
     },
     {
-     "name": "vendor",
+     "name": "name",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -22769,18 +22823,10 @@
      }
     },
     {
-     "name": "expiresOn",
+     "name": "vendor",
      "type": {
       "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isExpired",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
+      "name": "String",
       "ofType": null
      }
     },
@@ -22810,30 +22856,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "workflow",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "ID",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "instrument",
      "type": {
       "kind": "NON_NULL",
@@ -22846,7 +22868,19 @@
      }
     },
     {
-     "name": "softwareVersion",
+     "name": "isReproducible",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -22870,15 +22904,35 @@
      }
     },
     {
-     "name": "isReproducible",
+     "name": "softwareVersion",
      "type": {
       "kind": "NON_NULL",
       "name": null,
       "ofType": {
        "kind": "SCALAR",
-       "name": "Boolean",
+       "name": "String",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "workflow",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "computeHours",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
+      "ofType": null
      }
     },
     {
@@ -22895,14 +22949,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "computeHours",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
      }
     },
     {
@@ -22931,18 +22977,10 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "computeHours",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "workflow",
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
+      "name": "Float",
       "ofType": null
      }
     },
@@ -22951,6 +22989,30 @@
      "type": {
       "kind": "SCALAR",
       "name": "ID",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isReproducible",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "parameterPreset",
+     "type": {
+      "kind": "ENUM",
+      "name": "ParameterPresetEnum",
       "ofType": null
      }
     },
@@ -22979,26 +23041,10 @@
      }
     },
     {
-     "name": "parameterPreset",
-     "type": {
-      "kind": "ENUM",
-      "name": "ParameterPresetEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "computeHours",
+     "name": "workflow",
      "type": {
       "kind": "SCALAR",
-      "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isReproducible",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
+      "name": "ID",
       "ofType": null
      }
     },
@@ -23028,7 +23074,7 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "accession",
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -23047,6 +23093,30 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "replicateNumber",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Int",
        "ofType": null
       }
      }
@@ -23076,34 +23146,18 @@
      }
     },
     {
-     "name": "replicateNumber",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Int",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "accession",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "brainRegion",
      "type": {
       "kind": "ENUM",
       "name": "BrainRegionEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "collectedAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
       "ofType": null
      }
     },
@@ -23121,14 +23175,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "collectedAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
      }
     },
     {
@@ -23157,26 +23203,10 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "accession",
      "type": {
       "kind": "SCALAR",
       "name": "String",
-      "ofType": null
-     }
-    },
-    {
-     "name": "donor",
-     "type": {
-      "kind": "SCALAR",
-      "name": "ID",
-      "ofType": null
-     }
-    },
-    {
-     "name": "sampleType",
-     "type": {
-      "kind": "ENUM",
-      "name": "SampleTypeEnum",
       "ofType": null
      }
     },
@@ -23189,10 +23219,26 @@
      }
     },
     {
-     "name": "storageCondition",
+     "name": "collectedAt",
      "type": {
-      "kind": "ENUM",
-      "name": "StorageConditionEnum",
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
+     }
+    },
+    {
+     "name": "donor",
+     "type": {
+      "kind": "SCALAR",
+      "name": "ID",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -23205,10 +23251,18 @@
      }
     },
     {
-     "name": "accession",
+     "name": "sampleType",
      "type": {
-      "kind": "SCALAR",
-      "name": "String",
+      "kind": "ENUM",
+      "name": "SampleTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "storageCondition",
+     "type": {
+      "kind": "ENUM",
+      "name": "StorageConditionEnum",
       "ofType": null
      }
     },
@@ -23226,14 +23280,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "collectedAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
      }
     },
     {
@@ -23262,18 +23308,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "facilityType",
      "type": {
       "kind": "NON_NULL",
@@ -23298,18 +23332,6 @@
      }
     },
     {
-     "name": "temperatureCelsius",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Float",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "isAtCapacity",
      "type": {
       "kind": "NON_NULL",
@@ -23322,11 +23344,27 @@
      }
     },
     {
-     "name": "shelf",
+     "name": "name",
      "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "temperatureCelsius",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Float",
+       "ofType": null
+      }
      }
     },
     {
@@ -23334,6 +23372,14 @@
      "type": {
       "kind": "SCALAR",
       "name": "Int",
+      "ofType": null
+     }
+    },
+    {
+     "name": "shelf",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -23363,10 +23409,10 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "capacitySlots",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
+      "name": "Int",
       "ofType": null
      }
     },
@@ -23387,6 +23433,22 @@
      }
     },
     {
+     "name": "isAtCapacity",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
      "name": "shelf",
      "type": {
       "kind": "SCALAR",
@@ -23399,22 +23461,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Float",
-      "ofType": null
-     }
-    },
-    {
-     "name": "capacitySlots",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "isAtCapacity",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
       "ofType": null
      }
     },
@@ -23444,18 +23490,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "donor",
      "type": {
       "kind": "NON_NULL",
@@ -23463,6 +23497,30 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "isPositive",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -23492,15 +23550,19 @@
      }
     },
     {
-     "name": "isPositive",
+     "name": "findingsSummary",
      "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "Boolean",
-       "ofType": null
-      }
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "reportedAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
+      "ofType": null
      }
     },
     {
@@ -23517,22 +23579,6 @@
         "ofType": null
        }
       }
-     }
-    },
-    {
-     "name": "reportedAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "findingsSummary",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
      }
     },
     {
@@ -23561,14 +23607,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
      "name": "donor",
      "type": {
       "kind": "SCALAR",
@@ -23577,10 +23615,42 @@
      }
     },
     {
+     "name": "findingsSummary",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "isPositive",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
      "name": "panelType",
      "type": {
       "kind": "ENUM",
       "name": "ToxPanelTypeEnum",
+      "ofType": null
+     }
+    },
+    {
+     "name": "reportedAt",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Date",
       "ofType": null
      }
     },
@@ -23609,30 +23679,6 @@
      }
     },
     {
-     "name": "isPositive",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Boolean",
-      "ofType": null
-     }
-    },
-    {
-     "name": "reportedAt",
-     "type": {
-      "kind": "SCALAR",
-      "name": "Date",
-      "ofType": null
-     }
-    },
-    {
-     "name": "findingsSummary",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
      "name": "id",
      "type": {
       "kind": "SCALAR",
@@ -23658,18 +23704,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "inputSamples",
      "type": {
       "kind": "NON_NULL",
@@ -23686,6 +23720,30 @@
          "ofType": null
         }
        }
+      }
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "startedAt",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "DateTime",
+       "ofType": null
       }
      }
     },
@@ -23709,18 +23767,6 @@
       "ofType": {
        "kind": "ENUM",
        "name": "WorkflowTypeEnum",
-       "ofType": null
-      }
-     }
-    },
-    {
-     "name": "startedAt",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "DateTime",
        "ofType": null
       }
      }
@@ -23767,10 +23813,18 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "completedAt",
      "type": {
       "kind": "SCALAR",
-      "name": "String",
+      "name": "DateTime",
+      "ofType": null
+     }
+    },
+    {
+     "name": "durationHours",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Float",
       "ofType": null
      }
     },
@@ -23791,18 +23845,10 @@
      }
     },
     {
-     "name": "status",
+     "name": "name",
      "type": {
-      "kind": "ENUM",
-      "name": "WorkflowStatusEnum",
-      "ofType": null
-     }
-    },
-    {
-     "name": "workflowType",
-     "type": {
-      "kind": "ENUM",
-      "name": "WorkflowTypeEnum",
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -23815,18 +23861,18 @@
      }
     },
     {
-     "name": "completedAt",
+     "name": "status",
      "type": {
-      "kind": "SCALAR",
-      "name": "DateTime",
+      "kind": "ENUM",
+      "name": "WorkflowStatusEnum",
       "ofType": null
      }
     },
     {
-     "name": "durationHours",
+     "name": "workflowType",
      "type": {
-      "kind": "SCALAR",
-      "name": "Float",
+      "kind": "ENUM",
+      "name": "WorkflowTypeEnum",
       "ofType": null
      }
     },
@@ -24047,7 +24093,7 @@
   {
    "kind": "OBJECT",
    "name": "ValidationFailureType",
-   "description": "One tier-annotated validation failure (sec9 \u00a79.9).",
+   "description": "One tier-annotated validation failure (sec9 §9.9).",
    "fields": [
     {
      "name": "tier",
@@ -24276,7 +24322,7 @@
     },
     {
      "name": "subscriptionType",
-     "description": "If this server support subscription, the type that subscription operations will be rooted at.",
+     "description": "If this server supports subscription, the type that subscription operations will be rooted at.",
      "args": [],
      "type": {
       "kind": "OBJECT",
@@ -24287,7 +24333,21 @@
     {
      "name": "directives",
      "description": "A list of all directives supported by this server.",
-     "args": [],
+     "args": [
+      {
+       "name": "includeDeprecated",
+       "defaultValue": "false",
+       "type": {
+        "kind": "NON_NULL",
+        "name": null,
+        "ofType": {
+         "kind": "SCALAR",
+         "name": "Boolean",
+         "ofType": null
+        }
+       }
+      }
+     ],
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -24873,6 +24933,30 @@
        }
       }
      }
+    },
+    {
+     "name": "isDeprecated",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "deprecationReason",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
     }
    ],
    "inputFields": null,
@@ -24941,6 +25025,9 @@
     },
     {
      "name": "INPUT_FIELD_DEFINITION"
+    },
+    {
+     "name": "DIRECTIVE_DEFINITION"
     }
    ]
   }
