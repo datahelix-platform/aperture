@@ -14,7 +14,7 @@ TypeScript, urql (GraphQL), TanStack Table, nuqs. Talks to Hippo's GraphQL **dir
 > interpreted by a pure engine, staging in resumable version-pinned drafts, continuous
 > dry-run, and one atomic batch commit with intra-batch references; and the control plane
 > (Phase 4, ADR-0017): saved views, cross-browser drafts, and workflows-config-as-data as
-> versioned documents on a LinkML-on-Hippo store (co-located by default,
+> versioned documents on a LinkML-on-Mosaic store (co-located by default,
 > `VITE_CONTROL_PLANE_URL` to split; localStorage fallback, labeled in the footer).
 > The full query state `{collection, page, q, filters, entity, form, workflow}` lives in the
 > URL. See `../design/implementation-plan.md` for the phased build and
@@ -141,7 +141,7 @@ web/
 │   │   ├── scopedClient.ts       # capability-scoped client seam (urql pass-through)
 │   │   ├── introspection.ts      # standard __schema baseline
 │   │   ├── schemaModel.ts        # collections + column models + Capabilities derivation
-│   │   ├── hippoSource.ts        # the source adapter (ADR-0017)
+│   │   ├── mosaicSource.ts       # the source adapter (ADR-0017)
 │   │   └── DataSourceContext.tsx # useDataSource() / useCapabilities() (ADR-0029)
 │   ├── features/collections/     # nav, table, facets, detail, export, URL state
 │   ├── styles/                   # tokens.css (from design/design-tokens.md) + global.css

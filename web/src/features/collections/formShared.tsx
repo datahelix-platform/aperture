@@ -1,4 +1,4 @@
-import type { HippoSource, WriteValues } from '../../data/hippoSource';
+import type { MosaicSource, WriteValues } from '../../data/mosaicSource';
 import type { FormFieldModel } from '../../data/schemaModel';
 import { RefPicker } from './RefPicker';
 
@@ -69,7 +69,7 @@ export function FieldWidget({
 }: {
   field: FormFieldModel;
   value: string | boolean;
-  source: HippoSource;
+  source: MosaicSource;
   onChange: (value: string | boolean) => void;
 }) {
   // `id` doubles as the stable certification testid (field-<input name>,
@@ -140,7 +140,7 @@ export function FormFieldRow({
   field: FormFieldModel;
   value: string | boolean;
   error?: string;
-  source: HippoSource;
+  source: MosaicSource;
   onChange: (value: string | boolean) => void;
 }) {
   return (

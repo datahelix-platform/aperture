@@ -1,10 +1,10 @@
-import { connectHippoSource } from '../data/hippoSource';
+import { connectMosaicSource } from '../data/mosaicSource';
 import { capableSchema, fakeClient, realIntrospection } from '../data/testing/fixtures';
 import {
   NotOwnedError,
   canViewerRead,
   canViewerWrite,
-  createHippoStore,
+  createMosaicStore,
   createLocalStore,
   defaultVisibility,
   findDocumentCollection,
@@ -59,22 +59,22 @@ describe('payload envelopes (versioned + validated — ADR-0003/0004)', () => {
 
 describe('findDocumentCollection (structural recognition)', () => {
   it('finds the document collection when the schema advertises one', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema({ documents: true })));
+    const source = await connectMosaicSource(fakeClient(capableSchema({ documents: true })));
     expect(findDocumentCollection(source)?.id).toBe('apertureDocuments');
   });
 
   it('is absent otherwise — the store falls back honestly', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema()));
+    const source = await connectMosaicSource(fakeClient(capableSchema()));
     expect(findDocumentCollection(source)).toBeUndefined();
   });
 });
 
-describe('HippoControlPlaneStore (LinkML-on-Hippo reference impl)', () => {
+describe('MosaicControlPlaneStore (LinkML-on-Mosaic reference impl)', () => {
   it('puts (create then update on collision), gets, lists, and retires documents', async () => {
     const { client, docs } = documentBackend();
-    const source = await connectHippoSource(client);
-    const store = createHippoStore(source, findDocumentCollection(source)!);
-    expect(store.backend).toBe('hippo');
+    const source = await connectMosaicSource(client);
+    const store = createMosaicStore(source, findDocumentCollection(source)!);
+    expect(store.backend).toBe('mosaic');
 
     await store.put({ kind: 'savedView', name: 'my view', payload: sealPayload(1, { x: 1 }) });
     expect(docs).toHaveLength(1);
@@ -137,9 +137,9 @@ function envelopeDocumentBackend() {
   return { client, docs };
 }
 
-describe('HippoControlPlaneStore (live Hippo shapes — #15)', () => {
+describe('MosaicControlPlaneStore (live Hippo shapes — #15)', () => {
   it('recognizes the envelope-derived document collection structurally', async () => {
-    const source = await connectHippoSource(fakeClient(realIntrospection));
+    const source = await connectMosaicSource(fakeClient(realIntrospection));
     const collection = findDocumentCollection(source);
     expect(collection?.id).toBe('apertureDocuments');
     expect(collection?.pageShape).toBe('envelope');
@@ -147,8 +147,8 @@ describe('HippoControlPlaneStore (live Hippo shapes — #15)', () => {
 
   it('round-trips documents through envelope pages and the filter list', async () => {
     const { client, docs } = envelopeDocumentBackend();
-    const source = await connectHippoSource(client);
-    const store = createHippoStore(source, findDocumentCollection(source)!);
+    const source = await connectMosaicSource(client);
+    const store = createMosaicStore(source, findDocumentCollection(source)!);
 
     await store.put({ kind: 'savedView', name: 'my view', payload: sealPayload(1, { x: 1 }) });
     await store.put({ kind: 'savedView', name: 'my view', payload: sealPayload(1, { x: 2 }) });
@@ -236,9 +236,9 @@ function ownedBackend() {
 
 const ownedStore = async (viewer: string | null) => {
   const { client, docs } = ownedBackend();
-  const source = await connectHippoSource(client);
+  const source = await connectMosaicSource(client);
   const collection = findDocumentCollection(source)!;
-  return { store: createHippoStore(source, collection, viewer), docs, source, collection };
+  return { store: createMosaicStore(source, collection, viewer), docs, source, collection };
 };
 
 describe('the write rule (canViewerWrite / canViewerRead)', () => {
@@ -271,12 +271,12 @@ describe('the write rule (canViewerWrite / canViewerRead)', () => {
 
 describe('supportsOwnerScoping (structural, optional — ADR-0029)', () => {
   it('is true only when the endpoint carries filterable owner + visibility', async () => {
-    const scoped = await connectHippoSource(
+    const scoped = await connectMosaicSource(
       fakeClient(capableSchema({ documents: true, documentOwnership: true })),
     );
     expect(supportsOwnerScoping(findDocumentCollection(scoped)!)).toBe(true);
 
-    const legacy = await connectHippoSource(fakeClient(capableSchema({ documents: true })));
+    const legacy = await connectMosaicSource(fakeClient(capableSchema({ documents: true })));
     // The 1.0.0 recipe shape is still recognized as a document store …
     expect(findDocumentCollection(legacy)).toBeDefined();
     // … it just does not support per-user scoping.
@@ -284,7 +284,7 @@ describe('supportsOwnerScoping (structural, optional — ADR-0029)', () => {
   });
 });
 
-describe('HippoControlPlaneStore — per-user scoping', () => {
+describe('MosaicControlPlaneStore — per-user scoping', () => {
   it('reports shared scoping without a viewer, per-user with one', async () => {
     expect((await ownedStore(null)).store.scoping).toBe('shared');
     const alice = await ownedStore('alice');
@@ -293,8 +293,8 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
   });
 
   it('stays shared on a 1.0.0 endpoint even with a viewer — degrades honestly', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema({ documents: true })));
-    const store = createHippoStore(source, findDocumentCollection(source)!, 'alice');
+    const source = await connectMosaicSource(fakeClient(capableSchema({ documents: true })));
+    const store = createMosaicStore(source, findDocumentCollection(source)!, 'alice');
     expect(store.scoping).toBe('shared');
     expect(store.viewer).toBeNull();
   });
@@ -324,10 +324,10 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
 
   it('two viewers hold same-named views without collision (the core bug)', async () => {
     const { client, docs } = ownedBackend();
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     const collection = findDocumentCollection(source)!;
-    const alice = createHippoStore(source, collection, 'alice');
-    const bob = createHippoStore(source, collection, 'bob');
+    const alice = createMosaicStore(source, collection, 'alice');
+    const bob = createMosaicStore(source, collection, 'bob');
 
     await alice.put({ kind: 'savedView', name: 'PTSD cohort v2', payload: sealPayload(1, { a: 1 }) });
     await bob.put({ kind: 'savedView', name: 'PTSD cohort v2', payload: sealPayload(1, { b: 1 }) });
@@ -340,13 +340,13 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
 
   it('refuses to write or retire a view owned by someone else', async () => {
     const { client, docs } = ownedBackend();
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     const collection = findDocumentCollection(source)!;
-    const alice = createHippoStore(source, collection, 'alice');
+    const alice = createMosaicStore(source, collection, 'alice');
     await alice.put({ kind: 'savedView', name: 'shared one', payload: sealPayload(1, { a: 1 }) });
 
     // Bob sees it (shared) but cannot write it.
-    const bob = createHippoStore(source, collection, 'bob');
+    const bob = createMosaicStore(source, collection, 'bob');
     const seen = await bob.list('savedView');
     expect(seen.map((d) => d.name)).toEqual(['shared one']);
     expect(bob.canWrite(seen[0])).toBe(false);
@@ -361,7 +361,7 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
     // update, so the owner-only rule covers deletion for free.
     const alicesDoc = docs[0];
     await expect(
-      createHippoStore(source, collection, 'carol').remove('savedView', 'shared one'),
+      createMosaicStore(source, collection, 'carol').remove('savedView', 'shared one'),
     ).resolves.toBeUndefined(); // carol owns nothing by that name — a no-op, not a throw
     expect(alicesDoc.payload).toBe(sealPayload(1, { a: 1 }));
   });
@@ -387,8 +387,8 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
         return { data: { books: [], authors: [] }, error: null };
       },
     );
-    const source = await connectHippoSource(client);
-    const bob = createHippoStore(source, findDocumentCollection(source)!, 'bob');
+    const source = await connectMosaicSource(client);
+    const bob = createMosaicStore(source, findDocumentCollection(source)!, 'bob');
 
     await expect(
       bob.put({ kind: 'savedView', name: 'v', payload: sealPayload(1, { b: 1 }) }),
@@ -399,10 +399,10 @@ describe('HippoControlPlaneStore — per-user scoping', () => {
 
   it('lists the viewer own private drafts and no one else\'s', async () => {
     const { client } = ownedBackend();
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     const collection = findDocumentCollection(source)!;
-    const alice = createHippoStore(source, collection, 'alice');
-    const bob = createHippoStore(source, collection, 'bob');
+    const alice = createMosaicStore(source, collection, 'alice');
+    const bob = createMosaicStore(source, collection, 'bob');
 
     await alice.put({ kind: 'workflowDraft', name: 'ingest', payload: sealPayload(1, { a: 1 }) });
     expect((await alice.list('workflowDraft')).map((d) => d.name)).toEqual(['ingest']);

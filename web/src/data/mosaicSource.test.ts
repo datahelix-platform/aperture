@@ -5,8 +5,8 @@ import {
   buildSetAvailabilityMutation,
   buildSupersedeMutation,
   buildUpdateMutation,
-  connectHippoSource,
-} from './hippoSource';
+  connectMosaicSource,
+} from './mosaicSource';
 import { deriveCollections } from './schemaModel';
 import {
   bareSchema,
@@ -274,7 +274,7 @@ describe('write mutations (W4.3)', () => {
       }
       return { data: {}, error: null };
     });
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(await source.createEntity('books', { title: 'T' })).toBe('BK-NEW');
     await expect(source.updateEntity('books', 'BK-1', { title: '' })).rejects.toThrow(
       /Could not update Book “BK-1”: title must not be empty/,
@@ -326,14 +326,14 @@ describe('lifecycle mutations (W4.4)', () => {
       }
       return { data: {}, error: null };
     });
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
 
     await expect(source.setAvailability('books', 'BK-1', false)).rejects.toThrow(
       /Could not update availability for Book “BK-1”: entity not found/,
     );
     await expect(source.supersede('books', 'BK-1', 'BK-2')).resolves.toBeUndefined();
 
-    const bareSource = await connectHippoSource(fakeClient(capableSchema()));
+    const bareSource = await connectMosaicSource(fakeClient(capableSchema()));
     await expect(bareSource.setAvailability('books', 'BK-1', false)).rejects.toThrow(
       /does not support availability transitions/,
     );
@@ -343,11 +343,11 @@ describe('lifecycle mutations (W4.4)', () => {
   });
 });
 
-describe('connectHippoSource', () => {
+describe('connectMosaicSource', () => {
   it('introspects, then serves schema-derived pages', async () => {
     const rows = [{ id: 'b1' }, { id: 'b2' }];
     const client = fakeClient(capableSchema(), () => ({ data: { books: rows }, error: null }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
 
     expect(source.collections.map((c) => c.id)).toEqual(['books', 'authors']);
     expect(source.capabilities.offsetPagination).toBe(true);
@@ -367,7 +367,7 @@ describe('connectHippoSource', () => {
         ? { data: { searchBooks: items }, error: null }
         : { data: { books: { items, total: 5 } }, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.collections.map((c) => c.id)).toEqual([
       'apertureDocuments',
       'authors',
@@ -398,7 +398,7 @@ describe('connectHippoSource', () => {
         ? { data: { book: entity }, error: null }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(await source.getEntity('books', 'book-emma')).toEqual(entity);
   });
 
@@ -409,7 +409,7 @@ describe('connectHippoSource', () => {
         ? { data: { book: entity }, error: null }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(await source.getEntity('books', 'BK-1')).toEqual(entity);
   });
 
@@ -420,7 +420,7 @@ describe('connectHippoSource', () => {
         ? { data: { entityHistory: entries }, error: null }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.entityHistory).toBe(true);
     expect(await source.getHistory('BK-1')).toEqual(entries);
     expect(
@@ -429,7 +429,7 @@ describe('connectHippoSource', () => {
   });
 
   it('returns empty history when the endpoint does not advertise it', async () => {
-    const source = await connectHippoSource(fakeClient(bareSchema()));
+    const source = await connectMosaicSource(fakeClient(bareSchema()));
     expect(source.capabilities.entityHistory).toBe(false);
     expect(await source.getHistory('X')).toEqual([]);
   });
@@ -437,11 +437,11 @@ describe('connectHippoSource', () => {
   it('surfaces introspection failure as an error (honest, not a blank UI)', async () => {
     const boom = async () => ({ data: null, error: new Error('boom') });
     const failing = { query: boom, mutate: boom };
-    await expect(connectHippoSource(failing)).rejects.toThrow(/Could not introspect.*boom/);
+    await expect(connectMosaicSource(failing)).rejects.toThrow(/Could not introspect.*boom/);
   });
 
   it('rejects unknown collections and invalid paging', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema()));
+    const source = await connectMosaicSource(fakeClient(capableSchema()));
     await expect(source.listEntities('nope', { page: 1, pageSize: 25 })).rejects.toThrow(
       /Unknown collection/,
     );
@@ -458,7 +458,7 @@ describe('connectHippoSource', () => {
       data: null,
       error: new Error('timeout'),
     }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     await expect(source.listEntities('books', { page: 1, pageSize: 25 })).rejects.toThrow(
       /Could not list Books: timeout/,
     );
@@ -480,7 +480,7 @@ describe('getFacetCounts (Mosaic ADR-0007/X1, issue #20)', () => {
           }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.aggregation).toBe(true);
 
     const result = await source.getFacetCounts('things', ['status'], {
@@ -509,7 +509,7 @@ describe('getFacetCounts (Mosaic ADR-0007/X1, issue #20)', () => {
       data: { f0: [] },
       error: null,
     }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     await source.getFacetCounts('things', ['status'], {});
     const sent = client.recorded.find((r) => r.document.includes('ApertureFacetCounts'))!;
     expect(sent.document).toBe(
@@ -520,7 +520,7 @@ describe('getFacetCounts (Mosaic ADR-0007/X1, issue #20)', () => {
 
   it('returns {} without a request when the endpoint advertises no facetCounts field', async () => {
     const client = fakeClient(capableSchema());
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.aggregation).toBe(false);
     expect(await source.getFacetCounts('books', ['format'], {})).toEqual({});
     expect(client.queries.some((q) => q.includes('ApertureFacetCounts'))).toBe(false);
@@ -528,7 +528,7 @@ describe('getFacetCounts (Mosaic ADR-0007/X1, issue #20)', () => {
 
   it('returns {} without a request when fields is empty', async () => {
     const client = fakeClient(facetCountsSchema());
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(await source.getFacetCounts('things', [], {})).toEqual({});
     expect(client.queries.some((q) => q.includes('ApertureFacetCounts'))).toBe(false);
   });
@@ -541,7 +541,7 @@ describe('getFieldRange (Mosaic ADR-0007/X1, issue #61)', () => {
         ? { data: { f0: { min: 3, max: 88 } }, error: null }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.rangeFacets).toBe(true);
 
     const result = await source.getFieldRange('things', ['age'], { status: 'ACTIVE' });
@@ -560,7 +560,7 @@ describe('getFieldRange (Mosaic ADR-0007/X1, issue #61)', () => {
       data: { f0: { min: null, max: null } },
       error: null,
     }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     await source.getFieldRange('things', ['age'], {});
     const sent = client.recorded.find((r) => r.document.includes('ApertureFieldRange'))!;
     expect(sent.document).toBe(
@@ -575,7 +575,7 @@ describe('getFieldRange (Mosaic ADR-0007/X1, issue #61)', () => {
         ? { data: { f0: { min: 3, max: 88 }, f1: { min: '2020-01-01', max: '2026-01-01' } }, error: null }
         : { data: {}, error: null },
     );
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     const result = await source.getFieldRange('things', ['age', 'joined_on'], {});
     expect(result).toEqual({
       age: { min: 3, max: 88 },
@@ -586,7 +586,7 @@ describe('getFieldRange (Mosaic ADR-0007/X1, issue #61)', () => {
 
   it('returns {} without a request when the endpoint advertises no fieldRange field', async () => {
     const client = fakeClient(facetCountsSchema());
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.rangeFacets).toBe(false);
     expect(await source.getFieldRange('things', ['status'], {})).toEqual({});
     expect(client.queries.some((q) => q.includes('ApertureFieldRange'))).toBe(false);
@@ -594,7 +594,7 @@ describe('getFieldRange (Mosaic ADR-0007/X1, issue #61)', () => {
 
   it('returns {} without a request when fields is empty', async () => {
     const client = fakeClient(fieldRangeSchema());
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(await source.getFieldRange('things', [], {})).toEqual({});
     expect(client.queries.some((q) => q.includes('ApertureFieldRange'))).toBe(false);
   });

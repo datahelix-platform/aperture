@@ -1,4 +1,4 @@
-import type { HippoSource } from '../data/hippoSource';
+import type { MosaicSource } from '../data/mosaicSource';
 import type { Capabilities } from '../data/capabilities';
 import type { CollectionModel } from '../data/schemaModel';
 import { slotName } from '../data/schemaModel';
@@ -20,7 +20,7 @@ export const EXPAND_LIMIT = 25;
 
 export type GraphTier = 'server' | 'fallback';
 
-export function graphTier(capabilities: Capabilities, source: HippoSource): GraphTier {
+export function graphTier(capabilities: Capabilities, source: MosaicSource): GraphTier {
   return capabilities.neighborsTraversal && source.neighbors ? 'server' : 'fallback';
 }
 
@@ -58,7 +58,7 @@ export interface GraphSink {
 }
 
 export interface ExpandContext {
-  source: HippoSource;
+  source: MosaicSource;
   collections: CollectionModel[];
   byType: Map<string, CollectionModel>;
   byId: Map<string, CollectionModel>;

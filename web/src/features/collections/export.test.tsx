@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { App } from '../../App';
 import { capableSchema, fakeClient, fieldRangeSchema } from '../../data/testing/fixtures';
-import { connectHippoSource } from '../../data/hippoSource';
+import { connectMosaicSource } from '../../data/mosaicSource';
 import { deriveCollections } from '../../data/schemaModel';
 import { collectAllRows, downloadFile, toCSV, toJSONExport } from './export';
 
@@ -55,7 +55,7 @@ describe('collectAllRows', () => {
       const page = Math.floor(offset / pageSize) + 1;
       return { data: { books: pages[page] ?? [] }, error: null };
     });
-    return { source: await connectHippoSource(client), client };
+    return { source: await connectMosaicSource(client), client };
   }
 
   it('pages through until a short page', async () => {
@@ -93,7 +93,7 @@ describe('collectAllRows', () => {
       data: { things: { items: [{ id: 'T-1', age: 42 }], total: 1 } },
       error: null,
     }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     const [things] = source.collections;
     await collectAllRows(source, things, {}, '', 100, undefined, [
       { field: 'age', value: 18, op: 'GTE' },

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useControlPlane } from '../control/ControlPlaneContext';
 import type { BatchOpError, BatchResult } from '../data/batch';
 import { useDataSource } from '../data/DataSourceContext';
-import type { HippoSource, WriteValues } from '../data/hippoSource';
+import type { MosaicSource, WriteValues } from '../data/mosaicSource';
 import type { FormDraft } from '../features/collections/formShared';
 import {
   clientValidate,
@@ -91,7 +91,7 @@ type Notice =
   | { kind: 'drift'; savedAt: string }
   | null;
 
-function Runner({ workflow, source }: { workflow: WorkflowConfig; source: HippoSource }) {
+function Runner({ workflow, source }: { workflow: WorkflowConfig; source: MosaicSource }) {
   const { closeWorkflow, openIn } = useCollectionUrlState();
   const { status: storeStatus, store } = useControlPlane();
   const fingerprint = useMemo(() => schemaFingerprint(source), [source]);
@@ -339,7 +339,7 @@ function StepForm({
 }: {
   workflow: WorkflowConfig;
   step: WorkflowStepConfig;
-  source: HippoSource;
+  source: MosaicSource;
   run: WorkflowRunState;
   busy: boolean;
   batchErrors: BatchOpError[];
@@ -531,7 +531,7 @@ function SuccessPanel({
   openIn,
 }: {
   workflow: WorkflowConfig;
-  source: HippoSource;
+  source: MosaicSource;
   result: BatchResult;
   onClose: () => void;
   openIn: (collection: string, entity: string) => void;

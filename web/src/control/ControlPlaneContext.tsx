@@ -2,11 +2,11 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { runtimeEnv } from '../config/runtime';
 import { useDataSource } from '../data/DataSourceContext';
-import { connectHippoSource } from '../data/hippoSource';
+import { connectMosaicSource } from '../data/mosaicSource';
 import type { ScopedDataClient } from '../data/scopedClient';
 import { createPassthroughClient } from '../data/scopedClient';
 import type { ControlPlaneStore } from './store';
-import { createHippoStore, createLocalStore, findDocumentCollection } from './store';
+import { createMosaicStore, createLocalStore, findDocumentCollection } from './store';
 
 /**
  * Resolves the control-plane store once per session (N5.4): the control
@@ -78,21 +78,21 @@ export function ControlPlaneProvider({
         setState({
           status: 'ready',
           store: collection
-            ? createHippoStore(dataState.source, collection, viewer)
+            ? createMosaicStore(dataState.source, collection, viewer)
             : createLocalStore(window.localStorage, viewer),
         });
       }
       return;
     }
 
-    connectHippoSource(clientFactory(controlUrl))
+    connectMosaicSource(clientFactory(controlUrl))
       .then((source) => {
         if (cancelled) return;
         const collection = findDocumentCollection(source);
         setState({
           status: 'ready',
           store: collection
-            ? createHippoStore(source, collection, viewer)
+            ? createMosaicStore(source, collection, viewer)
             : createLocalStore(window.localStorage, viewer),
         });
       })

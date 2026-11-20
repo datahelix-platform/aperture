@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { FilterCondition, FilterValues, HippoSource } from '../../data/hippoSource';
+import type { FilterCondition, FilterValues, MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel } from '../../data/schemaModel';
 import { EXPORT_CAP, collectAllRows, downloadFile, toCSV, toJSONExport } from './export';
 
@@ -17,7 +17,7 @@ export function ExportButtons({
   orderBy,
   disabled,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
   filters: FilterValues;
   /** Active range-facet conditions (issue #61) — exports inherit them too. */

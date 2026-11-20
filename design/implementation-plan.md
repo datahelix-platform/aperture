@@ -18,7 +18,7 @@
 | 1 — Read loop | Full browse: collections nav, table, **facets + FTS**, detail, cross-links, export | R3.1–R3.10; ADR-0029 |
 | 2 — Write loop (Tier 0) | Schema-derived create/edit forms + client pre-validation | W4.1–W4.5; ADR-0027 |
 | 3 — Tier 1 workflow | One guided multi-step workflow (staged → validate → atomic commit via Hippo #84) | W4.6–W4.9; ADR-0028 |
-| 4 — Control plane | Saved views, drafts, config-as-data persistence (LinkML-on-Hippo) | ADR-0003/0017; L10 |
+| 4 — Control plane | Saved views, drafts, config-as-data persistence (LinkML-on-Mosaic) | ADR-0003/0017; L10 |
 
 Component sandbox (ADR-0011), agentic & schema-editing surfaces are **deferred** (ADR-0026).
 
@@ -49,7 +49,7 @@ possible surface.
 - **0.2 — Endpoint config.** A single **active endpoint** (L2) resolved from env/config
   (`VITE_GRAPHQL_URL`, mirroring the Python side's `DATAHELIX_*` convention). One config module;
   no multi-source. *(N5.2)*
-- **0.3 — GraphQL client + Layer-D adapter.** A urql client; a `HippoSource` adapter module that:
+- **0.3 — GraphQL client + Layer-D adapter.** A urql client; a `MosaicSource` adapter module that:
   (a) runs `__schema` introspection baseline + Mosaic `mosaicSchema`/`mosaicEntityType` enrichment,
   (b) exposes a typed **`Capabilities`** object (facets, FTS, pagination kind, sort, aggregation,
   relationship traversal, batch write — populated from what the endpoint advertises). *(ADR-0017;

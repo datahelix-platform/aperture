@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { HippoSource, ListOptions } from '../data/hippoSource';
+import type { MosaicSource, ListOptions } from '../data/mosaicSource';
 import type { Neighborhood } from '../data/neighbors';
 import { deriveNeighborsModel } from '../data/neighbors';
 import { deriveCollections, type CollectionModel } from '../data/schemaModel';
@@ -56,11 +56,11 @@ function fakeSource(hood?: Neighborhood) {
       calls.listEntities.push(options);
       return { rows: [{ id: 'r1', rating: 5 }], mayHaveMore: true };
     }),
-  } as unknown as HippoSource;
+  } as unknown as MosaicSource;
   return { source, calls };
 }
 
-function ctx(source: HippoSource): ExpandContext {
+function ctx(source: MosaicSource): ExpandContext {
   return { source, collections, byType, byId };
 }
 

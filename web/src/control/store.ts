@@ -1,11 +1,11 @@
-import type { HippoSource } from '../data/hippoSource';
+import type { MosaicSource } from '../data/mosaicSource';
 import type { CollectionModel } from '../data/schemaModel';
 
 /**
  * The control-plane store (Phase 4; ADR-0017, N5.4): Aperture's OWN state —
  * saved views, workflow drafts, config-as-data — lives in a control-plane
  * document store, DISTINCT from the browsed data plane. The MVP reference
- * impl is LinkML-on-Hippo: documents are ordinary entities on a (co-located)
+ * impl is LinkML-on-Mosaic: documents are ordinary entities on a (co-located)
  * Hippo whose schema carries an Aperture document type, reached through the
  * same Layer-D machinery as everything else. When no such type is advertised,
  * persistence degrades honestly to this browser's localStorage — labeled as
@@ -96,7 +96,7 @@ export function openPayload<T>(
 
 export interface ControlPlaneStore {
   /** Where documents live — surfaced in the UI so persistence scope is legible. */
-  backend: 'hippo' | 'local';
+  backend: 'mosaic' | 'local';
   /**
    * Whether documents are partitioned per viewer. 'shared' = one namespace for
    * everyone (no viewer identity, or an endpoint without the ownership fields);
@@ -157,16 +157,16 @@ export class NotOwnedError extends Error {
 }
 
 /* ------------------------------------------------------------------ */
-/* LinkML-on-Hippo store                                               */
+/* LinkML-on-Mosaic store                                               */
 /* ------------------------------------------------------------------ */
 
 /**
  * The document collection is recognized structurally, like every other
  * capability: an entity type with text-ish `kind`, `name`, and `payload`
  * fields, an equality filter over `kind` and `name`, and create + update
- * mutations. Anything less → no Hippo control plane (fallback applies).
+ * mutations. Anything less → no Mosaic control plane (fallback applies).
  */
-export function findDocumentCollection(source: HippoSource): CollectionModel | undefined {
+export function findDocumentCollection(source: MosaicSource): CollectionModel | undefined {
   return source.collections.find((c) => {
     const fields = new Map(c.detailColumns.map((col) => [col.field, col.kind]));
     const textish = (f: string) =>
@@ -197,8 +197,8 @@ export function supportsOwnerScoping(collection: CollectionModel): boolean {
   );
 }
 
-export function createHippoStore(
-  source: HippoSource,
+export function createMosaicStore(
+  source: MosaicSource,
   collection: CollectionModel,
   viewer: string | null = null,
 ): ControlPlaneStore {
@@ -260,7 +260,7 @@ export function createHippoStore(
   };
 
   return {
-    backend: 'hippo',
+    backend: 'mosaic',
     scoping: scoped ? 'per-user' : 'shared',
     viewer: scoped ? viewer : null,
 

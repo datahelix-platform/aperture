@@ -97,7 +97,7 @@ Phase-4 control plane (give the stub an `ApertureDocument {id, kind, name, paylo
 `apertureDocuments(filter: {kind, name}, limit, offset)` + create/update mutations; start vite
 WITHOUT `VITE_WORKFLOWS` and seed a `config/workflows` document via direct POST — config-as-data):
 
-- Footer reads "Control plane: LinkML-on-Hippo document store" (or "this browser only" when
+- Footer reads "Control plane: LinkML-on-Mosaic document store" (or "this browser only" when
   the document type is absent).
 - Workflows section appears from the seeded config document, no env var.
 - Facet a collection → "Save view" → name it → the document lands server-side and the view

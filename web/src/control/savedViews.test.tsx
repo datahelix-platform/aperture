@@ -52,10 +52,10 @@ function renderApp(ui: ReactNode, searchParams = '') {
 beforeEach(() => window.localStorage.clear());
 
 describe('saved views (Phase 4, R3.9)', () => {
-  it('footer reports the Hippo store when the document type is advertised', async () => {
+  it('footer reports the Mosaic store when the document type is advertised', async () => {
     const { client } = makeClient();
     renderApp(<App endpoint={endpoint} clientFactory={() => client} />);
-    expect(await screen.findByText(/LinkML-on-Hippo document store/)).toBeInTheDocument();
+    expect(await screen.findByText(/LinkML-on-Mosaic document store/)).toBeInTheDocument();
   });
 
   it('falls back to the browser store — and says so — without the document type', async () => {
@@ -173,7 +173,7 @@ describe('saved views (Phase 4, R3.9)', () => {
       { id: 'DOC-2', kind: 'savedView', name: 'garbage', payload: 'not-json' },
     ]);
     renderApp(<App endpoint={endpoint} clientFactory={() => client} />);
-    await screen.findByText(/LinkML-on-Hippo/);
+    await screen.findByText(/LinkML-on-Mosaic/);
     expect(screen.queryByText('broken')).not.toBeInTheDocument();
     expect(screen.queryByText('garbage')).not.toBeInTheDocument();
   });
@@ -282,7 +282,7 @@ describe('config-as-data through the control plane (Phase 4)', () => {
 });
 
 describe('workflow drafts through the control plane (W4.8)', () => {
-  it('staging a step writes a draft document to the Hippo store', async () => {
+  it('staging a step writes a draft document to the Mosaic store', async () => {
     const user = userEvent.setup();
     const wf = [
       {

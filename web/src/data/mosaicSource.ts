@@ -117,7 +117,7 @@ export interface HistoryEntry {
 /** Form values keyed by input-field name; null clears a field on update. */
 export type WriteValues = Record<string, string | number | boolean | null>;
 
-export interface HippoSource {
+export interface MosaicSource {
   capabilities: Capabilities;
   collections: CollectionModel[];
   history?: HistoryModel;
@@ -523,7 +523,7 @@ async function fetchSlotEnrichment(
   }
 }
 
-export async function connectHippoSource(client: ScopedDataClient): Promise<HippoSource> {
+export async function connectMosaicSource(client: ScopedDataClient): Promise<MosaicSource> {
   const result = await client.query<IntrospectionData>(INTROSPECTION_QUERY);
   if (result.error || !result.data?.__schema) {
     throw new Error(

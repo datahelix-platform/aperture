@@ -100,7 +100,7 @@ sides.**
 **Available and UNUSED by Aperture — free capability:**
 
 - `FilterMode { AND, OR }` — derived (`schemaModel.ts:682-685`) but the client hardcodes `'AND'`
-  (`hippoSource.ts:170`).
+  (`mosaicSource.ts:170`).
 - `asOf: String` on every list field — zero hits in `web/src`. (Server-side it is list-only:
   not on singular gets, search twins, or nested traversal fields, and the DataLoader cache key
   omits it — Mosaic ADR-0001's §6.8.5 remainder.)
@@ -125,7 +125,7 @@ PG side, and the repo has a strict parity discipline).
 
 Also load-bearing for the client: Mosaic filters key on LinkML **slot names**, not camelCase
 renames (`schemaModel.ts:280-287`) — any query IR must store slot names; and ref selections
-currently fetch only the target id (`hippoSource.ts:83-92`), so column traversal needs widened
+currently fetch only the target id (`mosaicSource.ts:83-92`), so column traversal needs widened
 selection sets regardless of server work.
 
 ## 4. Prior art (external survey, 2026-08-18)

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSavedViews } from '../../control/SavedViewsContext';
-import type { HippoSource } from '../../data/hippoSource';
+import type { MosaicSource } from '../../data/mosaicSource';
 import { schemaFingerprint } from '../../workflows/engine';
 import { formatSort, useCollectionUrlState } from './urlState';
 import type { ColumnsParam } from '../../query/columnView';
@@ -20,7 +20,7 @@ export function SaveViewButton({
   collectionId,
   query,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collectionId: string;
   /**
    * Save a QUERY (its executed spec and column choices) instead of the

@@ -1,5 +1,5 @@
 import type { BatchOperation } from '../data/batch';
-import type { HippoSource, WriteValues } from '../data/hippoSource';
+import type { MosaicSource, WriteValues } from '../data/mosaicSource';
 import type { WorkflowConfig, WorkflowStepConfig } from './config';
 
 /**
@@ -113,7 +113,7 @@ export interface WorkflowAvailability {
  */
 export function workflowAvailability(
   workflow: WorkflowConfig,
-  source: HippoSource,
+  source: MosaicSource,
 ): WorkflowAvailability {
   const reasons: string[] = [];
   if (!source.batch) reasons.push('the endpoint does not advertise a batch unit-of-work');
@@ -142,7 +142,7 @@ export function workflowAvailability(
  * drafts so resume can detect drift (L10). Interim until the mosaicSchema
  * enrichment exposes a real schema_version.
  */
-export function schemaFingerprint(source: HippoSource): string {
+export function schemaFingerprint(source: MosaicSource): string {
   const parts = source.collections
     .map((c) => `${c.typeName}:${c.detailColumns.map((col) => `${col.field}.${col.kind}`).join(',')}`)
     .sort()

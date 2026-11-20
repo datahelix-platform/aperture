@@ -908,7 +908,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "HippoEntityTypeInfo",
+         "name": "MosaicEntityTypeInfo",
          "ofType": null
         }
        }
@@ -934,7 +934,7 @@
      ],
      "type": {
       "kind": "OBJECT",
-      "name": "HippoEntityTypeInfo",
+      "name": "MosaicEntityTypeInfo",
       "ofType": null
      }
     }
@@ -2410,7 +2410,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "HippoEntityTypeInfo",
+   "name": "MosaicEntityTypeInfo",
    "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Hippo's *domain* schema introspection — the LinkML type model the GraphQL surface itself is generated from.",
    "fields": [
     {
@@ -2466,7 +2466,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "HippoSlotInfo",
+         "name": "MosaicSlotInfo",
          "ofType": null
         }
        }
@@ -2488,7 +2488,7 @@
         "name": null,
         "ofType": {
          "kind": "OBJECT",
-         "name": "HippoReferenceInfo",
+         "name": "MosaicReferenceInfo",
          "ofType": null
         }
        }
@@ -2501,7 +2501,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "HippoSlotInfo",
+   "name": "MosaicSlotInfo",
    "description": "One slot of an entity type, as classified by the shared LinkML type model (hippo.core.schema_typing).",
    "fields": [
     {
@@ -2660,7 +2660,7 @@
   },
   {
    "kind": "OBJECT",
-   "name": "HippoReferenceInfo",
+   "name": "MosaicReferenceInfo",
    "description": "One relationship of an entity type (mirrors REST GET /schemas/{type}/references).",
    "fields": [
     {

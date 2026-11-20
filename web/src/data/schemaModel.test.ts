@@ -1,6 +1,6 @@
 import type { IntrospectionSchema, TypeRef } from './introspection';
 import { deriveCollections, deriveCapabilities, deriveHistory, humanize } from './schemaModel';
-import { buildListQuery } from './hippoSource';
+import { buildListQuery } from './mosaicSource';
 import {
   arg,
   bareSchema,

@@ -1,5 +1,5 @@
 import type { Capabilities } from '../data/capabilities';
-import type { FilterCondition, HippoSource } from '../data/hippoSource';
+import type { FilterCondition, MosaicSource } from '../data/mosaicSource';
 import type { CollectionModel } from '../data/schemaModel';
 import { slotName } from '../data/schemaModel';
 import type { Criterion, FieldCondition, QuerySpec } from './querySpec';
@@ -51,7 +51,7 @@ function toFilterCondition(c: FieldCondition): FilterCondition {
 }
 
 export async function runQuerySpec(
-  source: HippoSource,
+  source: MosaicSource,
   collections: CollectionModel[],
   capabilities: Capabilities,
   spec: QuerySpec,

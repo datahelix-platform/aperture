@@ -15,7 +15,7 @@ guided workflow** ([#8](https://github.com/datahelix-platform/aperture/issues/8)
 stage → continuous dry-run → whole-set validate → one atomic `ingestBatch` with
 client-id-linked intra-batch refs; and the **control plane** ([#9](https://github.com/datahelix-platform/aperture/issues/9),
 ADR-0017/N5.4): saved views, cross-browser resumable drafts, and config-as-data (workflows)
-as versioned documents on a LinkML-on-Hippo store (co-located by default,
+as versioned documents on a LinkML-on-Mosaic store (co-located by default,
 `VITE_CONTROL_PLANE_URL` to split; honest localStorage fallback). Facet
 **counts**/sort stay capability-gated off until Hippo X1
 ([hippo#96](https://github.com/BU-Neuromics/hippo/issues/96)).

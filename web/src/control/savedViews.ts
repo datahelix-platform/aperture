@@ -1,4 +1,4 @@
-import type { FilterValues, RangeValues } from '../data/hippoSource';
+import type { FilterValues, RangeValues } from '../data/mosaicSource';
 import type { ColumnsParam } from '../query/columnView';
 import type { QuerySpec } from '../query/querySpec';
 import type { ControlPlaneDocument, Visibility } from './store';

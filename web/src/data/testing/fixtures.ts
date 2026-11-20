@@ -31,7 +31,8 @@ import certIntrospectionJson from './certIntrospection.json';
  * This capture and the two below are hand-edited for platform ADR-0007 (Q3): the
  * `hippoSchema` / `hippoEntityType` root fields are renamed to `mosaicSchema` /
  * `mosaicEntityType` (Mosaic v0.16.0), and `hippo_*` identifiers in descriptions to
- * `mosaic_*`. Everything else is as captured.
+ * `mosaic_*`. This one's `Hippo{EntityType,Slot,Reference}Info` object types are also
+ * renamed to the `Mosaic*` names later versions emit. Everything else is as captured.
  */
 export const realIntrospection = realIntrospectionJson as unknown as IntrospectionSchema;
 

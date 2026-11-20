@@ -620,7 +620,7 @@ function deriveFieldRange(
 /**
  * Numeric/date range facets (issue #61): derived from a 'filterList'
  * collection's own columns — the only shape whose typed `conditions`
- * mechanism can carry GTE/LTE (hippoSource.ts `listFilterEntries`; the
+ * mechanism can carry GTE/LTE (mosaicSource.ts `listFilterEntries`; the
  * inputObject/stub shape carries equality filters only and never sees
  * conditions). Gated on a genuine `FieldRange` field (ADR-0029): without it,
  * nothing changes even though the FilterOp vocabulary may already advertise
@@ -1257,7 +1257,7 @@ export function deriveCollections(
       facets: deriveFacets(schema, filterTypeName, detailColumns),
       facetCounts: deriveFacetCounts(schema, queryFields, field.name),
       // No `deriveRangeFacets` here: the inputObject/stub shape carries
-      // equality filters only (hippoSource.ts) — a widget wired to GTE/LTE
+      // equality filters only (mosaicSource.ts) — a widget wired to GTE/LTE
       // would silently do nothing, which ADR-0029 forbids. `fieldRange` is
       // still derived so the capability model is honest either way.
       fieldRange: deriveFieldRange(schema, queryFields, field.name),

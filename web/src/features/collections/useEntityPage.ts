@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { EntityPage, FilterCondition, FilterValues, HippoSource } from '../../data/hippoSource';
+import type { EntityPage, FilterCondition, FilterValues, MosaicSource } from '../../data/mosaicSource';
 
 export type EntityPageState =
   | { status: 'loading' }
@@ -8,7 +8,7 @@ export type EntityPageState =
 
 /** Fetches one offset page for the active collection; refetches on change. */
 export function useEntityPage(
-  source: HippoSource,
+  source: MosaicSource,
   collectionId: string,
   page: number,
   pageSize: number,
