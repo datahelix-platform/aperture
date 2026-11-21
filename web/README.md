@@ -14,8 +14,8 @@ TypeScript, urql (GraphQL), TanStack Table, nuqs. Talks to Hippo's GraphQL **dir
 > interpreted by a pure engine, staging in resumable version-pinned drafts, continuous
 > dry-run, and one atomic batch commit with intra-batch references; and the control plane
 > (Phase 4, ADR-0017): saved views, cross-browser drafts, and workflows-config-as-data as
-> versioned documents on a LinkML-on-Hippo store (co-located by default,
-> `VITE_HIPPO_CONTROL_PLANE_URL` to split; localStorage fallback, labeled in the footer).
+> versioned documents on a LinkML-on-Mosaic store (co-located by default,
+> `VITE_CONTROL_PLANE_URL` to split; localStorage fallback, labeled in the footer).
 > The full query state `{collection, page, q, filters, entity, form, workflow}` lives in the
 > URL. See `../design/implementation-plan.md` for the phased build and
 > `../design/design-export/` + `../design/design-tokens.md` for the visual target.
@@ -25,10 +25,10 @@ TypeScript, urql (GraphQL), TanStack Table, nuqs. Talks to Hippo's GraphQL **dir
 ```bash
 cd web
 npm install
-VITE_HIPPO_GRAPHQL_URL=http://localhost:8000/graphql npm run dev
+VITE_GRAPHQL_URL=http://localhost:8000/graphql npm run dev
 ```
 
-`VITE_HIPPO_GRAPHQL_URL` points at a running Hippo GraphQL endpoint (`hippo serve` with the
+`VITE_GRAPHQL_URL` points at a running Mosaic GraphQL endpoint (`mosaic serve` with the
 graphql extra). Without it the app starts in an honest "no endpoint configured" state. You can
 also put the variable in an untracked `web/.env.local`.
 
@@ -56,17 +56,17 @@ match `web/package.json`'s version).
 
 The published image is **deployment-agnostic**: endpoint config is injected at container
 start, not baked at build. The entrypoint (`docker/40-aperture-config.sh`) writes recognized
-env vars (`VITE_HIPPO_GRAPHQL_URL`, `VITE_HIPPO_CONTROL_PLANE_URL`, `VITE_WORKFLOWS`,
+env vars (`VITE_GRAPHQL_URL`, `VITE_CONTROL_PLANE_URL`, `VITE_WORKFLOWS`,
 `VITE_NAV`, `VITE_XREFS`, and the `VITE_AUTH_*` set below) into `config.js`, which `index.html` loads before
 the bundle
 (`src/config/runtime.ts`); runtime values override build-time ones.
 
 ```bash
 docker build -t aperture-web web/
-docker run -p 5173:80 -e VITE_HIPPO_GRAPHQL_URL=http://hippo:8001/graphql aperture-web
+docker run -p 5173:80 -e VITE_GRAPHQL_URL=http://mosaic:8001/graphql aperture-web
 ```
 
-`VITE_HIPPO_GRAPHQL_URL` may also be a **relative path** (e.g. `/graphql`): the SPA hands it
+`VITE_GRAPHQL_URL` may also be a **relative path** (e.g. `/graphql`): the SPA hands it
 to `fetch`, which resolves it against the page origin. Same-origin deployments that
 reverse-proxy the GraphQL endpoint next to the SPA (the DataHelix `solo` recipe) use this to
 avoid CORS configuration entirely.
@@ -137,11 +137,11 @@ web/
 │   │   ├── AppShell.tsx          # config selects layout; honest degradation
 │   │   └── layouts/HeaderNavMain.tsx
 │   ├── data/                     # steps 0.2–0.4, 0.7 — the Layer-D data spine
-│   │   ├── endpoint.ts           # VITE_HIPPO_GRAPHQL_URL → EndpointConfig
+│   │   ├── endpoint.ts           # VITE_GRAPHQL_URL → EndpointConfig
 │   │   ├── scopedClient.ts       # capability-scoped client seam (urql pass-through)
 │   │   ├── introspection.ts      # standard __schema baseline
 │   │   ├── schemaModel.ts        # collections + column models + Capabilities derivation
-│   │   ├── hippoSource.ts        # the source adapter (ADR-0017)
+│   │   ├── mosaicSource.ts       # the source adapter (ADR-0017)
 │   │   └── DataSourceContext.tsx # useDataSource() / useCapabilities() (ADR-0029)
 │   ├── features/collections/     # nav, table, facets, detail, export, URL state
 │   ├── styles/                   # tokens.css (from design/design-tokens.md) + global.css
@@ -158,7 +158,7 @@ web/
 - **Capabilities are negotiated, never faked (ADR-0029):** every flag derives from what the
   endpoint's introspection actually advertises. Sort/aggregation stay off until Hippo X1 lands;
   the pager hides entirely when offset pagination isn't advertised.
-- **Hippo enrichment:** `hippoSchema` presence is detected as a capability; the richer
+- **Mosaic enrichment:** `mosaicSchema` presence is detected as a capability; the richer
   enrichment query (slot kinds beyond GraphQL types) is a Phase-1 follow-on to confirm against
   a live `hippo serve`.
 - **Sort + facet counts:** deliberately absent until Hippo X1 (aggregation) advertises them —

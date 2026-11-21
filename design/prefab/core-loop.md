@@ -41,7 +41,7 @@ The exploration cycle every data portal lives or dies by:
   label lives in (later) config; the class name stays in data.
 
 ### Implementation approach
-- Collections derive from GraphQL introspection: Hippo's **`hippoSchema`** lists exposed entity
+- Collections derive from GraphQL introspection: Mosaic's **`mosaicSchema`** lists exposed entity
   types (richer than standard `__schema` — it also gives slot kinds, enum values, relationship
   targets). Generic baseline can fall back to `__schema`.
 - **Prefab:** a hand-authored nav list `[{type, label, icon, order}]`. This is the **Level-1

@@ -5,7 +5,7 @@ import {
   parseAsStringLiteral,
   useQueryStates,
 } from 'nuqs';
-import type { FilterCondition, FilterValues, RangeValues } from '../../data/hippoSource';
+import type { FilterCondition, FilterValues, RangeValues } from '../../data/mosaicSource';
 import type { QuerySpec } from '../../query/querySpec';
 import { validateColumnsShape } from '../../query/columnView';
 import type { ColumnsParam } from '../../query/columnView';
@@ -56,7 +56,7 @@ const EMPTY_RANGES: RangeValues = {};
 /**
  * Active ranges → typed `GTE`/`LTE` conditions for the existing `conditions`
  * mechanism (issue #61) — the same flat `filters:` list equality facets use
- * (`listFilterEntries` in hippoSource.ts), so no new query-building path.
+ * (`listFilterEntries` in mosaicSource.ts), so no new query-building path.
  */
 export function rangeConditions(ranges: RangeValues): FilterCondition[] {
   const conditions: FilterCondition[] = [];

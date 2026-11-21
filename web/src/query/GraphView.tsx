@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
 import type { Core, NodeSingular } from 'cytoscape';
-import type { HippoSource } from '../data/hippoSource';
+import type { MosaicSource } from '../data/mosaicSource';
 import type { CollectionModel, ColumnModel } from '../data/schemaModel';
 import { useCollectionUrlState } from '../features/collections/urlState';
 import { runQuerySpec } from './planner';
@@ -80,7 +80,7 @@ interface GraphNodeData {
   expanded: boolean;
 }
 
-export function GraphView({ source }: { source: HippoSource }) {
+export function GraphView({ source }: { source: MosaicSource }) {
   const { collections, capabilities } = source;
   const urlState = useCollectionUrlState();
   const containerRef = useRef<HTMLDivElement | null>(null);

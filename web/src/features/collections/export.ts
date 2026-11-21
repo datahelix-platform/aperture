@@ -1,4 +1,4 @@
-import type { FilterCondition, FilterValues, HippoSource } from '../../data/hippoSource';
+import type { FilterCondition, FilterValues, MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel, ColumnModel } from '../../data/schemaModel';
 import type { DisplayRow, PathColumn } from '../../data/selection';
 import { pathKey } from '../../data/selection';
@@ -20,7 +20,7 @@ export interface CollectedRows {
 }
 
 export async function collectAllRows(
-  source: HippoSource,
+  source: MosaicSource,
   collection: CollectionModel,
   filters: FilterValues,
   search: string,

@@ -10,13 +10,13 @@ import { useControlPlane } from './ControlPlaneContext';
 export function ControlPlaneStatus() {
   const { status, store } = useControlPlane();
   // data-testid is the stable certification contract (datahelix golden-path
-  // suite; #15) — the scenario asserts the Hippo-backed store is reported.
+  // suite; #15) — the scenario asserts the Mosaic-backed store is reported.
   if (status !== 'ready') {
     return <span data-testid="control-plane-status">Control plane: resolving…</span>;
   }
   const backend =
-    store.backend === 'hippo'
-      ? 'LinkML-on-Hippo document store'
+    store.backend === 'mosaic'
+      ? 'LinkML-on-Mosaic document store'
       : 'this browser only (no document type advertised by the endpoint)';
   const scoping =
     store.scoping === 'per-user'

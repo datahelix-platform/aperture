@@ -6,7 +6,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useCapabilities } from '../../data/DataSourceContext';
-import type { HippoSource } from '../../data/hippoSource';
+import type { MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel } from '../../data/schemaModel';
 import { typeColorStyle } from '../../data/typeColor';
 import { isRightAligned, renderCell } from './cells';
@@ -33,7 +33,7 @@ export function CollectionTable({
   source,
   collection,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
 }) {
   const capabilities = useCapabilities();

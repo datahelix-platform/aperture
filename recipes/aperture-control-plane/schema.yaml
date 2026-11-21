@@ -53,7 +53,7 @@ prefixes:
 
 imports:
   - linkml:types
-  - hippo_core
+  - mosaic_core
 
 default_range: string
 
@@ -86,13 +86,13 @@ classes:
         required: true
         description: savedView | workflowDraft | config (equality-filtered).
         annotations:
-          hippo_index: true
+          mosaic_index: true
       name:
         range: string
         required: true
         description: Document key within its (owner, kind) (equality-filtered).
         annotations:
-          hippo_index: true
+          mosaic_index: true
       payload:
         range: string
         required: true
@@ -114,7 +114,7 @@ classes:
           ownership must stamp this from the verified actor header and ignore
           any client-supplied value.
         annotations:
-          hippo_index: true
+          mosaic_index: true
       visibility:
         range: ApertureDocumentVisibility
         required: false
@@ -123,4 +123,4 @@ classes:
           `shared`, so documents predating this field keep their current
           everyone-can-see behavior. Never governs writes.
         annotations:
-          hippo_index: true
+          mosaic_index: true

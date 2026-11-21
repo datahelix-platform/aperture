@@ -14,7 +14,7 @@ describe('runtime config overlay (issue #22)', () => {
 
   it('runtime values override the build-time env', () => {
     (globalThis as ConfigWindow).__APERTURE_CONFIG__ = {
-      VITE_HIPPO_GRAPHQL_URL: 'http://runtime.test/graphql',
+      VITE_GRAPHQL_URL: 'http://runtime.test/graphql',
     };
     expect(resolveEndpoint(runtimeEnv())).toEqual({ url: 'http://runtime.test/graphql' });
   });
@@ -30,7 +30,7 @@ describe('runtime config overlay (issue #22)', () => {
     // browser's fetch resolves it against the page origin. resolveEndpoint
     // must not require an absolute URL.
     (globalThis as ConfigWindow).__APERTURE_CONFIG__ = {
-      VITE_HIPPO_GRAPHQL_URL: '/graphql',
+      VITE_GRAPHQL_URL: '/graphql',
     };
     expect(resolveEndpoint(runtimeEnv())).toEqual({ url: '/graphql' });
   });

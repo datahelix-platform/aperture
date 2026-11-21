@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useCapabilities } from '../../data/DataSourceContext';
-import type { HippoSource, HistoryEntry } from '../../data/hippoSource';
+import type { MosaicSource, HistoryEntry } from '../../data/mosaicSource';
 import type { CollectionModel, ColumnModel } from '../../data/schemaModel';
 import { xrefUrl } from '../../config/xrefs';
 import type { XrefTemplates } from '../../config/xrefs';
@@ -29,7 +29,7 @@ export function EntityDetail({
   collection,
   entityId,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
   entityId: string;
 }) {
@@ -188,7 +188,7 @@ function LifecycleActions({
   entity,
   onChanged,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
   entityId: string;
   entity: Record<string, unknown>;
@@ -350,7 +350,7 @@ function RelationRow({
   column,
   value,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
   entityId: string;
   column: ColumnModel;
@@ -409,7 +409,7 @@ function RelationRow({
   );
 }
 
-function HistorySection({ source, entityId }: { source: HippoSource; entityId: string }) {
+function HistorySection({ source, entityId }: { source: MosaicSource; entityId: string }) {
   const capabilities = useCapabilities();
   const [entries, setEntries] = useState<HistoryEntry[] | 'loading' | 'error'>('loading');
 

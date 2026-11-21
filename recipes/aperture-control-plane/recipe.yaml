@@ -1,6 +1,6 @@
 id: org.datahelix.aperture.control-plane
 name: aperture_control_plane
-version: 1.1.0
+version: 1.2.0
 description: >-
   The Aperture control-plane document type: a Mosaic entity type for storing
   Aperture's own state (saved views, workflow drafts, config-as-data) as
@@ -13,9 +13,14 @@ description: >-
   (owner, kind, name), owner-only writes, shared-but-read-only views.
   Both are recognized optionally, so the upgrade is additive — a
   deployment on 1.0.0 keeps working, with per-user scoping not lit up.
+
+  v1.2.0 follows Mosaic v0.16.0's identifier rename (platform ADR-0007):
+  the schema imports `mosaic_core` and annotates `mosaic_index` instead of
+  `hippo_core` / `hippo_index`, so it needs Mosaic >= 0.16.0. The document
+  type itself is unchanged.
 author:
   organization: datahelix-platform
 license: https://creativecommons.org/publicdomain/zero/1.0/
 created_at: 2026-07-18T00:00:00Z
-hippo_version: ">=0.11.0"
+mosaic_version: ">=0.16.0"
 source: https://github.com/datahelix-platform/aperture/tree/main/recipes/aperture-control-plane

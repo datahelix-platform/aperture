@@ -18,7 +18,7 @@ surface, not by re-running CI (typecheck/lint/test/build are `.github/workflows/
    `batchPut` mutation — that lights up the negotiated capabilities the UI gates on.
    Serve ~60 rows so pagination has 3 pages.
 
-2. **Dev server:** `cd web && VITE_HIPPO_GRAPHQL_URL=http://localhost:4000/ npm run dev -- --port 5173 --strictPort`
+2. **Dev server:** `cd web && VITE_GRAPHQL_URL=http://localhost:4000/ npm run dev -- --port 5173 --strictPort`
 
 3. **Browser:** `npm install playwright-core` in a scratch dir;
    `chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' })`
@@ -34,7 +34,7 @@ surface, not by re-running CI (typecheck/lint/test/build are `.github/workflows/
   "Back to first page".
 - Kill the stub → boot shows the connect-error panel; mid-session death shows the table error
   state; restart stub + Retry recovers.
-- No `VITE_HIPPO_GRAPHQL_URL` → "No data-plane endpoint configured" guidance panel.
+- No `VITE_GRAPHQL_URL` → "No data-plane endpoint configured" guidance panel.
 
 Phase-1 read loop (give the stub `filter`/`search` args, singular `book(id)`/`author(id)`
 fields, and `entityHistory(entityId)`; see `stub-hippo.mjs` in a session scratchpad or rebuild
@@ -97,7 +97,7 @@ Phase-4 control plane (give the stub an `ApertureDocument {id, kind, name, paylo
 `apertureDocuments(filter: {kind, name}, limit, offset)` + create/update mutations; start vite
 WITHOUT `VITE_WORKFLOWS` and seed a `config/workflows` document via direct POST — config-as-data):
 
-- Footer reads "Control plane: LinkML-on-Hippo document store" (or "this browser only" when
+- Footer reads "Control plane: LinkML-on-Mosaic document store" (or "this browser only" when
   the document type is absent).
 - Workflows section appears from the seeded config document, no env var.
 - Facet a collection → "Save view" → name it → the document lands server-side and the view

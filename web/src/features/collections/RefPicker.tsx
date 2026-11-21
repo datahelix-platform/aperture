@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { HippoSource } from '../../data/hippoSource';
+import type { MosaicSource } from '../../data/mosaicSource';
 
 /**
  * Relationship ref-picker (W4.5): resolves a ref slot by searching the target
@@ -18,7 +18,7 @@ export function RefPicker({
   onChange,
   inputId,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   targetType: string | undefined;
   value: string;
   onChange: (id: string) => void;

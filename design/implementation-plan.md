@@ -18,7 +18,7 @@
 | 1 — Read loop | Full browse: collections nav, table, **facets + FTS**, detail, cross-links, export | R3.1–R3.10; ADR-0029 |
 | 2 — Write loop (Tier 0) | Schema-derived create/edit forms + client pre-validation | W4.1–W4.5; ADR-0027 |
 | 3 — Tier 1 workflow | One guided multi-step workflow (staged → validate → atomic commit via Hippo #84) | W4.6–W4.9; ADR-0028 |
-| 4 — Control plane | Saved views, drafts, config-as-data persistence (LinkML-on-Hippo) | ADR-0003/0017; L10 |
+| 4 — Control plane | Saved views, drafts, config-as-data persistence (LinkML-on-Mosaic) | ADR-0003/0017; L10 |
 
 Component sandbox (ADR-0011), agentic & schema-editing surfaces are **deferred** (ADR-0026).
 
@@ -47,17 +47,17 @@ possible surface.
   content to slots; a slot a layout lacks degrades honestly. The registry seam exists so more
   layouts drop in later without a refactor. *(ADR-0031)*
 - **0.2 — Endpoint config.** A single **active endpoint** (L2) resolved from env/config
-  (`VITE_HIPPO_GRAPHQL_URL`, mirroring the Python side's `DATAHELIX_*` convention). One config module;
+  (`VITE_GRAPHQL_URL`, mirroring the Python side's `DATAHELIX_*` convention). One config module;
   no multi-source. *(N5.2)*
-- **0.3 — GraphQL client + Layer-D adapter.** A urql client; a `HippoSource` adapter module that:
-  (a) runs `__schema` introspection baseline + Hippo `hippoSchema`/`hippoEntityType` enrichment,
+- **0.3 — GraphQL client + Layer-D adapter.** A urql client; a `MosaicSource` adapter module that:
+  (a) runs `__schema` introspection baseline + Mosaic `mosaicSchema`/`mosaicEntityType` enrichment,
   (b) exposes a typed **`Capabilities`** object (facets, FTS, pagination kind, sort, aggregation,
   relationship traversal, batch write — populated from what the endpoint advertises). *(ADR-0017;
   N5.1)*
 - **0.4 — Capability seam.** A small `useCapabilities()` surface the UI reads; features check it
   and **degrade honestly** — Phase 0 only needs "offset pagination supported?" but the seam is the
   one ADR-0029 mandates, established here so later features plug in. *(ADR-0029)*
-- **0.5 — Schema-derived collection list (the slice).** Query `hippoSchema` → list entity types
+- **0.5 — Schema-derived collection list (the slice).** Query `mosaicSchema` → list entity types
   (rendered in the `primaryNav` slot) → select one → query its entities (offset page) → render a
   **TanStack Table** in the `main` slot whose columns derive from the type's slots (scalar/enum/ref
   renderers minimal). Loading/empty/error states. *(R3.1/R3.2; slots per ADR-0031)*
@@ -75,7 +75,7 @@ sandbox; real control-plane store (Phase 4); auth beyond the no-op seam.
 
 - A running **Hippo GraphQL** endpoint (`hippo serve`, graphql extra) for dev + e2e; document the
   one-liner. Confirm CORS / introspection availability against `hippo serve` early (a known risk —
-  `prior-art.md` notes introspection is sometimes gated; Hippo's `hippoSchema` sidesteps standard
+  `prior-art.md` notes introspection is sometimes gated; Mosaic's `mosaicSchema` sidesteps standard
   `__schema` if needed).
 
 ### Tests

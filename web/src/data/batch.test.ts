@@ -1,5 +1,5 @@
 import { buildIngestBatch, deriveBatchModel, normalizeBatchResult } from './batch';
-import { connectHippoSource } from './hippoSource';
+import { connectMosaicSource } from './mosaicSource';
 import { bareSchema, capableSchema, fakeClient, realIntrospection } from './testing/fixtures';
 
 const RESULT_SELECTION =
@@ -249,7 +249,7 @@ describe('source.runBatch', () => {
         error: null,
       };
     });
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     expect(source.capabilities.batchWrite).toBe(true);
 
     const ops = [{ ref: 'op-1', type: 'Book', data: { title: 'T' } }];
@@ -261,14 +261,14 @@ describe('source.runBatch', () => {
   });
 
   it('refuses when the endpoint has no batch surface, and on an empty set', async () => {
-    const bare = await connectHippoSource(
+    const bare = await connectMosaicSource(
       fakeClient(bareSchema(), () => ({ data: {}, error: null })),
     );
     expect(bare.capabilities.batchWrite).toBe(false);
     await expect(bare.runBatch([{ ref: 'x', type: 'T', data: {} }], true)).rejects.toThrow(
       /does not advertise a batch/,
     );
-    const capable = await connectHippoSource(fakeClient(capableSchema()));
+    const capable = await connectMosaicSource(fakeClient(capableSchema()));
     await expect(capable.runBatch([], true)).rejects.toThrow(/Nothing staged/);
   });
 
@@ -277,7 +277,7 @@ describe('source.runBatch', () => {
       data: null,
       error: new Error('FOREIGN KEY constraint failed'),
     }));
-    const source = await connectHippoSource(client);
+    const source = await connectMosaicSource(client);
     await expect(
       source.runBatch([{ ref: 'op-1', type: 'Book', data: { title: 'T' } }], false),
     ).rejects.toThrow(/Batch commit failed: FOREIGN KEY constraint failed/);

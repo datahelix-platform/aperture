@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCapabilities, useDataSource } from '../../data/DataSourceContext';
-import type { RangeValues } from '../../data/hippoSource';
+import type { RangeValues } from '../../data/mosaicSource';
 import type { FacetModel } from '../../data/schemaModel';
 import { activeCollection } from '../../nav/config';
 import { useNavView } from '../../nav/NavConfigContext';

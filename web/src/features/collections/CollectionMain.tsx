@@ -42,9 +42,10 @@ export function CollectionMain() {
       <div className="main-panel" role="status">
         <h1 className="main-panel-title">No data-plane endpoint configured</h1>
         <p className="main-panel-detail">
-          Point Aperture at a running Hippo GraphQL endpoint by setting{' '}
-          <code>VITE_HIPPO_GRAPHQL_URL</code> (for example{' '}
-          <code>VITE_HIPPO_GRAPHQL_URL=http://localhost:8000/graphql npm run dev</code>).
+          Point Aperture at a GraphQL endpoint (for example <code>mosaic serve --graphql</code>)
+          by setting{' '}
+          <code>VITE_GRAPHQL_URL</code> (for example{' '}
+          <code>VITE_GRAPHQL_URL=http://localhost:8000/graphql npm run dev</code>).
         </p>
       </div>
     );

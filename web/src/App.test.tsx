@@ -49,7 +49,7 @@ describe('App — the Phase-0 walking skeleton end to end', () => {
   it('shows an honest guidance panel when no endpoint is configured', () => {
     renderApp(<App endpoint={{ url: null }} />);
     expect(screen.getByText(/No data-plane endpoint configured/)).toBeInTheDocument();
-    expect(screen.getAllByText(/VITE_HIPPO_GRAPHQL_URL/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/VITE_GRAPHQL_URL/).length).toBeGreaterThan(0);
   });
 
   it('derives the collections nav from introspection and renders the first collection', async () => {

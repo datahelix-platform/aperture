@@ -1,5 +1,5 @@
 import { createLocalStore } from '../control/store';
-import { connectHippoSource } from '../data/hippoSource';
+import { connectMosaicSource } from '../data/mosaicSource';
 import { capableSchema, fakeClient } from '../data/testing/fixtures';
 import { parseWorkflowConfigs, resolveWorkflows } from './config';
 import type { WorkflowConfig } from './config';
@@ -96,12 +96,12 @@ describe('workflow engine (pure, serializable state = the draft)', () => {
 
 describe('workflowAvailability (honest gating — ADR-0029)', () => {
   it('is runnable when batch + create paths + binding fields all exist', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema({ authorWrite: true })));
+    const source = await connectMosaicSource(fakeClient(capableSchema({ authorWrite: true })));
     expect(workflowAvailability(REGISTER, source)).toEqual({ runnable: true, reasons: [] });
   });
 
   it('reports each missing prerequisite by name', async () => {
-    const source = await connectHippoSource(fakeClient(capableSchema()));
+    const source = await connectMosaicSource(fakeClient(capableSchema()));
     const availability = workflowAvailability(REGISTER, source);
     expect(availability.runnable).toBe(false);
     expect(availability.reasons.join(' ')).toMatch(/Author.*no create mutation/);
@@ -113,7 +113,7 @@ describe('workflowAvailability (honest gating — ADR-0029)', () => {
         { ...REGISTER.steps[1], bindings: [{ field: 'nonsense', fromStep: 'author-step' }] },
       ],
     };
-    const withWrite = await connectHippoSource(fakeClient(capableSchema({ authorWrite: true })));
+    const withWrite = await connectMosaicSource(fakeClient(capableSchema({ authorWrite: true })));
     expect(workflowAvailability(badBinding, withWrite).reasons.join(' ')).toMatch(
       /unknown field “nonsense”/,
     );
@@ -146,9 +146,9 @@ describe('drafts (W4.8 — inert, version-pinned, resumable control-plane docume
 
 describe('schemaFingerprint (interim schema-version pin)', () => {
   it('is stable for the same schema and changes when the schema changes', async () => {
-    const a = await connectHippoSource(fakeClient(capableSchema()));
-    const b = await connectHippoSource(fakeClient(capableSchema()));
-    const c = await connectHippoSource(fakeClient(capableSchema({ authorDetail: true })));
+    const a = await connectMosaicSource(fakeClient(capableSchema()));
+    const b = await connectMosaicSource(fakeClient(capableSchema()));
+    const c = await connectMosaicSource(fakeClient(capableSchema({ authorDetail: true })));
     expect(schemaFingerprint(a)).toBe(schemaFingerprint(b));
     expect(schemaFingerprint(a)).not.toBe(schemaFingerprint(c));
   });

@@ -1,10 +1,12 @@
 import type { IntrospectionSchema, TypeRef } from './introspection';
 import { deriveCollections, deriveCapabilities, deriveHistory, humanize } from './schemaModel';
-import { buildListQuery } from './hippoSource';
+import { buildListQuery } from './mosaicSource';
 import {
   arg,
   bareSchema,
   capableSchema,
+  certIntrospection,
+  demoIntrospection,
   enumRef,
   enumType,
   field,
@@ -77,7 +79,7 @@ describe('deriveCollections', () => {
   });
 
   it('skips non-list, singular-detail, history, and introspection fields', () => {
-    const collections = deriveCollections(capableSchema({ hippoSchema: true }));
+    const collections = deriveCollections(capableSchema({ mosaicSchema: true }));
     expect(collections.map((c) => c.id)).toEqual(['books', 'authors']);
   });
 
@@ -112,7 +114,7 @@ describe('deriveCollections (live Hippo shapes — #15)', () => {
   const collections = deriveCollections(realIntrospection);
   const books = collections.find((c) => c.id === 'books')!;
 
-  it('derives exactly the page-envelope collections — no search twins, no hippoSchema', () => {
+  it('derives exactly the page-envelope collections — no search twins, no mosaicSchema', () => {
     expect(collections.map((c) => c.id)).toEqual([
       'apertureDocuments',
       'authors',
@@ -525,10 +527,10 @@ describe('deriveHistory (R3.7)', () => {
 
 describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
   it('detects the full Hippo-like surface', () => {
-    const schema = capableSchema({ hippoSchema: true });
+    const schema = capableSchema({ mosaicSchema: true });
     const caps = deriveCapabilities(schema, deriveCollections(schema));
     expect(caps).toEqual({
-      schemaIntrospection: 'hippo',
+      schemaIntrospection: 'mosaic',
       offsetPagination: true,
       equalityFacets: true,
       fullTextSearch: true,
@@ -547,7 +549,7 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
     });
   });
 
-  it('reports standard introspection when hippoSchema is not advertised', () => {
+  it('reports standard introspection when mosaicSchema is not advertised', () => {
     const schema = capableSchema();
     const caps = deriveCapabilities(schema, deriveCollections(schema));
     expect(caps.schemaIntrospection).toBe('graphql');
@@ -555,7 +557,9 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
 
   it('negotiates the live Hippo surface (envelope pages + search twins)', () => {
     const caps = deriveCapabilities(realIntrospection, deriveCollections(realIntrospection));
-    expect(caps.schemaIntrospection).toBe('hippo');
+    // A v0.10.3 server advertised its enrichment as `hippoSchema`, which Aperture no
+    // longer reads (platform ADR-0007 Q3), so it negotiates as plain GraphQL.
+    expect(caps.schemaIntrospection).toBe('graphql');
     expect(caps.offsetPagination).toBe(true);
     expect(caps.equalityFacets).toBe(true);
     expect(caps.fullTextSearch).toBe(true);
@@ -568,6 +572,13 @@ describe('deriveCapabilities (negotiated, never faked — ADR-0029)', () => {
     // era) and no typed where inputs yet (Mosaic ADR-0006 not landed there).
     expect(caps.filterOps).toContain('EQ');
     expect(caps.whereFilter).toBe(false);
+  });
+
+  it('detects the mosaicSchema enrichment on current Mosaic captures (ADR-0007 Q3)', () => {
+    for (const schema of [demoIntrospection, certIntrospection]) {
+      const caps = deriveCapabilities(schema, deriveCollections(schema));
+      expect(caps.schemaIntrospection).toBe('mosaic');
+    }
   });
 
   it('sort gates on when an orderBy enum resolves to at least one column (Mosaic X1/ADR-0007, issue #20)', () => {

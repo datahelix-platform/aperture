@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import type { HippoSource } from '../../data/hippoSource';
+import type { MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel } from '../../data/schemaModel';
 import type { FormDraft } from './formShared';
 import { clientValidate, FormFieldRow, initialDraft, toWriteValues } from './formShared';
@@ -22,7 +22,7 @@ export function EntityForm({
   mode,
   entityId,
 }: {
-  source: HippoSource;
+  source: MosaicSource;
   collection: CollectionModel;
   mode: 'new' | 'edit';
   entityId?: string;

@@ -54,3 +54,5 @@ Hippo."
 - **One GraphQL relationship (config and data in the same assumed store).** Simpler to write,
   but couples Aperture to Hippo for *data* and prevents pointing the data plane elsewhere.
   Rejected — it defeats the generic-over-any-endpoint reframe.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** Mosaic v0.16.0 renamed the GraphQL fields named here: `hippoSchema` / `hippoEntityType` → `mosaicSchema` / `mosaicEntityType` (Q3), and Aperture reads the new names (aperture#35). The decision itself is unchanged.

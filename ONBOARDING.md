@@ -15,8 +15,8 @@ guided workflow** ([#8](https://github.com/datahelix-platform/aperture/issues/8)
 stage → continuous dry-run → whole-set validate → one atomic `ingestBatch` with
 client-id-linked intra-batch refs; and the **control plane** ([#9](https://github.com/datahelix-platform/aperture/issues/9),
 ADR-0017/N5.4): saved views, cross-browser resumable drafts, and config-as-data (workflows)
-as versioned documents on a LinkML-on-Hippo store (co-located by default,
-`VITE_HIPPO_CONTROL_PLANE_URL` to split; honest localStorage fallback). Facet
+as versioned documents on a LinkML-on-Mosaic store (co-located by default,
+`VITE_CONTROL_PLANE_URL` to split; honest localStorage fallback). Facet
 **counts**/sort stay capability-gated off until Hippo X1
 ([hippo#96](https://github.com/BU-Neuromics/hippo/issues/96)).
 **Cross-class queries + graph exploration** (ADR-0035/0037): the **Query builder** (nav →
@@ -44,7 +44,7 @@ until Mosaic `neighbors` lands). Local smoke harness: `web/e2e-smoke.mjs` +
 issue comments and the committed introspection capture
 (`web/src/data/testing/realIntrospection.json`):
 
-- **Introspection:** baseline `__schema` powers everything; the `hippoSchema` enrichment field is
+- **Introspection:** baseline `__schema` powers everything; the `mosaicSchema` enrichment field is
   advertised (richer enrichment still a later upgrade).
 - **Lists:** `books(filters, filterMode, limit!, offset!): BookPage` — `{ items total }` page
   envelopes, not bare lists; singular `book(id: ID!)` detail fields; bare-list `searchBooks(q!)`

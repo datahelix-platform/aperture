@@ -5,7 +5,7 @@ import type { WorkflowRunState } from './engine';
 /**
  * Resumable drafts (W4.8/L10): the run state persists as an INERT
  * control-plane document — nothing enters the domain graph until the atomic
- * commit. On a Hippo control plane the draft survives across browsers; on
+ * commit. On a Mosaic control plane the draft survives across browsers; on
  * the local fallback it lives in this browser (the footer says which). The
  * draft pins workflow + schema version via the fields inside
  * WorkflowRunState, so resume can detect drift instead of silently breaking.

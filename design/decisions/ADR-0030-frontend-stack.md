@@ -57,3 +57,5 @@ talks to Hippo directly). No Python BFF for MVP — the BFF role is Bridge (ADR-
   Rejected for MVP; revisit if the app and the Python client need independent release cadences.
 - **graphql-request + codegen.** Too thin — hand-rolled caching/pagination as the read loop
   grows. Rejected.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** Mosaic v0.16.0 renamed the GraphQL fields named here: `hippoSchema` / `hippoEntityType` → `mosaicSchema` / `mosaicEntityType` (Q3), and Aperture reads the new names (aperture#35). The decision itself is unchanged.

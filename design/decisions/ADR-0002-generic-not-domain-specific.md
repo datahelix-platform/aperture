@@ -45,3 +45,5 @@ anything, stricter: no source-specific *or* domain-specific nouns in Aperture so
   founding constraint, not a refactor.
 - **Stay generic only over Hippo deployments.** Still couples Aperture to one backend's
   introspection surface. Rejected by the 2026-06-15 refinement in favour of any-GraphQL.
+
+> **Note (2026-11-20, platform [ADR-0007](../../../platform/design/decisions/ADR-0007-retire-hippo-data-contract-identifiers.md)):** Mosaic v0.16.0 renamed the GraphQL fields named here: `hippoSchema` / `hippoEntityType` → `mosaicSchema` / `mosaicEntityType` (Q3), and Aperture reads the new names (aperture#35). The decision itself is unchanged.

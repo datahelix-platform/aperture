@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { HippoSource } from '../data/hippoSource';
+import type { MosaicSource } from '../data/mosaicSource';
 import type { CollectionModel } from '../data/schemaModel';
 import { slotName } from '../data/schemaModel';
 import { renderPathCell, isPathRightAligned } from '../features/collections/cells';
@@ -280,7 +280,7 @@ function stepZoom(current: number, direction: 1 | -1): number {
   return TABLE_ZOOM_STEPS[next]!;
 }
 
-export function QueryBuilderView({ source }: { source: HippoSource }) {
+export function QueryBuilderView({ source }: { source: MosaicSource }) {
   const { collections, capabilities } = source;
   const urlState = useCollectionUrlState();
   const navView = useNavView();

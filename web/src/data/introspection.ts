@@ -1,9 +1,9 @@
 /**
  * Standard GraphQL `__schema` introspection — the generic baseline every
- * conformant endpoint supports (ADR-0017). Hippo's `hippoSchema` /
- * `hippoEntityType` enrichment layers on top when advertised (its presence is
+ * conformant endpoint supports (ADR-0017). Mosaic's `mosaicSchema` /
+ * `mosaicEntityType` enrichment layers on top when advertised (its presence is
  * detected here; richer enrichment is a Phase-1 concern once its query shape
- * is confirmed against a live `hippo serve`).
+ * is confirmed against a live `mosaic serve`).
  */
 
 export interface TypeRef {
@@ -112,7 +112,7 @@ export function typeRefToSDL(ref: TypeRef): string {
 }
 
 /**
- * Mosaic's own LinkML type model, exposed as `hippoSchema` (Mosaic ADR-0009).
+ * Mosaic's own LinkML type model, exposed as `mosaicSchema` (Mosaic ADR-0009).
  *
  * Standard `__schema` carries a description on each TYPE but — verified against a live
  * endpoint — `null` on every FIELD, because the generated object types do not propagate
@@ -124,12 +124,11 @@ export function typeRefToSDL(ref: TypeRef): string {
  * (see this file's header note about enrichment being a later concern — the query shape is
  * now confirmed against a live server).
  *
- * The name keeps its historical `hippo` spelling: it is a data-contract identifier, not a
- * product name (Mosaic ADR-0004).
+ * Named `hippoSchema` until Mosaic v0.16.0, which renamed it per platform ADR-0007 (Q3).
  */
-export const HIPPO_SCHEMA_QUERY = `
+export const MOSAIC_SCHEMA_QUERY = `
   query ApertureSlotEnrichment {
-    hippoSchema {
+    mosaicSchema {
       name
       accessorName
       description
@@ -176,22 +175,22 @@ export interface EntityTypeInfo {
 }
 
 export interface SlotEnrichmentData {
-  hippoSchema: readonly EntityTypeInfo[];
+  mosaicSchema: readonly EntityTypeInfo[];
 }
 
 /**
  * Slot enrichment keyed by entity type name, then by slot name.
  *
- * `undefined` throughout when the endpoint does not advertise `hippoSchema`, or when the
+ * `undefined` throughout when the endpoint does not advertise `mosaicSchema`, or when the
  * query fails. Every consumer must read it as optional: an endpoint without it has to keep
  * working exactly as it did (ADR-0029 honest degradation).
  */
 export type SlotEnrichment = ReadonlyMap<string, ReadonlyMap<string, SlotInfo>>;
 
 export function indexSlotEnrichment(data: SlotEnrichmentData | null | undefined): SlotEnrichment | undefined {
-  if (!data?.hippoSchema) return undefined;
+  if (!data?.mosaicSchema) return undefined;
   const byType = new Map<string, ReadonlyMap<string, SlotInfo>>();
-  for (const entity of data.hippoSchema) {
+  for (const entity of data.mosaicSchema) {
     byType.set(entity.name, new Map(entity.fields.map((f) => [f.name, f])));
   }
   return byType;

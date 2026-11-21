@@ -2077,7 +2077,7 @@
      }
     },
     {
-     "name": "hippoSchema",
+     "name": "mosaicSchema",
      "description": null,
      "args": [],
      "type": {
@@ -2099,7 +2099,7 @@
      }
     },
     {
-     "name": "hippoEntityType",
+     "name": "mosaicEntityType",
      "description": null,
      "args": [
       {
@@ -2132,20 +2132,6 @@
    "description": "A person who writes Books. `name` is full-text searchable; the write loop creates an Author, and the atomic-workflow loop creates an Author and its Books in one batch (intra-batch reference: the Book's `author` points at the not-yet-committed Author by its batch ref).",
    "fields": [
     {
-     "name": "name",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "bio",
      "description": null,
      "args": [],
@@ -2157,7 +2143,7 @@
     },
     {
      "name": "booksCount",
-     "description": "Cardinality of `books` without resolving its member objects \u2014 a single indexed COUNT(*) over the relationship edges (issue #132).",
+     "description": "Cardinality of `books` without resolving its member objects — a single indexed COUNT(*) over the relationship edges (issue #132).",
      "args": [],
      "type": {
       "kind": "NON_NULL",
@@ -2165,6 +2151,20 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "Int",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "name",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -2339,22 +2339,8 @@
    "description": "A published work. `format` (enum) and `in_print` (boolean) drive facets; `author` is a typed reference used for cross-links and batch resolution.",
    "fields": [
     {
-     "name": "title",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "coAuthorsCount",
-     "description": "Cardinality of `co_authors` without resolving its member objects \u2014 a single indexed COUNT(*) over the relationship edges (issue #132).",
+     "description": "Cardinality of `co_authors` without resolving its member objects — a single indexed COUNT(*) over the relationship edges (issue #132).",
      "args": [],
      "type": {
       "kind": "NON_NULL",
@@ -2364,6 +2350,16 @@
        "name": "Int",
        "ofType": null
       }
+     }
+    },
+    {
+     "name": "dimensions",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "JSON",
+      "ofType": null
      }
     },
     {
@@ -2384,6 +2380,20 @@
       "kind": "SCALAR",
       "name": "Boolean",
       "ofType": null
+     }
+    },
+    {
+     "name": "title",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
+       "ofType": null
+      }
      }
     },
     {
@@ -2531,23 +2541,31 @@
    "enumValues": null
   },
   {
+   "kind": "SCALAR",
+   "name": "JSON",
+   "description": "The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).",
+   "fields": null,
+   "inputFields": null,
+   "enumValues": null
+  },
+  {
    "kind": "ENUM",
    "name": "BookFormat",
-   "description": "Physical/digital form of a Book \u2014 drives an enum facet in browse/filter.",
+   "description": "Physical/digital form of a Book — drives an enum facet in browse/filter.",
    "fields": null,
    "inputFields": null,
    "enumValues": [
     {
-     "name": "hardcover"
-    },
-    {
-     "name": "paperback"
+     "name": "audiobook"
     },
     {
      "name": "ebook"
     },
     {
-     "name": "audiobook"
+     "name": "hardcover"
+    },
+    {
+     "name": "paperback"
     }
    ]
   },
@@ -2627,7 +2645,7 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "FilterInput",
-   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `hippoSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected \u2014 absence is asked with IS_NULL, never with EQ null.",
+   "description": "Field/value filter (SDK query filter). ``field`` is a LinkML slot name (snake_case, as listed by `mosaicSchema`); the equivalent camelCase spelling exposed on the entity type is also accepted. An unrecognized name is an error, never an empty result (issue #149). ``op`` defaults to EQ (equality); IN treats ``value`` as a list and matches when the field is a member of it (issue #102). Comparison and null-test operators (ADR-0006): GT/GTE/LT/LTE on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, NEQ on comparable slots, IS_NULL (boolean ``value``; true matches entities with no stored value) everywhere. ``value: null`` is rejected — absence is asked with IS_NULL, never with EQ null.",
    "fields": null,
    "inputFields": [
     {
@@ -2670,14 +2688,6 @@
    "enumValues": null
   },
   {
-   "kind": "SCALAR",
-   "name": "JSON",
-   "description": "The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).",
-   "fields": null,
-   "inputFields": null,
-   "enumValues": null
-  },
-  {
    "kind": "ENUM",
    "name": "FilterOp",
    "description": "Predicate applied to a filter's field/value (SDK filter op). Which operators a given slot supports depends on its kind/range (ADR-0006): comparisons (GT/GTE/LT/LTE) on numeric and temporal slots, CONTAINS (case-insensitive substring) on string slots, IS_NULL everywhere. An operator outside a slot's set is a coded error, never a silently-wrong result (issue #129).",
@@ -2716,17 +2726,9 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "AuthorFilter",
-   "description": "Typed filter for Author (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Author (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
-    {
-     "name": "name",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
     {
      "name": "bio",
      "type": {
@@ -2740,6 +2742,14 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "BookEdgeQuantifiers",
+      "ofType": null
+     }
+    },
+    {
+     "name": "name",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -2887,17 +2897,9 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "BookFilter",
-   "description": "Typed filter for Book (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Book (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
-    {
-     "name": "title",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
-      "ofType": null
-     }
-    },
     {
      "name": "author",
      "type": {
@@ -2915,6 +2917,14 @@
      }
     },
     {
+     "name": "dimensions",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "JsonFilterOps",
+      "ofType": null
+     }
+    },
+    {
      "name": "format",
      "type": {
       "kind": "INPUT_OBJECT",
@@ -2927,6 +2937,14 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "BooleanFilterOps",
+      "ofType": null
+     }
+    },
+    {
+     "name": "title",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -3016,6 +3034,47 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "AuthorFilter",
+      "ofType": null
+     }
+    }
+   ],
+   "enumValues": null
+  },
+  {
+   "kind": "INPUT_OBJECT",
+   "name": "JsonFilterOps",
+   "description": "Operators on inline structured-value slots: whole-value equality/membership only.",
+   "fields": null,
+   "inputFields": [
+    {
+     "name": "eq",
+     "type": {
+      "kind": "SCALAR",
+      "name": "JSON",
+      "ofType": null
+     }
+    },
+    {
+     "name": "in",
+     "type": {
+      "kind": "LIST",
+      "name": null,
+      "ofType": {
+       "kind": "NON_NULL",
+       "name": null,
+       "ofType": {
+        "kind": "SCALAR",
+        "name": "JSON",
+        "ofType": null
+       }
+      }
+     }
+    },
+    {
+     "name": "isNull",
+     "type": {
+      "kind": "SCALAR",
+      "name": "Boolean",
       "ofType": null
      }
     }
@@ -3208,10 +3267,10 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "NAME"
+     "name": "BIO"
     },
     {
-     "name": "BIO"
+     "name": "NAME"
     },
     {
      "name": "ID"
@@ -3239,7 +3298,7 @@
   {
    "kind": "OBJECT",
    "name": "FacetCount",
-   "description": "One facet bucket: a stored value of the requested field and how many matching entities carry it (ADR-0007). Entities with no stored value are not counted \u2014 query absence with IS_NULL. Availability-consistent: buckets sum over exactly the entities the list query would return under the same filters.",
+   "description": "One facet bucket: a stored value of the requested field and how many matching entities carry it (ADR-0007). Entities with no stored value are not counted — query absence with IS_NULL. Availability-consistent: buckets sum over exactly the entities the list query would return under the same filters.",
    "fields": [
     {
      "name": "value",
@@ -3383,13 +3442,13 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "TITLE"
-    },
-    {
      "name": "FORMAT"
     },
     {
      "name": "IN_PRINT"
+    },
+    {
+     "name": "TITLE"
     },
     {
      "name": "YEAR"
@@ -3405,7 +3464,7 @@
   {
    "kind": "OBJECT",
    "name": "ExternalID",
-   "description": "DEPRECATED (since 0.6.0, issue #48): use the `ExternalReference` value type on a domain slot (optionally annotated `hippo_external_xref` for reverse lookup) instead. ExternalID remains for backward compatibility only and will be removed from hippo_core in a future major release; the SDK methods (`register_external_id`, `get_by_external_id`, `list_external_ids`, mapping-level `supersede`) and the `/external-ids` REST endpoints emit DeprecationWarning / are marked deprecated in OpenAPI.\nA stable cross-system identifier linking a Hippo entity to an ID managed by an external source system (e.g., STARLIMS barcode, HALO sample ID, Donor DB donor number). Lifecycle-tracked: each ExternalID instance is created, superseded, and retired via the normal entity machinery \u2014 same write path, same provenance, same query semantics as any other entity class. See sec3 \u00a73.4 and the \u03b2-refactor handoff (sec9 PR 1.1) for context.\nNote on lifecycle flags: `is_available` (inherited from Entity) is the standard entity-lifecycle flag that reflects soft-delete / supersede / archived state. `is_active` is a narrower flag meaning \"this external-system mapping is currently in use\". An ExternalID may be `is_available: true` (entity-level: not deleted) but `is_active: false` (mapping-level: superseded by a newer mapping).\n`(source_system, value)` must be unique within active records (`is_active = true`). The uniqueness constraint is declared here as a logical `unique_keys` block; the partial-index enforcement against `is_active = true` is wired in the DDL wrapper (PR 1.2).",
+   "description": "DEPRECATED (since 0.6.0, issue #48): use the `ExternalReference` value type on a domain slot (optionally annotated `mosaic_external_xref` for reverse lookup) instead. ExternalID remains for backward compatibility only and will be removed from mosaic_core in a future major release; the SDK methods (`register_external_id`, `get_by_external_id`, `list_external_ids`, mapping-level `supersede`) and the `/external-ids` REST endpoints emit DeprecationWarning / are marked deprecated in OpenAPI.\nA stable cross-system identifier linking a Mosaic entity to an ID managed by an external source system (e.g., STARLIMS barcode, HALO sample ID, Donor DB donor number). Lifecycle-tracked: each ExternalID instance is created, superseded, and retired via the normal entity machinery — same write path, same provenance, same query semantics as any other entity class. See sec3 §3.4 and the β-refactor handoff (sec9 PR 1.1) for context.\nNote on lifecycle flags: `is_available` (inherited from Entity) is the standard entity-lifecycle flag that reflects soft-delete / supersede / archived state. `is_active` is a narrower flag meaning \"this external-system mapping is currently in use\". An ExternalID may be `is_available: true` (entity-level: not deleted) but `is_active: false` (mapping-level: superseded by a newer mapping).\n`(source_system, value)` must be unique within active records (`is_active = true`). The uniqueness constraint is declared here as a logical `unique_keys` block; the partial-index enforcement against `is_active = true` is wired in the DDL wrapper (PR 1.2).",
    "fields": [
     {
      "name": "value",
@@ -3637,7 +3696,7 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ExternalIDFilter",
-   "description": "Typed filter for ExternalID (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for ExternalID (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
     {
@@ -3761,8 +3820,18 @@
   {
    "kind": "OBJECT",
    "name": "Review",
-   "description": "A review of a Book. Third entity in the atomic-workflow batch (Author \u2192 Book \u2192 Review), so the golden path stages a three-node linked set and commits it all-or-nothing.",
+   "description": "A review of a Book. Third entity in the atomic-workflow batch (Author → Book → Review), so the golden path stages a three-node linked set and commits it all-or-nothing.",
    "fields": [
+    {
+     "name": "body",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
     {
      "name": "rating",
      "description": null,
@@ -3775,16 +3844,6 @@
        "name": "Int",
        "ofType": null
       }
-     }
-    },
-    {
-     "name": "body",
-     "description": null,
-     "args": [],
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
      }
     },
     {
@@ -3975,9 +4034,17 @@
   {
    "kind": "INPUT_OBJECT",
    "name": "ReviewFilter",
-   "description": "Typed filter for Review (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a \u2014 one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b \u2014 EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
+   "description": "Typed filter for Review (ADR-0006). Slot fields and multiple operators within one field AND together; nest boolean structure with and/or/not. To-one reference edges nest the target type's filter under the edge name (M5a — one correlated EXISTS); multivalued reference edges nest some/none quantifiers over the target's filter (M5b — EXISTS/NOT EXISTS over the link table). Relationship predicates are not combinable with asOf. Composes with `filters:` by AND.",
    "fields": null,
    "inputFields": [
+    {
+     "name": "body",
+     "type": {
+      "kind": "INPUT_OBJECT",
+      "name": "StringFilterOps",
+      "ofType": null
+     }
+    },
     {
      "name": "book",
      "type": {
@@ -3991,14 +4058,6 @@
      "type": {
       "kind": "INPUT_OBJECT",
       "name": "IntFilterOps",
-      "ofType": null
-     }
-    },
-    {
-     "name": "body",
-     "type": {
-      "kind": "INPUT_OBJECT",
-      "name": "StringFilterOps",
       "ofType": null
      }
     },
@@ -4069,10 +4128,10 @@
    "inputFields": null,
    "enumValues": [
     {
-     "name": "RATING"
+     "name": "BODY"
     },
     {
-     "name": "BODY"
+     "name": "RATING"
     },
     {
      "name": "ID"
@@ -4085,7 +4144,7 @@
   {
    "kind": "OBJECT",
    "name": "ProvenanceEntry",
-   "description": "One provenance log entry for an entity (append-only audit trail; see sec6/sec9 \u00a79.6).",
+   "description": "One provenance log entry for an entity (append-only audit trail; see sec6/sec9 §9.6).",
    "fields": [
     {
      "name": "operationId",
@@ -4219,7 +4278,7 @@
   {
    "kind": "OBJECT",
    "name": "XrefMatch",
-   "description": "Entity resolved from an external reference (system, value) pair via the hippo_external_xref reverse-lookup index (issue #48). Generic envelope shape \u2014 the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "Entity resolved from an external reference (system, value) pair via the mosaic_external_xref reverse-lookup index (issue #48). Generic envelope shape — the matching entity type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",
@@ -4300,7 +4359,7 @@
   {
    "kind": "OBJECT",
    "name": "RelatedEntity",
-   "description": "An entity that references the queried entity through a relationships-table-backed multivalued slot (ADR-0002) \u2014 the reverse of forward multivalued-reference resolution (issue #146). Generic envelope shape \u2014 the referencing entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
+   "description": "An entity that references the queried entity through a relationships-table-backed multivalued slot (ADR-0002) — the reverse of forward multivalued-reference resolution (issue #146). Generic envelope shape — the referencing entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal.",
    "fields": [
     {
      "name": "entityId",
@@ -4395,7 +4454,7 @@
   {
    "kind": "OBJECT",
    "name": "SearchHit",
-   "description": "One cross-class search hit (issue #158): a heterogeneous JSON envelope \u2014 the matching entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal. `score` is the FTS rank, normalized to [0, 1] per index (comparable in relative terms across classes).",
+   "description": "One cross-class search hit (issue #158): a heterogeneous JSON envelope — the matching entity's type is only known at query time, so `data` carries the typed payload as JSON; use `entityType` with the per-type queries for typed traversal. `score` is the FTS rank, normalized to [0, 1] per index (comparable in relative terms across classes).",
    "fields": [
     {
      "name": "entityId",
@@ -4498,7 +4557,7 @@
   {
    "kind": "OBJECT",
    "name": "NeighborhoodGraph",
-   "description": "A depth-bounded subgraph around one entity (issue #158): renderable without further queries. `edgeSources` names the edge stores covered by this response; `notices` discloses any bound hit (node budget) or scoped-out coverage (column edges under asOf) \u2014 the graph is never silently partial.",
+   "description": "A depth-bounded subgraph around one entity (issue #158): renderable without further queries. `edgeSources` names the edge stores covered by this response; `notices` discloses any bound hit (node budget) or scoped-out coverage (column edges under asOf) — the graph is never silently partial.",
    "fields": [
     {
      "name": "nodes",
@@ -4595,7 +4654,7 @@
   {
    "kind": "OBJECT",
    "name": "GraphNode",
-   "description": "One node of a neighborhood subgraph (issue #158) \u2014 the same heterogeneous JSON envelope as SearchHit/XrefMatch.",
+   "description": "One node of a neighborhood subgraph (issue #158) — the same heterogeneous JSON envelope as SearchHit/XrefMatch.",
    "fields": [
     {
      "name": "entityId",
@@ -4662,7 +4721,7 @@
   {
    "kind": "OBJECT",
    "name": "GraphEdge",
-   "description": "One directed edge of a neighborhood subgraph. `type` is the referencing slot / relationship type; `edgeSource` names the store it came from \u2014 LINK_TABLE (relationship-backed multivalued references, ADR-0002) or COLUMN (single-valued reference slots).",
+   "description": "One directed edge of a neighborhood subgraph. `type` is the referencing slot / relationship type; `edgeSource` names the store it came from — LINK_TABLE (relationship-backed multivalued references, ADR-0002) or COLUMN (single-valued reference slots).",
    "fields": [
     {
      "name": "source",
@@ -4727,7 +4786,7 @@
   {
    "kind": "OBJECT",
    "name": "MosaicEntityTypeInfo",
-   "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Mosaic's *domain* schema introspection \u2014 the LinkML type model the GraphQL surface itself is generated from.",
+   "description": "One exposed entity type from the deployment's merged LinkML schema (mirrors REST GET /schemas). This is Mosaic's *domain* schema introspection — the LinkML type model the GraphQL surface itself is generated from.",
    "fields": [
     {
      "name": "name",
@@ -4805,6 +4864,52 @@
         "ofType": {
          "kind": "OBJECT",
          "name": "MosaicReferenceInfo",
+         "ofType": null
+        }
+       }
+      }
+     }
+    },
+    {
+     "name": "abstract",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "parent",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
+     "name": "kinds",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "LIST",
+       "name": null,
+       "ofType": {
+        "kind": "NON_NULL",
+        "name": null,
+        "ofType": {
+         "kind": "SCALAR",
+         "name": "String",
          "ofType": null
         }
        }
@@ -6120,7 +6225,7 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "name",
+     "name": "bio",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -6128,7 +6233,7 @@
      }
     },
     {
-     "name": "bio",
+     "name": "name",
      "type": {
       "kind": "SCALAR",
       "name": "String",
@@ -6157,7 +6262,7 @@
   {
    "kind": "OBJECT",
    "name": "AvailabilityResult",
-   "description": "Result of an availability transition. Mosaic never hard-deletes; lifecycle status drivers (active/archived/superseded/deleted/distributed/removed) are recorded in provenance (sec3, sec9 \u00a79.5).",
+   "description": "Result of an availability transition. Mosaic never hard-deletes; lifecycle status drivers (active/archived/superseded/deleted/distributed/removed) are recorded in provenance (sec3, sec9 §9.5).",
    "fields": [
     {
      "name": "entityId",
@@ -6194,7 +6299,7 @@
   {
    "kind": "OBJECT",
    "name": "BulkAvailabilityResult",
-   "description": "Summary of a bulk availability change (mirrors REST POST /entities/{type}/bulk-availability): per-record error isolation \u2014 failures never roll back sibling successes.",
+   "description": "Summary of a bulk availability change (mirrors REST POST /entities/{type}/bulk-availability): per-record error isolation — failures never roll back sibling successes.",
    "fields": [
     {
      "name": "total",
@@ -6367,18 +6472,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "title",
-     "type": {
-      "kind": "NON_NULL",
-      "name": null,
-      "ofType": {
-       "kind": "SCALAR",
-       "name": "String",
-       "ofType": null
-      }
-     }
-    },
-    {
      "name": "author",
      "type": {
       "kind": "NON_NULL",
@@ -6386,6 +6479,18 @@
       "ofType": {
        "kind": "SCALAR",
        "name": "ID",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "title",
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "String",
        "ofType": null
       }
      }
@@ -6404,6 +6509,14 @@
         "ofType": null
        }
       }
+     }
+    },
+    {
+     "name": "dimensions",
+     "type": {
+      "kind": "SCALAR",
+      "name": "JSON",
+      "ofType": null
      }
     },
     {
@@ -6456,14 +6569,6 @@
    "fields": null,
    "inputFields": [
     {
-     "name": "title",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
-      "ofType": null
-     }
-    },
-    {
      "name": "author",
      "type": {
       "kind": "SCALAR",
@@ -6488,6 +6593,14 @@
      }
     },
     {
+     "name": "dimensions",
+     "type": {
+      "kind": "SCALAR",
+      "name": "JSON",
+      "ofType": null
+     }
+    },
+    {
      "name": "format",
      "type": {
       "kind": "ENUM",
@@ -6500,6 +6613,14 @@
      "type": {
       "kind": "SCALAR",
       "name": "Boolean",
+      "ofType": null
+     }
+    },
+    {
+     "name": "title",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
       "ofType": null
      }
     },
@@ -6720,6 +6841,14 @@
    "fields": null,
    "inputFields": [
     {
+     "name": "body",
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
+    },
+    {
      "name": "book",
      "type": {
       "kind": "SCALAR",
@@ -6732,14 +6861,6 @@
      "type": {
       "kind": "SCALAR",
       "name": "Int",
-      "ofType": null
-     }
-    },
-    {
-     "name": "body",
-     "type": {
-      "kind": "SCALAR",
-      "name": "String",
       "ofType": null
      }
     },
@@ -6960,7 +7081,7 @@
   {
    "kind": "OBJECT",
    "name": "ValidationFailureType",
-   "description": "One tier-annotated validation failure (sec9 \u00a79.9).",
+   "description": "One tier-annotated validation failure (sec9 §9.9).",
    "fields": [
     {
      "name": "tier",
@@ -7189,7 +7310,7 @@
     },
     {
      "name": "subscriptionType",
-     "description": "If this server support subscription, the type that subscription operations will be rooted at.",
+     "description": "If this server supports subscription, the type that subscription operations will be rooted at.",
      "args": [],
      "type": {
       "kind": "OBJECT",
@@ -7200,7 +7321,21 @@
     {
      "name": "directives",
      "description": "A list of all directives supported by this server.",
-     "args": [],
+     "args": [
+      {
+       "name": "includeDeprecated",
+       "defaultValue": "false",
+       "type": {
+        "kind": "NON_NULL",
+        "name": null,
+        "ofType": {
+         "kind": "SCALAR",
+         "name": "Boolean",
+         "ofType": null
+        }
+       }
+      }
+     ],
      "type": {
       "kind": "NON_NULL",
       "name": null,
@@ -7786,6 +7921,30 @@
        }
       }
      }
+    },
+    {
+     "name": "isDeprecated",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "NON_NULL",
+      "name": null,
+      "ofType": {
+       "kind": "SCALAR",
+       "name": "Boolean",
+       "ofType": null
+      }
+     }
+    },
+    {
+     "name": "deprecationReason",
+     "description": null,
+     "args": [],
+     "type": {
+      "kind": "SCALAR",
+      "name": "String",
+      "ofType": null
+     }
     }
    ],
    "inputFields": null,
@@ -7854,6 +8013,9 @@
     },
     {
      "name": "INPUT_FIELD_DEFINITION"
+    },
+    {
+     "name": "DIRECTIVE_DEFINITION"
     }
    ]
   }

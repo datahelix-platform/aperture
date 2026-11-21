@@ -2,7 +2,7 @@ import { deriveCollections } from '../data/schemaModel';
 import { demoIntrospection } from '../data/testing/fixtures';
 import { describe, expect, it, vi } from 'vitest';
 import { NO_CAPABILITIES } from '../data/capabilities';
-import type { EntityPage, HippoSource, ListOptions } from '../data/hippoSource';
+import type { EntityPage, MosaicSource, ListOptions } from '../data/mosaicSource';
 import type { CollectionModel } from '../data/schemaModel';
 import { runQuerySpec, SEMIJOIN_CAP } from './planner';
 
@@ -52,7 +52,7 @@ const collections = [donors, samples];
 
 function sourceWith(
   pages: Record<string, (options: ListOptions) => EntityPage>,
-): HippoSource & { calls: { id: string; options: ListOptions }[] } {
+): MosaicSource & { calls: { id: string; options: ListOptions }[] } {
   const calls: { id: string; options: ListOptions }[] = [];
   return {
     calls,
@@ -69,7 +69,7 @@ function sourceWith(
     setAvailability: vi.fn(),
     supersede: vi.fn(),
     runBatch: vi.fn(),
-  } as unknown as HippoSource & { calls: { id: string; options: ListOptions }[] };
+  } as unknown as MosaicSource & { calls: { id: string; options: ListOptions }[] };
 }
 
 describe('runQuerySpec', () => {
@@ -238,7 +238,7 @@ describe('runQuerySpec', () => {
 describe('runQuerySpec — server-first execution (ADR-0035/0041)', () => {
   const demo = deriveCollections(demoIntrospection);
 
-  function recordingSource(): { source: HippoSource; calls: ListOptions[] } {
+  function recordingSource(): { source: MosaicSource; calls: ListOptions[] } {
     const calls: ListOptions[] = [];
     const source = {
       capabilities: NO_CAPABILITIES,
@@ -247,7 +247,7 @@ describe('runQuerySpec — server-first execution (ADR-0035/0041)', () => {
         calls.push(options);
         return { rows: [], mayHaveMore: false, total: 0 };
       },
-    } as unknown as HippoSource;
+    } as unknown as MosaicSource;
     return { source, calls };
   }
 

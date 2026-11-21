@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import type { Capabilities } from './capabilities';
 import { NO_CAPABILITIES } from './capabilities';
 import type { EndpointConfig } from './endpoint';
-import type { HippoSource } from './hippoSource';
-import { connectHippoSource } from './hippoSource';
+import type { MosaicSource } from './mosaicSource';
+import { connectMosaicSource } from './mosaicSource';
 import type { ScopedDataClient } from './scopedClient';
 import { createPassthroughClient } from './scopedClient';
 
@@ -16,7 +16,7 @@ import { createPassthroughClient } from './scopedClient';
 export type DataSourceState =
   | { status: 'unconfigured' }
   | { status: 'connecting' }
-  | { status: 'ready'; source: HippoSource }
+  | { status: 'ready'; source: MosaicSource }
   | { status: 'error'; message: string };
 
 const DataSourceContext = createContext<DataSourceState>({ status: 'unconfigured' });
@@ -41,7 +41,7 @@ export function DataSourceProvider({ endpoint, clientFactory, children }: DataSo
     }
     let cancelled = false;
     setState({ status: 'connecting' });
-    connectHippoSource(makeClient(endpoint.url))
+    connectMosaicSource(makeClient(endpoint.url))
       .then((source) => {
         if (!cancelled) setState({ status: 'ready', source });
       })

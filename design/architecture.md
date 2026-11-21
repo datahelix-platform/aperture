@@ -46,8 +46,8 @@ over any GraphQL" + multi-source is **D** (ADR-0002, ADR-0017).
 To be generic over "any GraphQL endpoint," the adapter **declares capabilities** (faceting,
 full-text, cursor pagination, relationship traversal, aggregation) and the UI **gates
 features** accordingly — the same pattern Mosaic uses for its own TUI backends. Baseline =
-standard `__schema` introspection; per-source enrichment = Mosaic's `hippoSchema` /
-`hippoEntityType`, or a Canon/Cappella adapter later. This is the natural next code artifact
+standard `__schema` introspection; per-source enrichment = Mosaic's `mosaicSchema` /
+`mosaicEntityType`, or a Canon/Cappella adapter later. This is the natural next code artifact
 (a GraphQL backend alongside the kept SDK/REST `backends/`). Internal cross-links come from
 resolved relationship fields; external hrefs from a `system → URL-template` map (ADR-0015).
 

@@ -5,8 +5,8 @@
  * gates features on these and degrades honestly when they are absent.
  */
 export interface Capabilities {
-  /** 'hippo' = `hippoSchema` enrichment available; 'graphql' = standard `__schema` only. */
-  schemaIntrospection: 'hippo' | 'graphql' | 'none';
+  /** 'mosaic' = `mosaicSchema` enrichment available; 'graphql' = standard `__schema` only. */
+  schemaIntrospection: 'mosaic' | 'graphql' | 'none';
   /** Collection list fields accept limit/offset args. */
   offsetPagination: boolean;
   /** Collection list fields accept an equality filter arg. */

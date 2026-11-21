@@ -129,7 +129,7 @@ documented limits: offset-only pagination, equality filters only (no CEL over Gr
 multivalued slots don't persist in the v0.1 SQLite adapter (resolved lists return `[]`),
 `isAvailable` always `true` on reads, and no schema-versioning of the GraphQL surface
 (additive-only tolerance). Internal cross-links come from resolved relationship fields;
-external hrefs from `ExternalReference` + `hippo_external_xref` reverse lookup (issue #48).
+external hrefs from `ExternalReference` + `mosaic_external_xref` reverse lookup (issue #48).
 
 The kept `src/aperture/backends/` protocol has `MosaicSdkBackend` (in-process) and
 `MosaicRestBackend` (REST); a **GraphQL backend is not yet implemented** and is the natural
