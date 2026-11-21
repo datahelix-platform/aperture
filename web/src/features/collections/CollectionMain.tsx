@@ -42,7 +42,7 @@ export function CollectionMain() {
       <div className="main-panel" role="status">
         <h1 className="main-panel-title">No data-plane endpoint configured</h1>
         <p className="main-panel-detail">
-          Point Aperture at a running Mosaic GraphQL endpoint by setting{' '}
+          Point Aperture at a GraphQL endpoint by setting{' '}
           <code>VITE_GRAPHQL_URL</code> (for example{' '}
           <code>VITE_GRAPHQL_URL=http://localhost:8000/graphql npm run dev</code>).
         </p>

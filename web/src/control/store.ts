@@ -6,7 +6,7 @@ import type { CollectionModel } from '../data/schemaModel';
  * saved views, workflow drafts, config-as-data — lives in a control-plane
  * document store, DISTINCT from the browsed data plane. The MVP reference
  * impl is LinkML-on-Mosaic: documents are ordinary entities on a (co-located)
- * Hippo whose schema carries an Aperture document type, reached through the
+ * Mosaic whose schema carries an Aperture document type, reached through the
  * same Layer-D machinery as everything else. When no such type is advertised,
  * persistence degrades honestly to this browser's localStorage — labeled as
  * such, never silently (ADR-0029).
@@ -270,7 +270,7 @@ export function createMosaicStore(
         return rows.map(toDocument).filter(isLiveDocument);
       }
       // Two filtered reads rather than one unfiltered one: the viewer's own
-      // documents plus the shared ones. Equality filters are all Hippo
+      // documents plus the shared ones. Equality filters are all Mosaic
       // advertises (ADR-0029), so an OR is not available — the union is
       // assembled here and deduped by row id.
       const [own, shared] = await Promise.all([
@@ -318,7 +318,7 @@ export function createMosaicStore(
     },
 
     async remove(kind, name) {
-      // No hard delete on Hippo (W4.4) — clearing the payload retires the
+      // No hard delete on Mosaic (W4.4) — clearing the payload retires the
       // document; readers treat an empty payload as absent. Retirement is an
       // UPDATE, so the owner-only rule above covers deletion for free.
       const existing = await fetchByName(kind, name);
