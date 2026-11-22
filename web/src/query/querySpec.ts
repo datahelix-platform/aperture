@@ -1,6 +1,8 @@
 import type { Capabilities } from '../data/capabilities';
-import type { CollectionModel } from '../data/schemaModel';
+import type { CollectionModel, ColumnModel } from '../data/schemaModel';
 import { humanize, slotName } from '../data/schemaModel';
+import type { ManyMode } from '../data/selection';
+import { MAX_PATH_HOPS } from '../data/selection';
 import { supportsRelationship } from './whereCompiler';
 
 /**
@@ -8,8 +10,10 @@ import { supportsRelationship } from './whereCompiler';
  * validated cross-class query artifact. This MVP carries the anchor, one
  * criteria group (AND/OR) of field conditions and quantified relationship
  * conditions, and rides the URL (`qs`). Nested criteria groups arrive with
- * the typed `where:` planner tier (Mosaic ADR-0006 inc. 2+); columns/sort
- * arrive with server aggregation (Mosaic ADR-0007). The artifact never
+ * the typed `where:` planner tier (Mosaic ADR-0006 inc. 2+); sort arrives
+ * with server aggregation (Mosaic ADR-0007). `columns` (ADR-0041) rides the
+ * conversational wire but not the builder's draft — see `QuerySpec.columns`.
+ * The artifact never
  * changes shape when the server upgrades — only the planner does.
  */
 
@@ -65,6 +69,31 @@ export interface RelatedCondition {
 export type Criterion = FieldCondition | RelatedCondition;
 
 /**
+ * One `columns` entry (ADR-0041 decision 1; Mosaic ADR-0009 note 2026-10-27,
+ * shipped in mosaic v0.16.0 as mosaic#236).
+ *
+ * `path` is spelled in **LinkML slot names**, like `criteria`: an anchor slot
+ * alone (`['title']`), or one or two reference hops then a leaf slot
+ * (`['donor', 'age_at_death']`, `['input_samples', 'donor', 'cohort']`). A
+ * hop may be forward or a declared `inverse:` reverse edge.
+ *
+ * `mode` says how a to-many hop resolves (`count`/`joinIds` keep one row per
+ * anchor; `explode` makes one row per member). Mosaic requires it on a path
+ * with a to-many hop and refuses it on one without. Whether a hop is to-many
+ * depends on the schema, so the shape guard checks only what is schema-free.
+ *
+ * Aperture never reads these paths directly: the builder works in GraphQL
+ * field paths (`PathColumn.path`), and `translateColumns` converts between
+ * the two spellings.
+ */
+export interface ColumnSpec {
+  path: string[];
+  mode?: ManyMode;
+}
+
+const COLUMN_MODES: readonly string[] = ['count', 'joinIds', 'explode'];
+
+/**
  * The artifact, spelled in LinkML vocabulary: `anchor` is the **class name**
  * (`"Sample"`), `slot` is the slot name, and a forward `edge` is the reference
  * slot's name.
@@ -93,6 +122,18 @@ export interface QuerySpec {
   /** Combinator across the top-level criteria. */
   mode: 'AND' | 'OR';
   criteria: Criterion[];
+  /**
+   * Traversal columns and their grain (ADR-0041 decision 1), slot-spelled.
+   *
+   * Carried on the wire to and from the conversational planner. The builder
+   * does not keep them on its draft: a proposal's columns seed the result
+   * table (`pathColumns`) and are then stripped, so `cols` is the one view
+   * source and `qs` never holds a stale copy. They are rebuilt from the table
+   * when the draft goes back to the planner. Execution stays client-side
+   * (full envelopes plus a merged nested selection) until Aperture sends
+   * `columns` to Mosaic for execution.
+   */
+  columns?: ColumnSpec[];
 }
 
 export function emptyQuerySpec(anchorTypeName: string): QuerySpec {
@@ -133,7 +174,47 @@ export function readQuerySpec(value: unknown): QuerySpec | null {
   ) {
     return null;
   }
+  if (spec.columns !== undefined && !columnsShapeOk(spec.columns)) return null;
   return spec;
+}
+
+/**
+ * The schema-free half of Mosaic's ColumnSpec check (`_parse_column_spec`,
+ * mosaic v0.16.0). Mosaic's parser is the reference: where it is stricter
+ * than aperture#89's description, it wins, so this also refuses unknown keys,
+ * a `mode` on an anchor slot, and one path asked for in two modes.
+ */
+function columnsShapeOk(columns: unknown): boolean {
+  if (!Array.isArray(columns)) return false;
+  const modes = new Map<string, string | undefined>();
+  for (const raw of columns) {
+    if (typeof raw !== 'object' || raw == null || Array.isArray(raw)) return false;
+    const entry = raw as Record<string, unknown>;
+    if (Object.keys(entry).some((k) => k !== 'path' && k !== 'mode')) return false;
+    const { path, mode } = entry;
+    if (!Array.isArray(path) || !path.every((s) => typeof s === 'string' && s !== '')) return false;
+    if (path.length < 1 || path.length > MAX_PATH_HOPS + 1) return false;
+    if (mode !== undefined && (!COLUMN_MODES.includes(mode as string) || path.length === 1)) {
+      return false;
+    }
+    const key = path.join('.');
+    if (modes.has(key) && modes.get(key) !== mode) return false;
+    modes.set(key, mode as string | undefined);
+  }
+  return true;
+}
+
+/** Drop exact repeats, as Mosaic's parser does: a repeated column is one column. */
+function normalizeColumns(columns: ColumnSpec[]): ColumnSpec[] {
+  const seen = new Set<string>();
+  const out: ColumnSpec[] = [];
+  for (const c of columns) {
+    const key = c.path.join('.');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(c.mode ? { path: [...c.path], mode: c.mode } : { path: [...c.path] });
+  }
+  return out;
 }
 
 /**
@@ -171,8 +252,112 @@ export function canonicalizeQuerySpec(
     return { ...criterion, edge: slotName(criterion.edge.slice('fwd:'.length)) };
   });
 
-  if (!rewrote && anchor.typeName === spec.anchor) return spec;
-  return { v: 1, anchor: anchor.typeName, mode: spec.mode, criteria };
+  // Columns are carried in slot spelling on both branches: normalized (exact
+  // repeats dropped), never translated. Translation to GraphQL field paths is
+  // `translateColumns`' job, done where the builder consumes them.
+  const columns = spec.columns ? normalizeColumns(spec.columns) : undefined;
+  const columnsChanged = columns != null && columns.length !== spec.columns!.length;
+
+  if (!rewrote && !columnsChanged && anchor.typeName === spec.anchor) return spec;
+  const out: QuerySpec = { v: 1, anchor: anchor.typeName, mode: spec.mode, criteria };
+  if (columns) out.columns = columns;
+  return out;
+}
+
+/** A column `translateColumns` could not carry across, and why (ADR-0029). */
+export interface DroppedColumn {
+  /** The path as it was given, in the source spelling. */
+  path: string[];
+  reason: string;
+}
+
+/** Which spelling `translateColumns` produces. */
+export type ColumnSpelling = 'field' | 'slot';
+
+function slotOf(column: ColumnModel): string {
+  return column.slot ?? slotName(column.field);
+}
+
+/**
+ * Convert column paths between the wire spelling (LinkML slot names, what
+ * Mosaic validates and a planner emits) and the builder's spelling (GraphQL
+ * field names, what `PathColumn.path` and the `cols` parameter use).
+ *
+ * `to: 'field'` reads slot-spelled paths (a proposal); `to: 'slot'` reads
+ * field-spelled paths (the result table, going back to the planner).
+ *
+ * The walk is schema-driven, hop by hop, rather than a case conversion: the
+ * introspected `slot` is authoritative where slot enrichment supplied it,
+ * and every hop must be a reference whose target this endpoint exposes. A
+ * column that does not resolve is DROPPED with its reason, never guessed at
+ * and never silently lost (ADR-0029). Grain rules (one to-many hop per path,
+ * one exploded link) are not checked here; `resolvePath` and
+ * `normalizeExplode` enforce them on the builder side.
+ */
+export function translateColumns(
+  columns: ColumnSpec[],
+  to: ColumnSpelling,
+  anchor: CollectionModel,
+  collections: CollectionModel[],
+): { columns: ColumnSpec[]; dropped: DroppedColumn[] } {
+  const fromName = to === 'field' ? slotOf : (c: ColumnModel) => c.field;
+  const toName = to === 'field' ? (c: ColumnModel) => c.field : slotOf;
+  const out: ColumnSpec[] = [];
+  const dropped: DroppedColumn[] = [];
+
+  for (const col of columns) {
+    let current = anchor;
+    const translated: string[] = [];
+    let reason: string | null = null;
+    for (let i = 0; i < col.path.length; i += 1) {
+      const name = col.path[i]!;
+      const column = current.detailColumns.find((c) => fromName(c) === name);
+      if (!column) {
+        reason = `${current.label} has no field “${name}”.`;
+        break;
+      }
+      translated.push(toName(column));
+      if (i === col.path.length - 1) break;
+      // A hop: must be a reference to a type this endpoint exposes.
+      const isRef = column.kind === 'ref' || column.kind === 'refList';
+      if (!isRef || !column.targetType) {
+        reason = `${current.label} → ${column.label} is not a reference, so it cannot be followed.`;
+        break;
+      }
+      const next = collections.find((c) => c.typeName === column.targetType);
+      if (!next) {
+        reason = `${current.label} → ${column.label} leads to ${column.targetType}, which this endpoint does not expose.`;
+        break;
+      }
+      current = next;
+    }
+    if (reason) dropped.push({ path: col.path, reason });
+    else out.push(col.mode ? { path: translated, mode: col.mode } : { path: translated });
+  }
+  return { columns: out, dropped };
+}
+
+/**
+ * The draft as it goes back to the planner: the turn-derived spec with its
+ * `columns` replaced by the result table's (aperture#89 round trip).
+ *
+ * Returned UNCHANGED, by identity, when the table agrees with what the spec
+ * already says, or when neither carries any columns. Reel compares the wire
+ * `query_spec` with the spec it derives from `turns`; sending the derived spec
+ * verbatim whenever nothing was edited keeps that comparison exact, so only a
+ * real edit ever reaches the planner as one. An edit to an empty list is
+ * sent as `columns: []`, so "the reader removed them all" is not mistaken for
+ * "nothing was said".
+ */
+export function draftForWire(spec: unknown, columns: ColumnSpec[] | null): unknown {
+  if (spec == null || columns == null || typeof spec !== 'object') return spec;
+  const raw = spec as Record<string, unknown>;
+  const stated = Array.isArray(raw['columns']) ? (raw['columns'] as ColumnSpec[]) : null;
+  if (!stated && columns.length === 0) return spec;
+  const key = (cs: ColumnSpec[]) =>
+    JSON.stringify(normalizeColumns(cs).map((c) => [c.path, c.mode ?? null]));
+  if (stated && key(stated) === key(columns)) return spec;
+  return { ...raw, columns };
 }
 
 /** The anchor collection a spec names, by LinkML class name. */

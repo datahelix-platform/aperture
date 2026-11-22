@@ -4,7 +4,7 @@ import type { ConversationTurn } from '../data/conversation';
 import { currentQuerySpec } from '../data/conversation';
 import type { CollectionModel } from '../data/schemaModel';
 import { useCollectionUrlState } from '../features/collections/urlState';
-import { canonicalizeQuerySpec, readQuerySpec } from './querySpec';
+import { canonicalizeQuerySpec, draftForWire, readQuerySpec } from './querySpec';
 import { useConversation } from './ConversationContext';
 import { SpecProse } from './specProse';
 import './query.css';
@@ -115,7 +115,10 @@ export function ChatPanel() {
       const response = await source.converse(
         {
           utterance,
-          querySpec: spec,
+          // The turn-derived draft, with the result table's columns in
+          // place of the proposal's when the reader has changed them
+          // (aperture#89). Needs a Reel that accepts an edited draft.
+          querySpec: draftForWire(spec, conversation?.columns ?? null),
           turns,
           editTurnId: editing?.id ?? null,
         },

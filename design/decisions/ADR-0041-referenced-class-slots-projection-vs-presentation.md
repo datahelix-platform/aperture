@@ -270,6 +270,47 @@ the server-independence payoff this ADR inherits from ADR-0035.
 pass"* (the typed `where:` surface) did ship in the same pass, in PR #70, exactly as argued —
 `buildListQuery`'s filter and selection paths were rewritten once, not twice.
 
+## Note (2026-11-22): a proposal's `columns` reach the result table (aperture#89)
+
+Recorded as a note, per the supersede-don't-edit convention. It changes no decision above; it
+records how decisions 1 and 4 land now that their gate has cleared.
+
+**The gate cleared.** Mosaic [#236](https://github.com/datahelix-platform/mosaic/issues/236)
+shipped in **mosaic v0.16.0** (2026-11-20): `columns` paths of 1–2 reference hops (forward, or a
+declared `inverse:` reverse), `count | joinIds | explode` on a to-many hop, spelled as LinkML slot
+names. Decision 4's condition ("nothing is added to the wire artifact until Mosaic's validator
+accepts it") is met, so `QuerySpec.columns` now exists in Aperture's type and on the
+conversational wire.
+
+**What [#89](https://github.com/datahelix-platform/aperture/issues/89) built**, with the two
+placement choices decided by labadorf on 2026-11-22:
+
+- **Type and shape guard.** `ColumnSpec = { path: string[]; mode?: ManyMode }`, schema-free like
+  the rest of `readQuerySpec`. Mosaic's shipped parser (`core/query_spec.py`,
+  `_parse_column_spec`) is the reference. Where it is stricter than #89's wording, the guard
+  follows it: it also refuses a `mode` on a one-segment (anchor-slot) path, a key other than
+  `path`/`mode`, and one path asked for in two modes.
+- **Spelling: `pathColumns` owns the columns.** `canonicalizeQuerySpec` carries `columns` in slot
+  spelling on both branches. It drops exact repeats and translates nothing. `translateColumns`
+  converts between slot and GraphQL spelling by walking the schema hop by hop (it does no case
+  conversion). When a proposal lands, its columns seed `pathColumns`, and one-segment paths clear
+  those fields from `hiddenFields`. The columns are then **stripped from the draft**, so `cols`
+  stays the one view source and `qs` never carries a stale copy. A proposal with no `columns` key
+  leaves the reader's columns alone; an explicit list, even an empty one, replaces them. A column
+  that does not resolve is listed under the builder with its reason (ADR-0029).
+- **Round trip.** The panel sends the turn-derived spec with `columns` rebuilt from the table,
+  slot-spelled. If the table agrees with the spec, the spec goes out unchanged. This depends on
+  Reel accepting a `query_spec` that differs from the one it derives from `turns`; see ADR-0039's
+  note of the same date.
+- **Execution is unchanged:** full envelopes plus a merged nested selection, projected in the
+  client. Sending `columns` to Mosaic for execution, and deleting the client projection, is the
+  next step. The artifact does not change for it.
+
+**What a planner emitting `columns` must match** (reel#12/#13): slot names on every segment, as in
+`criteria`; at most 2 hops; a `mode` on every path with a to-many hop and none on any other; at
+most one exploded link. A to-many path that arrives with no `mode` reads as `count` in the builder,
+but goes back on the wire with its mode stated.
+
 ## Alternatives considered
 
 - **Put everything in `QuerySpec.columns`, visibility included** (ADR-0035's literal sketch). Makes

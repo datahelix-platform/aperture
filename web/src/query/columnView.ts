@@ -2,8 +2,8 @@ import type { CollectionModel, ColumnModel } from '../data/schemaModel';
 import { slotName } from '../data/schemaModel';
 import type { ManyMode, PathColumn } from '../data/selection';
 import { MAX_PATH_HOPS, normalizeExplode, pathLabel } from '../data/selection';
-import type { QueryEdge } from './querySpec';
-import { deriveEdges } from './querySpec';
+import type { ColumnSpec, DroppedColumn, QueryEdge } from './querySpec';
+import { deriveEdges, translateColumns } from './querySpec';
 
 /**
  * The `cols` URL parameter (ADR-0041 sub-question, aperture#73).
@@ -178,4 +178,88 @@ export function decodeColumns(
   // explodes with it, so a hand-edited link cannot split a link's columns.
   return { pathColumns: normalizeExplode(pathColumns), hiddenFields };
 
+}
+
+/**
+ * What a proposal's `columns` (slot-spelled, aperture#89) become in the builder.
+ *
+ * - A traversal (two or three segments) becomes a `PathColumn`, resolved
+ *   through `resolvePath` exactly as the picker and the `cols` decoder do, so
+ *   a proposal can only produce columns a user could have picked.
+ * - An anchor slot (one segment) is not a path column: anchor fields already
+ *   show by default, so it is returned in `showFields` for the caller to
+ *   clear from `hiddenFields`.
+ * - Anything that does not resolve is returned in `dropped` with its reason,
+ *   for the caller to show (ADR-0029: listed, never silent).
+ *
+ * The one-exploded-link cap is applied last (`normalizeExplode`), the same
+ * way a hand-edited link is treated. Mosaic refuses a second exploded link
+ * already, so on a validated proposal this changes nothing.
+ */
+export function seedFromProposal(
+  columns: ColumnSpec[],
+  anchor: CollectionModel,
+  collections: CollectionModel[],
+): { pathColumns: PathColumn[]; showFields: string[]; dropped: DroppedColumn[] } {
+  const pathColumns: PathColumn[] = [];
+  const showFields: string[] = [];
+  const dropped: DroppedColumn[] = [];
+  const seen = new Set<string>();
+
+  for (const spec of columns) {
+    const { columns: [translated], dropped: [miss] } = translateColumns([spec], 'field', anchor, collections);
+    if (miss) {
+      dropped.push(miss);
+      continue;
+    }
+    if (!translated) continue;
+    const key = translated.path.join('.');
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    if (translated.path.length === 1) {
+      const field = translated.path[0]!;
+      if (anchor.columns.some((c) => c.field === field)) showFields.push(field);
+      else {
+        dropped.push({
+          path: spec.path,
+          reason: `${anchor.label} shows “${spec.path[0]}” on its record page only, not in the result table.`,
+        });
+      }
+      continue;
+    }
+    const resolved = resolvePath(translated.path, anchor, collections);
+    if (!resolved) {
+      dropped.push({
+        path: spec.path,
+        reason: 'This path cannot be read into the table (it crosses more than one list, or a hop has no field to select through).',
+      });
+      continue;
+    }
+    pathColumns.push(toPathColumn(resolved, spec.mode));
+  }
+  return { pathColumns: normalizeExplode(pathColumns), showFields, dropped };
+}
+
+/**
+ * The builder's current column choices as a slot-spelled `columns` list, for
+ * the conversational wire (aperture#89 round trip).
+ *
+ * `shownFields` are the anchor slots a proposal named that the reader has not
+ * since hidden; path columns follow in table order. A to-many path carries
+ * its mode, as Mosaic requires; a to-one path carries none, as it also
+ * requires. The `cols` URL parameter keeps its GraphQL spelling; only this
+ * wire form uses slot names.
+ */
+export function wireColumns(
+  shownFields: string[],
+  pathColumns: PathColumn[],
+  anchor: CollectionModel,
+  collections: CollectionModel[],
+): ColumnSpec[] {
+  const specs: ColumnSpec[] = [
+    ...shownFields.map((f) => ({ path: [f] })),
+    ...pathColumns.map((c) => (c.many ? { path: c.path, mode: c.many.mode } : { path: c.path })),
+  ];
+  return translateColumns(specs, 'slot', anchor, collections).columns;
 }

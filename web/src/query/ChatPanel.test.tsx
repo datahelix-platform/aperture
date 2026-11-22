@@ -22,12 +22,24 @@ interface WireTurn {
  * proposes a spec, an unresolvable one asks for clarification, and an edit
  * replays the list so a turn that depended on the edited one suspends.
  */
-function conversationalClient(options: { anchor?: string; criteria?: unknown[] } = {}) {
+function conversationalClient(
+  options: {
+    anchor?: string;
+    criteria?: unknown[];
+    /** A proposal's `columns` (aperture#89), slot-spelled. */
+    columns?: unknown[];
+    /** Rows the list queries answer with, so a Run has something to show. */
+    books?: unknown[];
+    /** Adds `Author.books` (a to-many edge) to the schema. */
+    authorDetail?: boolean;
+  } = {},
+) {
   const anchor = options.anchor ?? 'Book';
   const criteria = options.criteria ?? [];
-  const client = fakeClient(capableSchema({ conversational: true }), (query, variables) => {
+  const schema = capableSchema({ conversational: true, authorDetail: options.authorDetail });
+  const client = fakeClient(schema, (query, variables) => {
     if (!query.includes('ApertureConverse')) {
-      return { data: { books: [], authors: [] }, error: null } as GraphQLResult<unknown>;
+      return { data: { books: options.books ?? [], authors: [] }, error: null } as GraphQLResult<unknown>;
     }
     const utterance = variables['utterance'] as string;
     const prior = (variables['turns'] as WireTurn[] | undefined) ?? [];
@@ -39,7 +51,13 @@ function conversationalClient(options: { anchor?: string; criteria?: unknown[] }
         : {
             status: 'proposal',
             message: `Filtering to ${text}.`,
-            query_spec: { v: 1, anchor, mode: 'AND', criteria },
+            query_spec: {
+              v: 1,
+              anchor,
+              mode: 'AND',
+              criteria,
+              ...(options.columns ? { columns: options.columns } : {}),
+            },
           };
 
     if (editId) {
@@ -362,5 +380,94 @@ describe('ChatPanel (ADR-0039)', () => {
     // The first turn survived the rejection — both turns are on screen.
     expect(screen.getByText('Filtering to recent books.')).toBeInTheDocument();
     expect(screen.getAllByTestId('chat-turn')).toHaveLength(2);
+  });
+
+  // aperture#89: a proposal's `columns` reach the result table.
+  describe('proposal columns', () => {
+    const columns = [
+      { path: ['author', 'name'] },
+      { path: ['author', 'books', 'title'], mode: 'explode' },
+      { path: ['publisher', 'name'] },
+    ];
+    const books = [
+      {
+        id: 'b1',
+        title: 'Dune',
+        author: { id: 'a1', name: 'Herbert', books: [{ id: 'b1', title: 'Dune' }, { id: 'b2', title: 'Children of Dune' }] },
+      },
+    ];
+
+    async function propose(user: ReturnType<typeof userEvent.setup>, client: ReturnType<typeof conversationalClient>) {
+      renderApp(<App endpoint={endpoint} clientFactory={() => client} />, '?view=query');
+      await screen.findByTestId('chat-panel');
+      await user.type(screen.getByRole('textbox', { name: 'Describe the query' }), 'books with authors');
+      await user.click(screen.getByRole('button', { name: 'Send' }));
+      await screen.findByText('Filtering to books with authors.');
+    }
+
+    it('seeds a to-one and an exploded to-many path, and states the grain', async () => {
+      const user = userEvent.setup();
+      const client = conversationalClient({ columns, books, authorDetail: true });
+      await propose(user, client);
+
+      // The builder is locked under a conversation; the panel's handoff runs it.
+      await user.click(screen.getByRole('button', { name: 'Run this query' }));
+      const table = await screen.findByRole('table');
+      expect(within(table).getByRole('columnheader', { name: /Author → Name/ })).toBeInTheDocument();
+      expect(within(table).getByRole('columnheader', { name: /Author → Book → Title/ })).toBeInTheDocument();
+      // One book, exploded by its author's two books: two rows, and the note says so.
+      expect(await screen.findByTestId('query-grain')).toHaveTextContent(/2\s+rows from 1/);
+      // The draft does not keep the columns; `cols` holds them (GraphQL spelling).
+      const run = client.recorded.filter((r) => r.document.includes('books')).pop()!;
+      expect(run.document).toMatch(/author\s*\{[^}]*name/);
+    });
+
+    it('lists a column whose hop does not resolve, with its reason', async () => {
+      const user = userEvent.setup();
+      const client = conversationalClient({ columns, books, authorDetail: true });
+      await propose(user, client);
+
+      const dropped = await screen.findByTestId('query-columns-dropped');
+      expect(dropped).toHaveTextContent('publisher → name');
+      expect(dropped).toHaveTextContent(/no field “publisher”/);
+    });
+
+    it('sends the table columns back, slot-spelled, and the derived spec verbatim when unchanged', async () => {
+      const user = userEvent.setup();
+      const client = conversationalClient({ columns: columns.slice(0, 2), books, authorDetail: true });
+      await propose(user, client);
+
+      await user.type(screen.getByRole('textbox', { name: 'Describe the query' }), 'only hardbacks');
+      await user.click(screen.getByRole('button', { name: 'Send' }));
+      await screen.findByText('Filtering to only hardbacks.');
+
+      const second = client.recorded.filter((r) => r.document.includes('ApertureConverse'))[1]!;
+      const sent = second.variables['querySpec'] as { columns: unknown };
+      const derived = (second.variables['turns'] as WireTurn[])[0]!.query_spec as { columns: unknown };
+      expect(sent).toEqual(derived);
+      expect(sent.columns).toEqual(columns.slice(0, 2));
+    });
+
+    it('keeps the reader\'s columns when a proposal says nothing about columns', async () => {
+      const user = userEvent.setup();
+      const client = conversationalClient({ books, authorDetail: true });
+      renderApp(
+        <App endpoint={endpoint} clientFactory={() => client} />,
+        `?view=query&cols=${encodeURIComponent(JSON.stringify({ paths: [{ path: ['author', 'name'] }] }))}`,
+      );
+      await screen.findByTestId('chat-panel');
+      await user.type(screen.getByRole('textbox', { name: 'Describe the query' }), 'recent books');
+      await user.click(screen.getByRole('button', { name: 'Send' }));
+      await screen.findByText('Filtering to recent books.');
+
+      await user.type(screen.getByRole('textbox', { name: 'Describe the query' }), 'only hardbacks');
+      await user.click(screen.getByRole('button', { name: 'Send' }));
+      await screen.findByText('Filtering to only hardbacks.');
+
+      // The proposal carried no columns, the table has one: that is an edit,
+      // so it goes back as one.
+      const second = client.recorded.filter((r) => r.document.includes('ApertureConverse'))[1]!;
+      expect((second.variables['querySpec'] as { columns: unknown }).columns).toEqual([{ path: ['author', 'name'] }]);
+    });
   });
 });

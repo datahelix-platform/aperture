@@ -144,6 +144,21 @@ Concretely:
   builder-lock/reset affordance) are implementation detail under this decision, not separate
   decisions — but the builder lock is load-bearing for correctness, not taste: Mosaic rejects a
   request whose wire `query_spec` disagrees with what it derives from `turns`.
+
+## Note (2026-11-22): the round trip carries the reader's columns (aperture#89)
+
+The builder lock above stays: criteria and anchor are still read-only while a conversation owns
+the spec. The result table's columns are not locked. ADR-0041 places them in the query, and a
+reader can still change them under a live conversation. aperture#89 sends them back so a
+refinement turn plans against what the reader chose. The wire `query_spec` is therefore the
+turn-derived spec with `columns` taken from the table. It is identical to the derived spec when
+nothing was changed.
+
+That means the planner can no longer insist on exact equality with what it derives from `turns`
+(it was the planner, Reel, that enforced it, not Mosaic as written above). Relaxing that check is
+a Reel change, recorded as an amendment to Reel's turn contract (Decision 9). Aperture's side
+needs that Reel release before a reader's column edit can ride a refinement turn. Until then an
+unedited draft still matches exactly.
 - Conversation-as-provenance (ADR-0020) is deliberately out of scope: a chat-produced saved view
   keeps the resulting `QuerySpec` and loses the conversation that produced it. Revisit if
   conversations become provenance events in practice.

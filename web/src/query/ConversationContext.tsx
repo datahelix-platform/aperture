@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react';
 import { currentQuerySpec } from '../data/conversation';
 import type { ConversationTurn } from '../data/conversation';
+import type { ColumnSpec } from './querySpec';
 import { useCollectionUrlState } from '../features/collections/urlState';
 
 /**
@@ -46,6 +47,15 @@ export interface ConversationState {
    * design, so a refresh discards it regardless (contract Decision 3).
    */
   clear: () => void;
+  /**
+   * The result table's current columns, slot-spelled (aperture#89), published
+   * by the builder so the panel can send them back as the draft's `columns`.
+   * `null` until a builder has published any. They live here because the
+   * builder owns them and the panel sends them, and the two sit in different
+   * columns of the layout.
+   */
+  columns: ColumnSpec[] | null;
+  setColumns: (columns: ColumnSpec[] | null) => void;
 }
 
 const ConversationContext = createContext<ConversationState | null>(null);
@@ -53,6 +63,7 @@ const ConversationContext = createContext<ConversationState | null>(null);
 export function ConversationProvider({ children }: { children: ReactNode }) {
   const [turns, setTurns] = useState<ConversationTurn[]>([]);
   const [suspended, setSuspended] = useState<string[]>([]);
+  const [columns, setColumns] = useState<ColumnSpec[] | null>(null);
   const urlState = useCollectionUrlState();
 
   const clear = useCallback(() => {
@@ -69,8 +80,10 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
       setSuspended,
       locked: currentQuerySpec(turns) != null,
       clear,
+      columns,
+      setColumns,
     }),
-    [turns, suspended, clear],
+    [turns, suspended, clear, columns],
   );
 
   return <ConversationContext.Provider value={value}>{children}</ConversationContext.Provider>;

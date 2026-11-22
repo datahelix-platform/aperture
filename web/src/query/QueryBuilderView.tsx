@@ -13,6 +13,7 @@ import type { QueryRunResult } from './planner';
 import { runQuerySpec, SEMIJOIN_CAP } from './planner';
 import type {
   Criterion,
+  DroppedColumn,
   FieldCondition,
   FilterSlot,
   QueryEdge,
@@ -31,7 +32,14 @@ import {
   readQuerySpec,
   validateQuerySpec,
 } from './querySpec';
-import { decodeColumns, encodeColumns, resolvePath, toPathColumn } from './columnView';
+import {
+  decodeColumns,
+  encodeColumns,
+  resolvePath,
+  seedFromProposal,
+  toPathColumn,
+  wireColumns,
+} from './columnView';
 import { currentQuerySpec } from '../data/conversation';
 import { useConversation } from './ConversationContext';
 import { OP_LABELS } from './specProse';
@@ -321,10 +329,10 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
    * Which result fields to show.
    *
    * The goal this surface exists for ends in "the specific data elements they
-   * wish to include in a query" — and a QuerySpec cannot say that. `columns` is
-   * reserved and hard-rejected upstream (COLUMNS_NOT_SUPPORTED), whose message
-   * prescribes the remedy: "request full envelopes and project client-side".
-   * This is that projection. Every field still crosses the wire; the user
+   * wish to include in a query". Mosaic has accepted `QuerySpec.columns` since
+   * v0.16.0 (mosaic#236), but Aperture does not send it for execution yet: it
+   * still requests full envelopes and projects client-side, as Mosaic's old
+   * COLUMNS_NOT_SUPPORTED message prescribed. This is that projection. Every field still crosses the wire; the user
    * chooses what to read and what to export.
    *
    * Held as HIDDEN rather than shown so a schema that gains a field shows it by
@@ -347,6 +355,14 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
    * nobody requested.
    */
   const [pathColumns, setPathColumns] = useState<PathColumn[]>(seed.pathColumns);
+  /**
+   * Anchor fields the current proposal named as columns (aperture#89). They
+   * show by default anyway; this remembers that the planner ASKED for them, so
+   * the round trip can tell it which of them the reader still shows.
+   */
+  const [proposedFields, setProposedFields] = useState<string[]>([]);
+  /** Proposal columns that could not be shown, each with its reason (ADR-0029). */
+  const [droppedColumns, setDroppedColumns] = useState<DroppedColumn[]>([]);
   const [pickingFields, setPickingFields] = useState(false);
   /** View-only scale of the results table, so a wide or long result can be taken in at once. */
   const [tableZoom, setTableZoom] = useState(1);
@@ -607,11 +623,58 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
   useEffect(() => {
     if (proposalJson === lastProposal.current) return;
     lastProposal.current = proposalJson;
-    if (!proposal) return;
+    // A drop notice belongs to the proposal that caused it.
+    setDroppedColumns([]);
+    if (!proposal) {
+      setProposedFields([]);
+      return;
+    }
     const parsed = readQuerySpec(proposal);
     const canonical = parsed ? canonicalizeQuerySpec(parsed, collections) : null;
-    if (canonical) setDraft(canonical);
+    if (!canonical) return;
+    // The draft never keeps `columns` (aperture#89): they seed the result
+    // table below, and `cols` is the one view source from then on. A copy left
+    // on the draft would ride into `qs` on Run and go stale the first time the
+    // reader changed a column.
+    const { columns, ...rest } = canonical;
+    setDraft(rest);
+    // A proposal WITHOUT `columns` says nothing about them, so the reader's
+    // choices stand -- a planner that does not emit columns yet must not wipe
+    // the table on every refinement. An explicit list, even an empty one,
+    // replaces them.
+    if (!columns) return;
+    const target = resolveAnchor(rest, collections);
+    if (!target) return;
+    const seeded = seedFromProposal(columns, target, collections);
+    setPathColumns(seeded.pathColumns);
+    setProposedFields(seeded.showFields);
+    setDroppedColumns(seeded.dropped);
+    if (seeded.showFields.length > 0) {
+      setHiddenFields((prev) => {
+        const next = new Set(prev);
+        for (const f of seeded.showFields) next.delete(f);
+        return next;
+      });
+    }
   }, [proposalJson, proposal, collections]);
+
+  // Publish the table's columns, slot-spelled, for the conversational round
+  // trip: the panel sends them back as the draft's `columns` so a refinement
+  // turn sees what the reader has chosen (aperture#89).
+  const setConversationColumns = conversation?.setColumns;
+  const wireJson = JSON.stringify(
+    anchor
+      ? wireColumns(
+          proposedFields.filter((f) => !hiddenFields.has(f)),
+          pathColumns,
+          anchor,
+          collections,
+        )
+      : [],
+  );
+  useEffect(() => {
+    setConversationColumns?.(JSON.parse(wireJson));
+  }, [wireJson, setConversationColumns]);
 
   // A hidden-field set belongs to one entity type. Carrying it across an anchor
   // change would hide fields by coincidence of name, or hide nothing at all
@@ -852,6 +915,15 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
         )}
       </fieldset>
 
+      {droppedColumns.length > 0 && (
+        <ul className="query-notes" role="status" data-testid="query-columns-dropped">
+          {droppedColumns.map((d) => (
+            <li key={d.path.join('.')}>
+              Proposed column “{d.path.join(' → ')}” is not shown: {d.reason}
+            </li>
+          ))}
+        </ul>
+      )}
       {error && (
         <div className="query-notes" role="alert">
           {error}
