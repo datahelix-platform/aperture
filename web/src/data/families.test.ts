@@ -3,6 +3,8 @@ import { deriveCollections, KIND_COLUMN, recordCollection } from './schemaModel'
 import { familyIntrospection } from './testing/fixtures';
 import { selectionForPaths } from './selection';
 import type { PathColumn } from './selection';
+import { translateColumns } from '../query/querySpec';
+import { resolvePath, seedFromProposal, toPathColumn, wireColumns } from '../query/columnView';
 
 // Families (Mosaic ADR-0014, Aperture ADR-0042), against a live mosaic v0.16.0 capture.
 const collections = deriveCollections(familyIntrospection);
@@ -78,5 +80,32 @@ describe('selections through a family carry __typename', () => {
     const label = of('samples').detailColumns.find((c) => c.field === 'label')!;
     const path: PathColumn = { path: ['sample', 'label'], column: label, label: 'Sample → Label' };
     expect(selectionForPaths([path], of('measurements'), collections)).toMatch(/sample \{[^}]*__typename/);
+  });
+});
+
+describe('proposal columns through a family (aperture#89 review, ADR-0042)', () => {
+  it('translates, seeds and round-trips a path through a family range', () => {
+    const measurements = of('measurements');
+    // Before ADR-0042 this was dropped as "Measurement has no field “sample”".
+    expect(translateColumns([{ path: ['sample', 'label'] }], 'field', measurements, collections)).toEqual({
+      columns: [{ path: ['sample', 'label'] }],
+      dropped: [],
+    });
+    const seeded = seedFromProposal([{ path: ['sample', 'label'] }], measurements, collections);
+    expect(seeded.dropped).toEqual([]);
+    expect(seeded.pathColumns.map((c) => c.label)).toEqual(['Sample → Label']);
+    expect(wireColumns([], seeded.pathColumns, measurements, collections)).toEqual([{ path: ['sample', 'label'] }]);
+
+    // A to-many hop into a family, exploded.
+    const assays = of('assays');
+    const inputs = seedFromProposal([{ path: ['inputs', 'label'], mode: 'explode' }], assays, collections);
+    expect(inputs.pathColumns.map((c) => [c.path.join('.'), c.many?.mode])).toEqual([['inputs.label', 'explode']]);
+  });
+
+  it('keeps the family Kind column off the wire', () => {
+    const measurements = of('measurements');
+    const kind = toPathColumn(resolvePath(['sample', '__typename'], measurements, collections)!);
+    expect(wireColumns([], [kind], measurements, collections)).toEqual([]);
+    expect(translateColumns([{ path: ['sample', '__typename'] }], 'field', measurements, collections).dropped).toHaveLength(1);
   });
 });

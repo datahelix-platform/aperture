@@ -262,7 +262,10 @@ export function wireColumns(
 ): ColumnSpec[] {
   const specs: ColumnSpec[] = [
     ...shownFields.map((f) => ({ path: [f] })),
-    ...pathColumns.map((c) => (c.many ? { path: c.path, mode: c.many.mode } : { path: c.path })),
+    // A family's Kind column (`__typename`) is not a slot: it stays off the wire (ADR-0042).
+    ...pathColumns
+      .filter((c) => !c.column.synthetic)
+      .map((c) => (c.many ? { path: c.path, mode: c.many.mode } : { path: c.path })),
   ];
   return translateColumns(specs, 'slot', anchor, collections).columns;
 }

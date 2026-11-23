@@ -326,7 +326,9 @@ export function translateColumns(
     let reason: string | null = null;
     for (let i = 0; i < col.path.length; i += 1) {
       const name = col.path[i]!;
-      const column = current.detailColumns.find((c) => fromName(c) === name);
+      // A synthetic column (a family's Kind) is Aperture's, not a slot, so it
+      // never matches a wire path in either direction (ADR-0042).
+      const column = current.detailColumns.find((c) => !c.synthetic && fromName(c) === name);
       if (!column) {
         reason = `${current.label} has no field “${name}”.`;
         break;
