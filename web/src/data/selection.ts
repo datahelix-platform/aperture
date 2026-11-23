@@ -162,6 +162,8 @@ export function buildSelectionTree(
         // Every nested object carries its own identifier. Row-click navigation,
         // `joinIds` and stable row keys all read it, and it is cheap.
         if (next.idColumn) child.leaves.add(next.idColumn);
+        // A family member names its kind, for its link (ADR-0042).
+        if (next.family) child.leaves.add('__typename');
       }
       node = child;
       collection = next;
@@ -175,6 +177,7 @@ export function buildSelectionTree(
       // for under edge-only emission.
       const child = node.children.get(leaf) ?? emptyNode();
       if (leafColumn.targetIdField) child.leaves.add(leafColumn.targetIdField);
+      if (leafColumn.targetIsFamily) child.leaves.add('__typename');
       node.children.set(leaf, child);
     } else {
       node.leaves.add(leaf);
@@ -241,6 +244,8 @@ export interface DisplayRow {
   values: Record<string, unknown>;
   /** The anchor entity's id — row-click navigation always targets the anchor. */
   anchorId?: string;
+  /** The anchor's `__typename`, when selected: a family row's kind (ADR-0042). */
+  anchorKind?: string;
 }
 
 export interface FlattenResult {
@@ -299,12 +304,15 @@ export function flattenRows(
   const out: DisplayRow[] = [];
   for (const [i, row] of rows.entries()) {
     const anchorId = anchorIdField ? row[anchorIdField] : undefined;
+    const kind = row['__typename'];
+    const anchorKind = typeof kind === 'string' ? { anchorKind: kind } : {};
     const baseKey = anchorId != null ? String(anchorId) : `row-${i}`;
 
     if (!explodePath) {
       out.push({
         key: baseKey,
         anchorId: anchorId == null ? undefined : String(anchorId),
+        ...anchorKind,
         values: Object.fromEntries(columns.map((c) => [pathKey(c.path), read(row, c)])),
       });
       continue;
@@ -332,7 +340,12 @@ export function flattenRows(
         }
       }
       // Composite key: the anchor id alone collides across exploded siblings.
-      out.push({ key: `${baseKey}#${m}`, anchorId: anchorId == null ? undefined : String(anchorId), values });
+      out.push({
+        key: `${baseKey}#${m}`,
+        anchorId: anchorId == null ? undefined : String(anchorId),
+        ...anchorKind,
+        values,
+      });
     });
   }
 

@@ -38,6 +38,13 @@ export interface IntrospectionType {
   /** For INPUT_OBJECT types (e.g. filter inputs) — feeds facet derivation. */
   inputFields?: IntrospectionInputValue[] | null;
   enumValues?: { name: string }[] | null;
+  /**
+   * For INTERFACE types: the object types implementing it. Standard
+   * introspection (ADR-0017). Mosaic emits an interface per family, an
+   * abstract class with exposed kinds (Mosaic ADR-0014), so this is the
+   * family's kinds (ADR-0042).
+   */
+  possibleTypes?: { name: string }[] | null;
 }
 
 export interface IntrospectionSchema {
@@ -74,6 +81,7 @@ export const INTROSPECTION_QUERY = `
         }
         inputFields { name type { ${typeRefSelection(TYPE_REF_DEPTH)} } }
         enumValues { name }
+        possibleTypes { name }
       }
     }
   }

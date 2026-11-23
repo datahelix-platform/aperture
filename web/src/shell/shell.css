@@ -253,6 +253,19 @@
   text-overflow: ellipsis;
 }
 
+/* A family entry's marker (ADR-0042): one read-only collection over several
+   kinds. Interim, until the class browser settles how families nest. */
+.nav-item-family {
+  flex: 0 0 auto;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-1, 4px);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--chrome-text-muted);
+}
+
 /* Whose shared view this is — shown only for views the viewer cannot edit,
    so two same-named views are distinguishable (ADR-0032 ownership). */
 .nav-item-owner {

@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { useCapabilities } from '../../data/DataSourceContext';
 import type { MosaicSource, HistoryEntry } from '../../data/mosaicSource';
 import type { CollectionModel, ColumnModel } from '../../data/schemaModel';
+import { referenceTarget } from '../../data/schemaModel';
 import { xrefUrl } from '../../config/xrefs';
 import type { XrefTemplates } from '../../config/xrefs';
 import { useXrefs } from '../../config/XrefsContext';
@@ -362,7 +363,9 @@ function RelationRow({
   if (column.kind === 'ref') {
     const refId =
       value == null ? null : String((value as Record<string, unknown>)[column.targetIdField ?? '']);
-    const canOpen = target?.detail != null && refId != null;
+    // A family value opens its concrete kind's page (ADR-0042).
+    const opens = referenceTarget(column, value, source.collections);
+    const canOpen = opens != null && refId != null;
     return (
       <div className="detail-relation">
         <span className="detail-relation-label">{column.label}</span>
@@ -370,7 +373,7 @@ function RelationRow({
           {refId == null ? (
             <span className="cell-empty">—</span>
           ) : canOpen ? (
-            <button type="button" className="detail-link" onClick={() => openIn(target.id, refId)}>
+            <button type="button" className="detail-link" onClick={() => openIn(opens.id, refId)}>
               {refId}
             </button>
           ) : (
