@@ -4,7 +4,7 @@ import type { CollectionModel } from '../data/schemaModel';
 import { recordCollection, slotName } from '../data/schemaModel';
 import { renderPathCell, isPathRightAligned } from '../features/collections/cells';
 import type { ManyMode, PathColumn } from '../data/selection';
-import { explodeKey, flattenRows, normalizeExplode, pathKey, selectionForPaths } from '../data/selection';
+import { capExplode, explodeKey, flattenRows, normalizeExplode, pathKey, selectionForPaths } from '../data/selection';
 import { toCSVPaths, toJSONExportPaths } from '../features/collections/export';
 import { useCollectionUrlState } from '../features/collections/urlState';
 import { useNavView } from '../nav/NavConfigContext';
@@ -685,14 +685,24 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
   // from the new one, and left in place it would vanish from the round trip
   // without a word (wireColumns drops what it cannot translate). Paths that
   // DO resolve stay -- a proposal that moves the anchor seeds its own columns
-  // in the same update, and those must survive this effect.
+  // in the same update, and those must survive this effect. A survivor is
+  // RE-RESOLVED from the new anchor, keeping only its mode: the same field
+  // names can cross different links there, so its old to-many metadata
+  // (depth, edge label) and label would be wrong.
   useEffect(() => {
     if (anchorName === lastAnchor.current) return;
     lastAnchor.current = anchorName;
     setHiddenFields(new Set());
     const next = resolveAnchor(emptyQuerySpec(anchorName), collections);
     setPathColumns((prev) =>
-      next ? prev.filter((c) => resolvePath(c.path, next, collections) != null) : [],
+      next
+        ? capExplode(
+            prev.flatMap((c) => {
+              const resolved = resolvePath(c.path, next, collections);
+              return resolved ? [toPathColumn(resolved, c.many?.mode)] : [];
+            }),
+          )
+        : [],
     );
   }, [anchorName, collections]);
 

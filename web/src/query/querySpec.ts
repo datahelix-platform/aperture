@@ -343,7 +343,12 @@ export function translateColumns(
       }
       const next = collections.find((c) => c.typeName === column.targetType);
       if (!next) {
-        reason = `${current.label} → ${column.label} leads to ${column.targetType}, which this endpoint does not expose.`;
+        // A family opted out of anchoring (`mosaic_anchor: false`) is still an
+        // edge target in Mosaic, so "does not expose" would be wrong: it is
+        // there, but with no collection of its own to step through (ADR-0042).
+        reason = column.targetIsFamily
+          ? `${current.label} → ${column.label} leads to ${column.targetType}, a family with no collection of its own, so Aperture cannot follow it yet.`
+          : `${current.label} → ${column.label} leads to ${column.targetType}, which this endpoint does not expose.`;
         break;
       }
       current = next;

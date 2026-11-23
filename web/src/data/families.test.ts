@@ -188,6 +188,15 @@ describe('a family without a collection (mosaic_anchor: false, review item 1)', 
     expect(sampleRef).toMatchObject({ kind: 'ref', targetIsFamily: true });
   });
 
+  it('drops a proposal path through it with an accurate reason', () => {
+    const measurements = cols.find((c) => c.id === 'measurements')!;
+    const { dropped } = translateColumns([{ path: ['sample', 'label'] }], 'field', measurements, cols);
+    expect(dropped).toEqual([
+      { path: ['sample', 'label'], reason: expect.stringMatching(/Sample, a family with no collection of its own/) },
+    ]);
+    expect(dropped[0]!.reason).not.toMatch(/does not expose/);
+  });
+
   it('still opens a value on its kind\'s page', () => {
     expect(referenceTarget(sampleRef, { id: 'br1', __typename: 'Brain' }, cols)?.id).toBe('brains');
     expect(referenceTarget(sampleRef, { id: 'x' }, cols)).toBeUndefined();
