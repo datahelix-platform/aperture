@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { useCapabilities } from '../../data/DataSourceContext';
 import type { MosaicSource, HistoryEntry } from '../../data/mosaicSource';
 import type { CollectionModel, ColumnModel } from '../../data/schemaModel';
-import { recordCollection } from '../../data/schemaModel';
+import { referenceTarget } from '../../data/schemaModel';
 import { xrefUrl } from '../../config/xrefs';
 import type { XrefTemplates } from '../../config/xrefs';
 import { useXrefs } from '../../config/XrefsContext';
@@ -364,7 +364,7 @@ function RelationRow({
     const refId =
       value == null ? null : String((value as Record<string, unknown>)[column.targetIdField ?? '']);
     // A family value opens its concrete kind's page (ADR-0042).
-    const opens = recordCollection(target, value, source.collections);
+    const opens = referenceTarget(column, value, source.collections);
     const canOpen = opens != null && refId != null;
     return (
       <div className="detail-relation">

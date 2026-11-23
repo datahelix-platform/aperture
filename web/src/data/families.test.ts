@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { deriveCollections, KIND_COLUMN, recordCollection } from './schemaModel';
+import { deriveCapabilities, deriveCollections, KIND_COLUMN, recordCollection, referenceTarget } from './schemaModel';
+import type { IntrospectionSchema } from './introspection';
+import { filterSlots, validateQuerySpec } from '../query/querySpec';
 import { familyIntrospection } from './testing/fixtures';
 import { selectionForPaths } from './selection';
 import type { PathColumn } from './selection';
@@ -78,5 +80,87 @@ describe('selections through a family carry __typename', () => {
     const label = of('samples').detailColumns.find((c) => c.field === 'label')!;
     const path: PathColumn = { path: ['sample', 'label'], column: label, label: 'Sample → Label' };
     expect(selectionForPaths([path], of('measurements'), collections)).toMatch(/sample \{[^}]*__typename/);
+  });
+});
+
+describe('a family has no lifecycle actions, and types never borrow mutations (review B1)', () => {
+  // The Mutation type with one more mutation that names the family.
+  const withFamilyMutations: IntrospectionSchema = {
+    ...familyIntrospection,
+    types: familyIntrospection.types.map((t) =>
+      t.name !== familyIntrospection.mutationType?.name
+        ? t
+        : {
+            ...t,
+            fields: [
+              ...(t.fields ?? []).filter((f) => f.name === 'setBrainAvailability' || f.name === 'supersedeBrain').map((f) => ({
+                ...f,
+                name: f.name.replace('Brain', 'Sample'),
+              })),
+              ...(t.fields ?? []),
+            ],
+          },
+    ),
+  };
+
+  it('derives no lifecycle actions for a family, even when the Mutation type names it', () => {
+    const samples = deriveCollections(withFamilyMutations).find((c) => c.id === 'samples')!;
+    expect(samples.lifecycle).toEqual({});
+  });
+
+  it('matches the whole mutation name, so Brain does not pick up BankBrain\'s', () => {
+    // `setBankBrainAvailability` sorts before `setBrainAvailability` and
+    // contains "brain": the substring match handed it to Brain.
+    expect(of('brains').lifecycle.setAvailability?.field).toBe('setBrainAvailability');
+    expect(of('brains').lifecycle.supersede?.field).toBe('supersedeBrain');
+    expect(of('bankBrains').lifecycle.setAvailability?.field).toBe('setBankBrainAvailability');
+  });
+});
+
+describe('kind-only fields filter on the family (review B2, Mosaic #278)', () => {
+  it('lists them as filter fields, with kinds from their ops type', () => {
+    const samples = of('samples');
+    expect(samples.filterFields).toEqual(expect.arrayContaining(['label', 'hemisphere', 'volume_ml', 'drawn_from']));
+    const kinds = Object.fromEntries(filterSlots(samples).map((s) => [s.slot, s.kind]));
+    expect(kinds).toMatchObject({ hemisphere: 'text', volume_ml: 'number', drawn_from: 'ref' });
+    // A concrete collection keeps its column-derived filter fields only.
+    expect(of('brains').filterKinds).toBeUndefined();
+  });
+
+  it('accepts a family QuerySpec filtering on a kind-only field', () => {
+    const spec = {
+      v: 1 as const,
+      anchor: 'Sample',
+      mode: 'AND' as const,
+      criteria: [
+        { kind: 'field' as const, slot: 'hemisphere', op: 'eq' as const, value: 'L' },
+        { kind: 'field' as const, slot: 'volume_ml', op: 'gt' as const, value: 1 },
+      ],
+    };
+    expect(validateQuerySpec(spec, collections, deriveCapabilities(familyIntrospection, collections)).errors).toEqual([]);
+  });
+});
+
+describe('a family without a collection (mosaic_anchor: false, review item 1)', () => {
+  // Drop the family's own roots, as Mosaic does for `mosaic_anchor: false`;
+  // references into it still resolve to the interface.
+  const queryName = familyIntrospection.queryType.name;
+  const noAnchor: IntrospectionSchema = {
+    ...familyIntrospection,
+    types: familyIntrospection.types.map((t) =>
+      t.name !== queryName ? t : { ...t, fields: (t.fields ?? []).filter((f) => !/^(sample|samples|searchSamples|samples\w+)$/.test(f.name)) },
+    ),
+  };
+  const cols = deriveCollections(noAnchor);
+  const sampleRef = cols.find((c) => c.id === 'measurements')!.detailColumns.find((c) => c.field === 'sample')!;
+
+  it('derives no family collection, but keeps the reference', () => {
+    expect(cols.find((c) => c.typeName === 'Sample')).toBeUndefined();
+    expect(sampleRef).toMatchObject({ kind: 'ref', targetIsFamily: true });
+  });
+
+  it('still opens a value on its kind\'s page', () => {
+    expect(referenceTarget(sampleRef, { id: 'br1', __typename: 'Brain' }, cols)?.id).toBe('brains');
+    expect(referenceTarget(sampleRef, { id: 'x' }, cols)).toBeUndefined();
   });
 });

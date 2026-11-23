@@ -1,7 +1,7 @@
 # ADR-0042: A family (an abstract class, Mosaic ADR-0014) is a read-only collection whose rows open their own kind's record page
 
 - **Status:** Accepted
-- **Date:** 2026-11-23
+- **Date:** 2026-11-23 (amended the same day after the #105 review: read-only enforced for lifecycle, kind-only filter fields, `mosaic_anchor: false` references)
 - **Deciders:** labadorf (the four UI choices and the interim nav, 2026-11-23, in the aperture#103 review)
 - **Related:** **Mosaic ADR-0014** (polymorphic references; abstract classes as GraphQL interfaces and read-only anchors), ADR-0017 (standard introspection is the baseline), ADR-0029 (honest degradation), ADR-0041 (traversal columns), ADR-0035 (QuerySpec); [aperture#104](https://github.com/datahelix-platform/aperture/issues/104) (the class-browser page that replaces the sidebar's class list); aperture#103 / #89 (proposal columns through a family range)
 
@@ -42,14 +42,27 @@ introspection, and open each of its rows on that row's own kind's record page.**
    collections do: nav, record links, query anchor, traversal paths (ADR-0041) and the
    conversational round trip.
 2. **What a family carries follows Mosaic ADR-0014.** Its columns are the interface's fields,
-   i.e. only the slots every kind stores alike. Its filters are whatever its filter input
-   advertises, kind-only fields included, which Mosaic reads as NULL for other kinds. Aperture
-   adds no semantics of its own. `mosaic_anchor: false` and `mosaic_manifest: false` need no
-   handling here: a family opted out of anchoring has no page, so no collection derives; the
-   manifest flag affects only the planner.
-3. **Read-only.** No write affordance is derived, because none is advertised (Mosaic ADR-0014
-   Decision 6). The existing gating already does this; nothing is special-cased. Edits happen on
-   the kind's page (item 4).
+   i.e. only the slots every kind stores alike. Its **filter fields are built from its filter
+   input type**: the columns' fields plus every kind-only field the input takes, which Mosaic
+   reads as NULL for other kinds (#278 ruling). A kind-only field has no column, so its kind
+   (`CollectionModel.filterKinds`) is read from its ops type: `FloatFilterOps` gives `number`,
+   a nested `<Type>Filter` gives `ref`. Aperture adds no semantics of its own.
+   - **`mosaic_anchor: false`** removes the family's own page and lookup, so no collection
+     derives. References into it remain (Mosaic keeps it as an edge target), and they are
+     handled: a value still opens its kind's page by `__typename` (`referenceTarget`). A path
+     through it can't be followed yet, because path resolution steps through collections. A
+     proposal column through it is dropped with a reason that says so (aperture#103).
+   - **`mosaic_manifest: false`** affects only the planner.
+3. **Read-only.** A family derives **no write and no lifecycle actions** (Mosaic ADR-0014
+   Decision 6). Edits happen on the kind's page (item 4). Writes need no special case: create
+   and update match on the mutation's return type, and no mutation returns the interface.
+   Lifecycle actions are matched by name, so they are set to none for a family explicitly. Their
+   names are now matched **whole** (`set<Type>Availability`, `supersede<Type>`), case-insensitive
+   only for Mosaic's camel-casing (`ExternalID` → `setExternalIdAvailability`). The earlier
+   substring match let a type borrow another's mutations. `Prize` took
+   `setLiteraryPrizeAvailability`, which reported success on the family page and changed
+   nothing. `Brain` took `setBankBrainAvailability`, on main as well. Mosaic accepting a
+   mismatched id is [mosaic#289](https://github.com/datahelix-platform/mosaic/issues/289).
 4. **A row opens its concrete kind's record page.** A family value is selected with
    `__typename`. `recordCollection` maps it to the collection of that type, which shows every
    field and the kind's own edit and lifecycle actions. If the kind has no collection with a
@@ -81,6 +94,11 @@ introspection, and open each of its rows on that row's own kind's record page.**
 - An endpoint without interfaces is unaffected: nothing derives differently (ADR-0029).
 - `possibleTypes` is a new introspection field. Every conformant GraphQL server answers it.
 
+- **Known follow-up: kind-only fields get no facets or sorting.** Mosaic facets, ranges and
+  orders on them over the family, but Aperture derives facets and sort keys from columns only.
+  Tracked in [aperture#106](https://github.com/datahelix-platform/aperture/issues/106). They
+  filter (Decision 2).
+
 ## Alternatives considered
 
 - **Family-only path resolution** (resolve a hop into an interface's fields without making it a
@@ -103,6 +121,10 @@ introspection, and open each of its rows on that row's own kind's record page.**
   - `sample(id:)` serves the fallback page.
   - `Measurement.sample` opens the kind's page.
   - `[sample, label]` and an exploded `[inputs, label]` render.
-  - A `Sample`-anchored QuerySpec on kind-only `hemisphere = L` returns `br1` only.
+  - A `Sample`-anchored QuerySpec on kind-only `hemisphere = L` returns `br1` only. After the
+    review fix it also passes Aperture's own `validateQuerySpec` (it was rejected as "not
+    filterable", which disabled Run). So does `volume_ml > 1`, which returns `bl1`.
+  - Live lifecycle: `samples` has none, `brains` gets `setBrainAvailability` / `supersedeBrain`,
+    and `bankBrains` gets its own.
 - Whether a concrete parent's rows should link to their subclass's page (via `entityType`) is
   open, and is not needed for v0.8.0.
