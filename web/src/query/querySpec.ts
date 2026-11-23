@@ -569,7 +569,9 @@ export function filterSlots(collection: CollectionModel): FilterSlot[] {
       return {
         slot,
         label: column?.label ?? humanize(slot),
-        kind: column?.kind ?? 'text',
+        // A family's kind-only field has no column; its kind comes from its
+        // filter input (ADR-0042).
+        kind: column?.kind ?? collection.filterKinds?.[slot] ?? 'text',
         enumValues: column?.enumValues,
       };
     });

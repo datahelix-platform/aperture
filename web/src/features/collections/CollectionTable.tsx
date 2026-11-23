@@ -8,7 +8,7 @@ import {
 import { useCapabilities } from '../../data/DataSourceContext';
 import type { MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel } from '../../data/schemaModel';
-import { recordCollection } from '../../data/schemaModel';
+import { recordCollection, referenceTarget } from '../../data/schemaModel';
 import { typeColorStyle } from '../../data/typeColor';
 import { isRightAligned, renderCell } from './cells';
 import { ExportButtons } from './ExportButtons';
@@ -111,11 +111,7 @@ export function CollectionTable({
             // dead text, and the only link — the id column — assumed the
             // current collection, so a mis-picked FK linked to the wrong one).
             if (model.kind === 'ref' && value != null) {
-              const target = recordCollection(
-                source.collections.find((c) => c.typeName === model.targetType),
-                value,
-                source.collections,
-              );
+              const target = referenceTarget(model, value, source.collections);
               const refId = (value as Record<string, unknown>)[model.targetIdField ?? ''];
               if (target != null && refId != null) {
                 return (

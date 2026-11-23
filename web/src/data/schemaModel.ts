@@ -264,6 +264,13 @@ export interface CollectionModel {
    * ADR-0042). `kinds` are the implementing object types, sorted.
    */
   family?: { kinds: string[] };
+  /**
+   * For a family: the kinds of filter fields that have no column, i.e. the
+   * kind-only fields its filter input takes (`hemisphere`, `volume_ml`),
+   * keyed by slot. Read from each field's ops type, since there is no column
+   * to read it from (ADR-0042, Mosaic ADR-0014 #278).
+   */
+  filterKinds?: Record<string, SlotKind>;
 }
 
 /** One field of a typed `<Type>Filter` input, classified by how it compiles. */
@@ -824,18 +831,27 @@ function requiredScalarIdArg(
  * mutations are excluded — this derives the single-entity detail-view
  * affordances only. Unlike create/update (`deriveWriteModel`), these
  * mutations return a result/receipt type rather than the entity itself, so
- * the match can't ride the return type — the field name must reference the
- * entity type instead. Nothing advertised → no affordance (ADR-0029).
+ * the match can't ride the return type — the field name must name the entity
+ * type instead. Nothing advertised → no affordance (ADR-0029).
+ *
+ * The WHOLE name is matched (`set<Type>Availability`, `supersede<Type>`),
+ * case-insensitively only because Mosaic camel-cases the class name
+ * (`ExternalID` → `setExternalIdAvailability`). A substring match let a type
+ * pick up another type's mutations: `Prize` matched
+ * `setLiteraryPrizeAvailability`, and on a family that "succeeded" on the
+ * wrong type and changed nothing (ADR-0042 review).
  */
 function deriveLifecycleModel(schema: IntrospectionSchema, typeName: string): LifecycleModel {
   const mutationType = findType(schema, schema.mutationType?.name ?? null);
   const lifecycle: LifecycleModel = {};
   const lowerType = typeName.toLowerCase();
+  const availabilityName = `set${lowerType}availability`;
+  const supersedeName = `supersede${lowerType}`;
 
   for (const field of mutationType?.fields ?? []) {
-    if (!field.name.toLowerCase().includes(lowerType)) continue;
+    const name = field.name.toLowerCase();
 
-    if (!lifecycle.setAvailability && /availability/i.test(field.name) && !/bulk/i.test(field.name)) {
+    if (!lifecycle.setAvailability && name === availabilityName) {
       const idArg = requiredScalarIdArg(field);
       const availabilityArg = field.args.find((a) => namedType(a.type).name === 'Boolean');
       if (idArg && availabilityArg) {
@@ -850,7 +866,7 @@ function deriveLifecycleModel(schema: IntrospectionSchema, typeName: string): Li
       }
     }
 
-    if (!lifecycle.supersede && /^supersede/i.test(field.name)) {
+    if (!lifecycle.supersede && name === supersedeName) {
       const idArg = requiredScalarIdArg(field);
       const replacementArg = idArg && requiredScalarIdArg(field, idArg.name);
       if (idArg && replacementArg) {
@@ -1035,6 +1051,42 @@ function enrichColumn(column: ColumnModel, slots: ReadonlyMap<string, SlotInfo>)
   };
 }
 
+/**
+ * The filter fields and typed `where` shape of a collection.
+ *
+ * For a family, the filter fields also take every field its filter input
+ * advertises that no column covers: the kind-only fields, which Mosaic reads
+ * as NULL for kinds without them (Mosaic ADR-0014, #278 ruling). Their kinds
+ * come from their ops type. To-many quantifier edges are not field criteria.
+ */
+function filterSurface(
+  columnFields: string[],
+  whereFields: Record<string, WhereField> | undefined,
+  isFamily: boolean,
+): Pick<CollectionModel, 'filterFields' | 'whereFields' | 'filterKinds'> {
+  if (!isFamily || !whereFields) return { filterFields: columnFields, whereFields };
+  const filterFields = [...columnFields];
+  const filterKinds: Record<string, SlotKind> = {};
+  for (const w of Object.values(whereFields)) {
+    if (w.kind === 'quantifiers') continue;
+    const slot = slotName(w.field);
+    if (filterFields.includes(slot)) continue;
+    filterFields.push(slot);
+    filterKinds[slot] = whereFieldKind(w);
+  }
+  return { filterFields, whereFields, filterKinds };
+}
+
+function whereFieldKind(w: WhereField): SlotKind {
+  if (w.kind === 'nested') return 'ref';
+  const scalar = w.inputType.replace(/FilterOps$/, '');
+  if (NUMBER_SCALARS.has(scalar)) return 'number';
+  if (scalar === 'Boolean') return 'boolean';
+  if (DATE_SCALARS.has(scalar)) return 'date';
+  if (scalar === 'String' || scalar === 'ID') return 'text';
+  return 'enum';
+}
+
 /** A family's "Kind" column: the row's concrete type, from `__typename` (ADR-0042). */
 export const KIND_COLUMN: ColumnModel = { field: '__typename', label: 'Kind', kind: 'text', synthetic: 'kind' };
 
@@ -1064,6 +1116,28 @@ export function recordCollection(
     if (own) return own;
   }
   return collection.detail ? collection : undefined;
+}
+
+/**
+ * The collection a reference cell's value opens (ADR-0042).
+ *
+ * A value of a family opens its concrete kind's page by `__typename`, even
+ * when the family has no collection of its own (`mosaic_anchor: false`: Mosaic
+ * still resolves references into it). Otherwise it falls back to the target
+ * type's collection, when that has a record lookup.
+ */
+export function referenceTarget(
+  column: ColumnModel,
+  value: unknown,
+  collections: readonly CollectionModel[],
+): CollectionModel | undefined {
+  if (column.targetIsFamily && value != null && typeof value === 'object') {
+    const kind = (value as Record<string, unknown>)['__typename'];
+    const own = typeof kind === 'string' ? collections.find((c) => c.typeName === kind && c.detail) : undefined;
+    if (own) return own;
+  }
+  const target = collections.find((c) => c.typeName === column.targetType);
+  return target?.detail ? target : undefined;
 }
 
 function enrichCollection(collection: CollectionModel, enrichment: SlotEnrichment): CollectionModel {
@@ -1164,11 +1238,16 @@ export function deriveCollections(
         : [],
       facetCounts: deriveFacetCounts(schema, queryFields, field.name),
       fieldRange,
-      filterFields: args.filter ? deriveColumnFilterFields(detailColumns) : [],
-      whereFields: deriveWhereFields(schema, args.where ? (namedType(args.where.type).name ?? undefined) : undefined),
+      ...filterSurface(
+        args.filter ? deriveColumnFilterFields(detailColumns) : [],
+        deriveWhereFields(schema, args.where ? (namedType(args.where.type).name ?? undefined) : undefined),
+        family != null,
+      ),
       detail: deriveDetailPath(queryFields, entityType.name, undefined, idColumn),
       write: deriveWriteModel(schema, entityType.name, detailColumns),
-      lifecycle: deriveLifecycleModel(schema, entityType.name),
+      // A family is read-only (Mosaic ADR-0014 Decision 6): no lifecycle
+      // actions, whatever the Mutation type happens to name (ADR-0042).
+      lifecycle: family ? {} : deriveLifecycleModel(schema, entityType.name),
       ...(family ? { family } : {}),
     });
   }
