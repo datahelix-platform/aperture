@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { demoIntrospection } from '../data/testing/fixtures';
 import { deriveCollections } from '../data/schemaModel';
-import { decodeColumns, encodeColumns, validateColumnsShape } from './columnView';
+import { decodeColumns, encodeColumns, seedFromProposal, validateColumnsShape, wireColumns } from './columnView';
 
 const collections = deriveCollections(demoIntrospection);
 const of = (id: string) => collections.find((c) => c.id === id)!;
@@ -49,10 +49,10 @@ describe('cols URL parameter (aperture#73)', () => {
     expect(pathColumns).toEqual([]);
   });
 
-  it('explodes every column through the exploded link together', () => {
-    // "One row each" belongs to the LINK. Two columns through inputSamples are
-    // one row per input sample, not a cross product -- the old per-column cap
-    // demoted one of them, so the two columns described different samples.
+  it('keeps each column\'s own mode on the exploded link', () => {
+    // A proposal may mix modes on one link and Mosaic accepts it (aperture#89
+    // review), so `cols` restores them as written. The cap is still by LINK
+    // (capExplode, tested in selection.test.ts).
     const { pathColumns } = decodeColumns(
       {
         paths: [
@@ -63,7 +63,7 @@ describe('cols URL parameter (aperture#73)', () => {
       of('workflows'),
       collections,
     );
-    expect(pathColumns.map((c) => c.many?.mode)).toEqual(['explode', 'explode']);
+    expect(pathColumns.map((c) => c.many?.mode)).toEqual(['explode', 'count']);
   });
 
   it('restores a two-hop column through a list, with its depth and export name', () => {
@@ -100,5 +100,87 @@ describe('cols URL parameter (aperture#73)', () => {
     expect(() => validateColumnsShape({ paths: [{ path: ['a', 'b'], mode: 'bogus' }] })).toThrow();
     expect(() => validateColumnsShape({ hidden: [1] })).toThrow();
     expect(validateColumnsShape({})).toEqual({});
+  });
+});
+
+
+describe('seedFromProposal (aperture#89)', () => {
+  const workflows = of('workflows');
+  const samples = of('samples');
+
+  it('turns slot-spelled traversals into path columns with their grain', () => {
+    const { pathColumns, dropped } = seedFromProposal(
+      [
+        { path: ['input_samples', 'accession'], mode: 'explode' },
+        { path: ['input_samples', 'donor', 'cohort'], mode: 'explode' },
+      ],
+      workflows,
+      collections,
+    );
+    expect(dropped).toEqual([]);
+    expect(pathColumns.map((c) => [c.path.join('.'), c.many?.mode])).toEqual([
+      ['inputSamples.accession', 'explode'],
+      ['inputSamples.donor.cohort', 'explode'],
+    ]);
+  });
+
+  it('defaults a to-many path with no mode to count, never explode', () => {
+    const { pathColumns } = seedFromProposal([{ path: ['input_samples', 'accession'] }], workflows, collections);
+    expect(pathColumns[0]!.many?.mode).toBe('count');
+  });
+
+  it('gives a to-one path no grain', () => {
+    const { pathColumns } = seedFromProposal([{ path: ['donor', 'age_at_death'] }], samples, collections);
+    expect(pathColumns[0]!.path).toEqual(['donor', 'ageAtDeath']);
+    expect(pathColumns[0]!.many).toBeUndefined();
+  });
+
+  it('returns anchor slots as fields to show, not as path columns', () => {
+    const field = samples.columns.find((c) => c.field !== 'id')!.field;
+    const slot = field.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+    const { pathColumns, showFields } = seedFromProposal([{ path: [slot] }], samples, collections);
+    expect(pathColumns).toEqual([]);
+    expect(showFields).toEqual([field]);
+  });
+
+  it('keeps the proposal\'s modes when it mixes explode and joinIds on one link', () => {
+    const { pathColumns } = seedFromProposal(
+      [
+        { path: ['input_samples', 'accession'], mode: 'explode' },
+        { path: ['input_samples', 'id'], mode: 'joinIds' },
+      ],
+      of('workflows'),
+      collections,
+    );
+    expect(pathColumns.map((c) => [c.path.join('.'), c.many?.mode])).toEqual([
+      ['inputSamples.accession', 'explode'],
+      ['inputSamples.id', 'joinIds'],
+    ]);
+  });
+
+  it('drops an unresolvable path with its reason and keeps the rest', () => {
+    const { pathColumns, dropped } = seedFromProposal(
+      [{ path: ['publisher', 'name'] }, { path: ['donor', 'cohort'] }],
+      samples,
+      collections,
+    );
+    expect(pathColumns.map((c) => c.path.join('.'))).toEqual(['donor.cohort']);
+    expect(dropped).toEqual([{ path: ['publisher', 'name'], reason: expect.stringMatching(/no field “publisher”/) }]);
+  });
+});
+
+describe('wireColumns (aperture#89 round trip)', () => {
+  it('spells the table back in slot names, with a mode only on to-many paths', () => {
+    const workflows = of('workflows');
+    const { pathColumns } = decodeColumns(
+      { paths: [{ path: ['inputSamples', 'accession'], mode: 'explode' }, { path: ['inputSamples', 'donor', 'cohort'] }] },
+      workflows,
+      collections,
+    );
+    expect(wireColumns(['workflowType'], pathColumns, workflows, collections)).toEqual([
+      { path: ['workflow_type'] },
+      { path: ['input_samples', 'accession'], mode: 'explode' },
+      { path: ['input_samples', 'donor', 'cohort'], mode: 'count' },
+    ]);
   });
 });

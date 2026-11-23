@@ -5,6 +5,8 @@ import { filterSlots, validateQuerySpec } from '../query/querySpec';
 import { familyIntrospection } from './testing/fixtures';
 import { selectionForPaths } from './selection';
 import type { PathColumn } from './selection';
+import { translateColumns } from '../query/querySpec';
+import { resolvePath, seedFromProposal, toPathColumn, wireColumns } from '../query/columnView';
 
 // Families (Mosaic ADR-0014, Aperture ADR-0042), against a live mosaic v0.16.0 capture.
 const collections = deriveCollections(familyIntrospection);
@@ -83,6 +85,33 @@ describe('selections through a family carry __typename', () => {
   });
 });
 
+describe('proposal columns through a family (aperture#89 review, ADR-0042)', () => {
+  it('translates, seeds and round-trips a path through a family range', () => {
+    const measurements = of('measurements');
+    // Before ADR-0042 this was dropped as "Measurement has no field “sample”".
+    expect(translateColumns([{ path: ['sample', 'label'] }], 'field', measurements, collections)).toEqual({
+      columns: [{ path: ['sample', 'label'] }],
+      dropped: [],
+    });
+    const seeded = seedFromProposal([{ path: ['sample', 'label'] }], measurements, collections);
+    expect(seeded.dropped).toEqual([]);
+    expect(seeded.pathColumns.map((c) => c.label)).toEqual(['Sample → Label']);
+    expect(wireColumns([], seeded.pathColumns, measurements, collections)).toEqual([{ path: ['sample', 'label'] }]);
+
+    // A to-many hop into a family, exploded.
+    const assays = of('assays');
+    const inputs = seedFromProposal([{ path: ['inputs', 'label'], mode: 'explode' }], assays, collections);
+    expect(inputs.pathColumns.map((c) => [c.path.join('.'), c.many?.mode])).toEqual([['inputs.label', 'explode']]);
+  });
+
+  it('keeps the family Kind column off the wire', () => {
+    const measurements = of('measurements');
+    const kind = toPathColumn(resolvePath(['sample', '__typename'], measurements, collections)!);
+    expect(wireColumns([], [kind], measurements, collections)).toEqual([]);
+    expect(translateColumns([{ path: ['sample', '__typename'] }], 'field', measurements, collections).dropped).toHaveLength(1);
+  });
+});
+
 describe('a family has no lifecycle actions, and types never borrow mutations (review B1)', () => {
   // The Mutation type with one more mutation that names the family.
   const withFamilyMutations: IntrospectionSchema = {
@@ -157,6 +186,15 @@ describe('a family without a collection (mosaic_anchor: false, review item 1)', 
   it('derives no family collection, but keeps the reference', () => {
     expect(cols.find((c) => c.typeName === 'Sample')).toBeUndefined();
     expect(sampleRef).toMatchObject({ kind: 'ref', targetIsFamily: true });
+  });
+
+  it('drops a proposal path through it with an accurate reason', () => {
+    const measurements = cols.find((c) => c.id === 'measurements')!;
+    const { dropped } = translateColumns([{ path: ['sample', 'label'] }], 'field', measurements, cols);
+    expect(dropped).toEqual([
+      { path: ['sample', 'label'], reason: expect.stringMatching(/Sample, a family with no collection of its own/) },
+    ]);
+    expect(dropped[0]!.reason).not.toMatch(/does not expose/);
   });
 
   it('still opens a value on its kind\'s page', () => {

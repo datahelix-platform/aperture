@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { deriveCollections } from './schemaModel';
 import { demoIntrospection } from './testing/fixtures';
-import { explodeKey, flattenRows, normalizeExplode, pathLabel, selectionForPaths, valueAtPath } from './selection';
+import { capExplode, explodeKey, flattenRows, normalizeExplode, pathLabel, selectionForPaths, valueAtPath } from './selection';
 import type { ManyMode, PathColumn } from './selection';
 
 const demo = deriveCollections(demoIntrospection);
@@ -151,6 +151,37 @@ describe('flattenRows', () => {
     const out = flattenRows(rows, [status, cohort('explode'), second], 'id');
     // A cartesian product has no user model behind it (v1 cap, ADR-0041).
     expect(out.rows).toHaveLength(3);
+  });
+});
+
+describe('mixed modes on one link (aperture#89 review: Mosaic accepts them)', () => {
+  const on = (field: string, mode: ManyMode): PathColumn => ({
+    path: ['inputSamples', field],
+    column: col('samples', field),
+    label: field,
+    many: { mode },
+  });
+  const rows = [{ id: 'w1', inputSamples: [{ id: 's1', accession: 'A1' }, { id: 's2', accession: 'A2' }] }];
+
+  it('capExplode keeps a sibling\'s own mode on the exploded link', () => {
+    const out = capExplode([on('accession', 'explode'), on('id', 'joinIds')]);
+    expect(out.map((c) => c.many?.mode)).toEqual(['explode', 'joinIds']);
+  });
+
+  it('capExplode still demotes an explode through a second link', () => {
+    const other: PathColumn = {
+      path: ['outputSamples', 'accession'],
+      column: col('samples', 'accession'),
+      label: 'out',
+      many: { mode: 'explode' },
+    };
+    expect(capExplode([on('accession', 'explode'), other]).map((c) => c.many?.mode)).toEqual(['explode', 'count']);
+  });
+
+  it('flattenRows reads an exploded column per member and a joinIds sibling as the anchor\'s list', () => {
+    const out = flattenRows(rows, [on('accession', 'explode'), on('id', 'joinIds')], 'id');
+    expect(out.rows.map((r) => r.values['inputSamples.accession'])).toEqual(['A1', 'A2']);
+    expect(out.rows.map((r) => r.values['inputSamples.id'])).toEqual(['s1; s2', 's1; s2']);
   });
 });
 

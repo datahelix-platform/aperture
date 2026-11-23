@@ -147,3 +147,25 @@ Concretely:
 - Conversation-as-provenance (ADR-0020) is deliberately out of scope: a chat-produced saved view
   keeps the resulting `QuerySpec` and loses the conversation that produced it. Revisit if
   conversations become provenance events in practice.
+
+## Note (2026-11-22): the round trip carries the reader's columns (aperture#89)
+
+The builder lock above stays: criteria and anchor are still read-only while a conversation owns
+the spec. The result table's columns are not locked. ADR-0041 places them in the query, and a
+reader can still change them under a live conversation. aperture#89 sends them back so a
+refinement turn plans against what the reader chose. The wire `query_spec` is therefore the
+turn-derived spec with `columns` taken from the table. It is identical to the derived spec when
+nothing was changed.
+
+That means the planner can no longer insist on exact equality with what it derives from `turns`
+(it was the planner, Reel, that enforced it, not Mosaic as written above). Relaxing that check is
+a Reel change, recorded as Amendment 2 to Reel's turn contract (Decision 9,
+[reel#26](https://github.com/datahelix-platform/reel/pull/26)).
+
+**Release pairing (corrected 2026-11-23, review of aperture#103).** This note first said an
+unedited draft still matches exactly, so nothing breaks against an older Reel. That is wrong. The
+round trip sends the table's columns whenever the table has any traversal column, including
+columns restored from `cols` or added with the picker, not only a proposal's. Against a Reel
+without reel#26 (v0.2.0 and earlier), every refinement turn then answers 400. Aperture releases
+carrying aperture#89 (v0.8.0 on) must ship only alongside a Reel release that includes reel#26.
+The README's *Compatibility* section records the pairing.

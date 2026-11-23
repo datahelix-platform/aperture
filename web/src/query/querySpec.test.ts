@@ -12,6 +12,9 @@ import {
   validateQuerySpec,
   validateQuerySpecShape,
   canonicalizeQuerySpec,
+  draftForWire,
+  readQuerySpec,
+  translateColumns,
 } from './querySpec';
 
 const donors: CollectionModel = {
@@ -402,5 +405,203 @@ describe('canonicalizeQuerySpec (legacy dialect → platform spelling)', () => {
     expect(
       canonicalizeQuerySpec({ v: 1, anchor: 'gone', mode: 'AND', criteria: [] }, collections),
     ).toBeNull();
+  });
+});
+
+
+// aperture#89: the `columns` field, as mosaic v0.16.0's parser shapes it.
+describe('QuerySpec.columns shape (mosaic#236)', () => {
+  const base = { v: 1, anchor: 'Workflow', mode: 'AND', criteria: [] };
+  const ok = (columns: unknown) => readQuerySpec({ ...base, columns }) != null;
+
+  it('accepts an anchor slot, a one-hop and a two-hop path', () => {
+    expect(
+      ok([
+        { path: ['name'] },
+        { path: ['donor', 'cohort'] },
+        { path: ['input_samples', 'donor', 'age_at_death'], mode: 'explode' },
+      ]),
+    ).toBe(true);
+    expect(readQuerySpec({ ...base, columns: [{ path: ['a', 'b'], mode: 'count' }] })).toMatchObject({
+      columns: [{ path: ['a', 'b'], mode: 'count' }],
+    });
+  });
+
+  it('keeps a spec with no columns valid, as before', () => {
+    expect(readQuerySpec(base)).toEqual(base);
+  });
+
+  it('refuses paths outside 1–3 segments (Mosaic: at most 2 hops)', () => {
+    expect(ok([{ path: [] }])).toBe(false);
+    expect(ok([{ path: ['a', 'b', 'c', 'd'] }])).toBe(false);
+  });
+
+  it('refuses a mode outside count|joinIds|explode', () => {
+    expect(ok([{ path: ['a', 'b'], mode: 'flatten' }])).toBe(false);
+    expect(ok([{ path: ['a', 'b'], mode: 'joinIds' }])).toBe(true);
+  });
+
+  // Where Mosaic's parser is stricter than aperture#89's wording, it wins.
+  it('refuses a mode on an anchor slot, unknown keys, and one path in two modes', () => {
+    expect(ok([{ path: ['name'], mode: 'count' }])).toBe(false);
+    expect(ok([{ path: ['a', 'b'], grain: 'explode' }])).toBe(false);
+    expect(ok([{ path: ['a', 'b'], mode: 'count' }, { path: ['a', 'b'], mode: 'explode' }])).toBe(false);
+  });
+
+  it('refuses a non-list or non-string path', () => {
+    expect(ok({ path: ['a'] })).toBe(false);
+    expect(ok([{ path: [1, 2] }])).toBe(false);
+    expect(ok(['a.b'])).toBe(false);
+  });
+});
+
+describe('canonicalizeQuerySpec carries columns (aperture#89)', () => {
+  const columns = [{ path: ['donor', 'age_at_death'] }, { path: ['name'] }];
+
+  it('passes a canonical spec with columns through untouched', () => {
+    const spec: QuerySpec = { v: 1, anchor: 'Sample', mode: 'AND', criteria: [], columns };
+    expect(canonicalizeQuerySpec(spec, collections)).toBe(spec);
+  });
+
+  it('carries columns, still slot-spelled, through the legacy branch', () => {
+    const out = canonicalizeQuerySpec(
+      { v: 1, anchor: 'samples', mode: 'AND', criteria: [], columns },
+      collections,
+    );
+    expect(out).toEqual({ v: 1, anchor: 'Sample', mode: 'AND', criteria: [], columns });
+  });
+
+  it('drops exact repeats, as Mosaic does', () => {
+    const out = canonicalizeQuerySpec(
+      { v: 1, anchor: 'Sample', mode: 'AND', criteria: [], columns: [...columns, columns[0]!] },
+      collections,
+    );
+    expect(out?.columns).toEqual(columns);
+  });
+
+  it('adds no columns key to a spec that had none', () => {
+    const out = canonicalizeQuerySpec({ v: 1, anchor: 'samples', mode: 'AND', criteria: [] }, collections);
+    expect(out && 'columns' in out).toBe(false);
+  });
+});
+
+describe('translateColumns (slot ↔ GraphQL field, aperture#89)', () => {
+  const real = deriveCollections(demoIntrospection);
+  const workflows = real.find((c) => c.id === 'workflows')!;
+
+  it('translates every hop and the leaf from slot names to field names', () => {
+    const { columns, dropped } = translateColumns(
+      [
+        { path: ['input_samples', 'donor', 'age_at_death'], mode: 'explode' },
+        { path: ['input_samples', 'brain_region'], mode: 'count' },
+        { path: ['workflow_type'] },
+      ],
+      'field',
+      workflows,
+      real,
+    );
+    expect(dropped).toEqual([]);
+    expect(columns).toEqual([
+      { path: ['inputSamples', 'donor', 'ageAtDeath'], mode: 'explode' },
+      { path: ['inputSamples', 'brainRegion'], mode: 'count' },
+      { path: ['workflowType'] },
+    ]);
+  });
+
+  it('translates back from field names to slot names', () => {
+    const { columns } = translateColumns(
+      [{ path: ['inputSamples', 'donor', 'ageAtDeath'], mode: 'joinIds' }],
+      'slot',
+      workflows,
+      real,
+    );
+    expect(columns).toEqual([{ path: ['input_samples', 'donor', 'age_at_death'], mode: 'joinIds' }]);
+  });
+
+  it('round-trips without loss', () => {
+    const slots = [{ path: ['input_samples', 'storage_condition'], mode: 'count' as const }];
+    const fields = translateColumns(slots, 'field', workflows, real).columns;
+    expect(translateColumns(fields, 'slot', workflows, real).columns).toEqual(slots);
+  });
+
+  it('does not accept the other spelling: a GraphQL name is not a slot', () => {
+    const { columns, dropped } = translateColumns([{ path: ['inputSamples', 'accession'] }], 'field', workflows, real);
+    expect(columns).toEqual([]);
+    expect(dropped[0]!.path).toEqual(['inputSamples', 'accession']);
+  });
+
+  it('drops an unknown hop, a non-reference hop, and an unknown leaf, each with its reason', () => {
+    const { columns, dropped } = translateColumns(
+      [
+        { path: ['publisher', 'name'] },
+        { path: ['name', 'length'] },
+        { path: ['input_samples', 'nope'] },
+      ],
+      'field',
+      workflows,
+      real,
+    );
+    expect(columns).toEqual([]);
+    expect(dropped.map((d) => d.path.join('.'))).toEqual(['publisher.name', 'name.length', 'input_samples.nope']);
+    expect(dropped[0]!.reason).toMatch(/no field “publisher”/);
+    expect(dropped[1]!.reason).toMatch(/not a reference/);
+    expect(dropped[2]!.reason).toMatch(/no field “nope”/);
+  });
+});
+
+describe('the qs URL parameter never carries columns (aperture#89 review)', () => {
+  const base = { v: 1, anchor: 'Workflow', mode: 'AND', criteria: [{ kind: 'field', slot: 'name', op: 'eq', value: 'x' }] };
+
+  it('drops a valid columns list on load, keeping the query', () => {
+    const loaded = validateQuerySpecShape({ ...base, columns: [{ path: ['input_samples', 'accession'], mode: 'explode' }] });
+    expect(loaded).toEqual(base);
+    expect('columns' in loaded).toBe(false);
+  });
+
+  it('drops a malformed columns list without discarding the query', () => {
+    expect(validateQuerySpecShape({ ...base, columns: [{ path: ['name'], mode: 'count' }] })).toEqual(base);
+    expect(validateQuerySpecShape({ ...base, columns: 'name' })).toEqual(base);
+  });
+
+  it('still refuses a qs that is not a QuerySpec', () => {
+    expect(() => validateQuerySpecShape({ ...base, v: 2, columns: [] })).toThrow();
+  });
+});
+
+describe('draftForWire (aperture#89 round trip)', () => {
+  const derived = {
+    v: 1,
+    anchor: 'Workflow',
+    mode: 'AND',
+    criteria: [],
+    columns: [{ path: ['input_samples', 'accession'], mode: 'explode' }],
+  };
+
+  it('sends the turn-derived spec itself when the table agrees with it', () => {
+    expect(draftForWire(derived, [{ path: ['input_samples', 'accession'], mode: 'explode' }])).toBe(derived);
+  });
+
+  it('sends the reader\'s columns in place of the proposal\'s when they differ', () => {
+    const edited = [{ path: ['input_samples', 'accession'], mode: 'count' as const }, { path: ['name'] }];
+    expect(draftForWire(derived, edited)).toEqual({ ...derived, columns: edited });
+  });
+
+  it('treats a reordering alone as no edit', () => {
+    // The table lists anchor fields first; the proposal may not.
+    const spec = { ...derived, columns: [{ path: ['input_samples', 'accession'], mode: 'explode' }, { path: ['name'] }] };
+    expect(draftForWire(spec, [{ path: ['name'] }, { path: ['input_samples', 'accession'], mode: 'explode' }])).toBe(spec);
+  });
+
+  it('sends an empty list when the reader removed every column', () => {
+    expect(draftForWire(derived, [])).toEqual({ ...derived, columns: [] });
+  });
+
+  it('leaves a columns-free spec alone when the table has none', () => {
+    const plain = { v: 1, anchor: 'Workflow', mode: 'AND', criteria: [] };
+    expect(draftForWire(plain, [])).toBe(plain);
+  });
+
+  it('passes null through: there is no draft before the first proposal', () => {
+    expect(draftForWire(null, [{ path: ['name'] }])).toBeNull();
   });
 });
