@@ -8,6 +8,7 @@ import {
 import { useCapabilities } from '../../data/DataSourceContext';
 import type { MosaicSource } from '../../data/mosaicSource';
 import type { CollectionModel } from '../../data/schemaModel';
+import { recordCollection } from '../../data/schemaModel';
 import { typeColorStyle } from '../../data/typeColor';
 import { isRightAligned, renderCell } from './cells';
 import { ExportButtons } from './ExportButtons';
@@ -85,13 +86,19 @@ export function CollectionTable({
           header: model.label,
           cell: (info) => {
             const value = info.getValue();
-            // The id column links to THIS entity's own detail (R3.7).
-            if (model.field === collection.idColumn && collection.detail && value != null) {
+            // The id column links to THIS entity's own detail (R3.7). A family
+            // row opens its concrete kind's page instead (ADR-0042).
+            const own = model.field === collection.idColumn && value != null
+              ? recordCollection(collection, info.row.original, source.collections)
+              : undefined;
+            if (own) {
               return (
                 <button
                   type="button"
                   className="cell-id cell-id-link"
-                  onClick={() => openEntity(String(value))}
+                  onClick={() =>
+                    own.id === collection.id ? openEntity(String(value)) : openIn(own.id, String(value))
+                  }
                 >
                   {String(value)}
                 </button>
@@ -104,9 +111,13 @@ export function CollectionTable({
             // dead text, and the only link — the id column — assumed the
             // current collection, so a mis-picked FK linked to the wrong one).
             if (model.kind === 'ref' && value != null) {
-              const target = source.collections.find((c) => c.typeName === model.targetType);
+              const target = recordCollection(
+                source.collections.find((c) => c.typeName === model.targetType),
+                value,
+                source.collections,
+              );
               const refId = (value as Record<string, unknown>)[model.targetIdField ?? ''];
-              if (target?.detail != null && refId != null) {
+              if (target != null && refId != null) {
                 return (
                   <button
                     type="button"

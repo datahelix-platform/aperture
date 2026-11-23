@@ -194,7 +194,10 @@ export interface MosaicSource {
 
 function selectionFor(column: ColumnModel): string {
   if (column.kind === 'ref' || column.kind === 'refList') {
-    return `${column.field} { ${column.targetIdField} }`;
+    // A family's value says which kind it is, so its link can open that
+    // kind's record page (ADR-0042).
+    const kind = column.targetIsFamily ? ' __typename' : '';
+    return `${column.field} { ${column.targetIdField}${kind} }`;
   }
   return column.field;
 }

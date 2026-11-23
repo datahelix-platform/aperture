@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MosaicSource } from '../data/mosaicSource';
 import type { CollectionModel } from '../data/schemaModel';
-import { slotName } from '../data/schemaModel';
+import { recordCollection, slotName } from '../data/schemaModel';
 import { renderPathCell, isPathRightAligned } from '../features/collections/cells';
 import type { ManyMode, PathColumn } from '../data/selection';
 import { explodeKey, flattenRows, normalizeExplode, pathKey, selectionForPaths } from '../data/selection';
@@ -1021,7 +1021,9 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
                     // Always the anchor, even on an exploded row: the row
                     // describes a pair, but the record it belongs to is the
                     // anchor entity.
-                    if (row.anchorId != null) urlState.openIn(anchor.id, row.anchorId);
+                    // A family row opens its concrete kind's page (ADR-0042).
+                    const opens = recordCollection(anchor, { __typename: row.anchorKind }, collections) ?? anchor;
+                    if (row.anchorId != null) urlState.openIn(opens.id, row.anchorId);
                   }}
                 >
                   {shownColumns.map((c) => (

@@ -10,6 +10,7 @@ import type { GraphQLResult, ScopedDataClient } from '../scopedClient';
 import realIntrospectionJson from './realIntrospection.json';
 import demoIntrospectionJson from './demoIntrospection.json';
 import certIntrospectionJson from './certIntrospection.json';
+import familyIntrospectionJson from './familyIntrospection.json';
 
 /**
  * Introspection fixtures for adapter unit tests. Deliberately generic
@@ -95,6 +96,23 @@ export const demoIntrospection = demoIntrospectionJson as unknown as Introspecti
  * off against the other, with no branch on a version number.
  */
 export const certIntrospection = certIntrospectionJson as unknown as IntrospectionSchema;
+
+/**
+ * The captured `__schema` of **mosaic v0.16.0** (released wheel) over Mosaic's own
+ * closure fixture (`tests/support/closure_fixture.py`, #241), plus one to-one reference
+ * into the family (`Measurement.sample: Sample`). Captured 2026-11-23 with Aperture's
+ * INTROSPECTION_QUERY, including `possibleTypes`.
+ *
+ * It carries a FAMILY (Mosaic ADR-0014, Aperture ADR-0042): abstract `Sample` with kinds
+ * `Brain` and `Blood`, emitted as a GraphQL INTERFACE with a read-only `samples` page,
+ * `sample(id:)`, search, count, facets and field range, and no mutations. The interface
+ * carries only the shared fields (`id`, `label`, `producedBy`); `SampleFilter` and
+ * `SampleOrderField` also take the kind-only ones (`hemisphere`, `volumeMl`, `drawnFrom`).
+ * References into it: `Measurement.sample` (to-one) and `Assay.inputs` (to-many). It also
+ * has the concrete-parent case: `Process` with subclass `BankBrain`, and `Person` with
+ * `Donor`.
+ */
+export const familyIntrospection = familyIntrospectionJson as unknown as IntrospectionSchema;
 
 export const scalar = (name: string): TypeRef => ({ kind: 'SCALAR', name, ofType: null });
 export const enumRef = (name: string): TypeRef => ({ kind: 'ENUM', name, ofType: null });
