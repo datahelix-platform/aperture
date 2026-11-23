@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import type { ReactNode } from 'react';
@@ -446,6 +446,32 @@ describe('ChatPanel (ADR-0039)', () => {
       const derived = (second.variables['turns'] as WireTurn[])[0]!.query_spec as { columns: unknown };
       expect(sent).toEqual(derived);
       expect(sent.columns).toEqual(columns.slice(0, 2));
+    });
+
+    it('clears a path column that no longer resolves when a proposal moves the anchor', async () => {
+      // aperture#89 review: a column-less proposal on another anchor left the
+      // Book-relative `author → name` in the table state, and the round trip
+      // dropped it without a word. It is cleared with the anchor change.
+      const user = userEvent.setup();
+      const client = conversationalClient({ anchor: 'Author', books, authorDetail: true });
+      const urls: string[] = [];
+      render(
+        <NuqsTestingAdapter
+          searchParams={`?view=query&cols=${encodeURIComponent(JSON.stringify({ paths: [{ path: ['author', 'name'] }] }))}`}
+          hasMemory
+          onUrlUpdate={(e) => urls.push(e.queryString)}
+        >
+          <App endpoint={endpoint} clientFactory={() => client} />
+        </NuqsTestingAdapter>,
+      );
+      await screen.findByTestId('chat-panel');
+      await user.type(screen.getByRole('textbox', { name: 'Describe the query' }), 'all authors');
+      await user.click(screen.getByRole('button', { name: 'Send' }));
+      await screen.findByText('Filtering to all authors.');
+
+      await waitFor(() => expect(urls.length).toBeGreaterThan(0));
+      const cols = new URLSearchParams(urls[urls.length - 1]).get('cols');
+      expect(cols ?? '').not.toContain('author');
     });
 
     it('keeps the reader\'s columns when a proposal says nothing about columns', async () => {

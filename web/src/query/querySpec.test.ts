@@ -422,7 +422,7 @@ describe('QuerySpec.columns shape (mosaic#236)', () => {
         { path: ['input_samples', 'donor', 'age_at_death'], mode: 'explode' },
       ]),
     ).toBe(true);
-    expect(validateQuerySpecShape({ ...base, columns: [{ path: ['a', 'b'], mode: 'count' }] })).toMatchObject({
+    expect(readQuerySpec({ ...base, columns: [{ path: ['a', 'b'], mode: 'count' }] })).toMatchObject({
       columns: [{ path: ['a', 'b'], mode: 'count' }],
     });
   });
@@ -549,6 +549,25 @@ describe('translateColumns (slot ↔ GraphQL field, aperture#89)', () => {
   });
 });
 
+describe('the qs URL parameter never carries columns (aperture#89 review)', () => {
+  const base = { v: 1, anchor: 'Workflow', mode: 'AND', criteria: [{ kind: 'field', slot: 'name', op: 'eq', value: 'x' }] };
+
+  it('drops a valid columns list on load, keeping the query', () => {
+    const loaded = validateQuerySpecShape({ ...base, columns: [{ path: ['input_samples', 'accession'], mode: 'explode' }] });
+    expect(loaded).toEqual(base);
+    expect('columns' in loaded).toBe(false);
+  });
+
+  it('drops a malformed columns list without discarding the query', () => {
+    expect(validateQuerySpecShape({ ...base, columns: [{ path: ['name'], mode: 'count' }] })).toEqual(base);
+    expect(validateQuerySpecShape({ ...base, columns: 'name' })).toEqual(base);
+  });
+
+  it('still refuses a qs that is not a QuerySpec', () => {
+    expect(() => validateQuerySpecShape({ ...base, v: 2, columns: [] })).toThrow();
+  });
+});
+
 describe('draftForWire (aperture#89 round trip)', () => {
   const derived = {
     v: 1,
@@ -565,6 +584,12 @@ describe('draftForWire (aperture#89 round trip)', () => {
   it('sends the reader\'s columns in place of the proposal\'s when they differ', () => {
     const edited = [{ path: ['input_samples', 'accession'], mode: 'count' as const }, { path: ['name'] }];
     expect(draftForWire(derived, edited)).toEqual({ ...derived, columns: edited });
+  });
+
+  it('treats a reordering alone as no edit', () => {
+    // The table lists anchor fields first; the proposal may not.
+    const spec = { ...derived, columns: [{ path: ['input_samples', 'accession'], mode: 'explode' }, { path: ['name'] }] };
+    expect(draftForWire(spec, [{ path: ['name'] }, { path: ['input_samples', 'accession'], mode: 'explode' }])).toBe(spec);
   });
 
   it('sends an empty list when the reader removed every column', () => {

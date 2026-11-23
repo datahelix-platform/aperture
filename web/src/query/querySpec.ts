@@ -141,6 +141,21 @@ export function emptyQuerySpec(anchorTypeName: string): QuerySpec {
 }
 
 /**
+ * `value` with any `columns` key removed. `qs` never carries columns: `cols`
+ * is the result table's one source (aperture#89), so a `columns` list in a
+ * hand-edited or older link is dropped on load. It is dropped BEFORE the shape
+ * check, so a malformed list costs only the columns, never the whole query.
+ */
+function withoutColumns(value: unknown): unknown {
+  if (typeof value !== 'object' || value == null || Array.isArray(value) || !('columns' in value)) {
+    return value;
+  }
+  const rest: Record<string, unknown> = { ...(value as Record<string, unknown>) };
+  delete rest['columns'];
+  return rest;
+}
+
+/**
  * Shape guard for the `qs` URL parameter (nuqs parseAsJson validator).
  *
  * Deliberately schema-*un*aware: nuqs calls this with no app context, and
@@ -148,7 +163,7 @@ export function emptyQuerySpec(anchorTypeName: string): QuerySpec {
  * `canonicalizeQuerySpec`.
  */
 export function validateQuerySpecShape(value: unknown): QuerySpec {
-  const spec = readQuerySpec(value);
+  const spec = readQuerySpec(withoutColumns(value));
   if (!spec) throw new Error('not a QuerySpec');
   return spec;
 }
@@ -341,8 +356,8 @@ export function translateColumns(
  * The draft as it goes back to the planner: the turn-derived spec with its
  * `columns` replaced by the result table's (aperture#89 round trip).
  *
- * Returned UNCHANGED, by identity, when the table agrees with what the spec
- * already says, or when neither carries any columns. Reel compares the wire
+ * Returned UNCHANGED, by identity, when the table holds the same columns the
+ * spec already says (in any order), or when neither carries any columns. Reel compares the wire
  * `query_spec` with the spec it derives from `turns`; sending the derived spec
  * verbatim whenever nothing was edited keeps that comparison exact, so only a
  * real edit ever reaches the planner as one. An edit to an empty list is
@@ -354,8 +369,15 @@ export function draftForWire(spec: unknown, columns: ColumnSpec[] | null): unkno
   const raw = spec as Record<string, unknown>;
   const stated = Array.isArray(raw['columns']) ? (raw['columns'] as ColumnSpec[]) : null;
   if (!stated && columns.length === 0) return spec;
+  // Compared as SETS: the table lists anchor fields before path columns, so
+  // its order need not match the proposal's, and order alone is not an edit
+  // (aperture#89 review).
   const key = (cs: ColumnSpec[]) =>
-    JSON.stringify(normalizeColumns(cs).map((c) => [c.path, c.mode ?? null]));
+    JSON.stringify(
+      normalizeColumns(cs)
+        .map((c) => JSON.stringify([c.path, c.mode ?? null]))
+        .sort(),
+    );
   if (stated && key(stated) === key(columns)) return spec;
   return { ...raw, columns };
 }

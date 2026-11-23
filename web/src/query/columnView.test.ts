@@ -49,10 +49,10 @@ describe('cols URL parameter (aperture#73)', () => {
     expect(pathColumns).toEqual([]);
   });
 
-  it('explodes every column through the exploded link together', () => {
-    // "One row each" belongs to the LINK. Two columns through inputSamples are
-    // one row per input sample, not a cross product -- the old per-column cap
-    // demoted one of them, so the two columns described different samples.
+  it('keeps each column\'s own mode on the exploded link', () => {
+    // A proposal may mix modes on one link and Mosaic accepts it (aperture#89
+    // review), so `cols` restores them as written. The cap is still by LINK
+    // (capExplode, tested in selection.test.ts).
     const { pathColumns } = decodeColumns(
       {
         paths: [
@@ -63,7 +63,7 @@ describe('cols URL parameter (aperture#73)', () => {
       of('workflows'),
       collections,
     );
-    expect(pathColumns.map((c) => c.many?.mode)).toEqual(['explode', 'explode']);
+    expect(pathColumns.map((c) => c.many?.mode)).toEqual(['explode', 'count']);
   });
 
   it('restores a two-hop column through a list, with its depth and export name', () => {
@@ -143,6 +143,21 @@ describe('seedFromProposal (aperture#89)', () => {
     expect(showFields).toEqual([field]);
   });
 
+  it('keeps the proposal\'s modes when it mixes explode and joinIds on one link', () => {
+    const { pathColumns } = seedFromProposal(
+      [
+        { path: ['input_samples', 'accession'], mode: 'explode' },
+        { path: ['input_samples', 'id'], mode: 'joinIds' },
+      ],
+      of('workflows'),
+      collections,
+    );
+    expect(pathColumns.map((c) => [c.path.join('.'), c.many?.mode])).toEqual([
+      ['inputSamples.accession', 'explode'],
+      ['inputSamples.id', 'joinIds'],
+    ]);
+  });
+
   it('drops an unresolvable path with its reason and keeps the rest', () => {
     const { pathColumns, dropped } = seedFromProposal(
       [{ path: ['publisher', 'name'] }, { path: ['donor', 'cohort'] }],
@@ -165,7 +180,7 @@ describe('wireColumns (aperture#89 round trip)', () => {
     expect(wireColumns(['workflowType'], pathColumns, workflows, collections)).toEqual([
       { path: ['workflow_type'] },
       { path: ['input_samples', 'accession'], mode: 'explode' },
-      { path: ['input_samples', 'donor', 'cohort'], mode: 'explode' },
+      { path: ['input_samples', 'donor', 'cohort'], mode: 'count' },
     ]);
   });
 });

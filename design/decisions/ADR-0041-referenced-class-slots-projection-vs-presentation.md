@@ -301,7 +301,23 @@ placement choices decided by labadorf on 2026-11-22:
 - **Round trip.** The panel sends the turn-derived spec with `columns` rebuilt from the table,
   slot-spelled. If the table agrees with the spec, the spec goes out unchanged. This depends on
   Reel accepting a `query_spec` that differs from the one it derives from `turns`; see ADR-0039's
-  note of the same date.
+  note of the same date. **Release pairing:** any traversal column in the table counts as an edit
+  against a proposal without `columns`, so this needs a Reel release that includes reel#26. Ship
+  v0.8.0 only with one (ADR-0039 note, corrected 2026-11-23).
+- **Review fixes (2026-11-23, aperture#103).**
+  - *Mixed modes on one link are kept.* Mosaic accepts `explode` beside `joinIds`/`count` on the
+    same link, and Mosaic's rules win. A proposal's columns (and `cols` restored from a link) go
+    through `capExplode`, which only demotes an explode through a second link. It no longer
+    promotes every sibling on the exploded link to `explode`, as `normalizeExplode` does for a
+    choice made in the builder. In the table, an exploded column reads per member. A
+    `count`/`joinIds` sibling on that link shows the anchor's summary on each of its rows. This
+    narrows the 2026-09 rule that every column through the exploded link explodes with it: that
+    rule now holds for the builder's own explode action, not for columns that arrive with modes.
+  - *Order is not an edit.* The round trip compares the table's columns and the spec's as sets.
+  - *`qs` drops `columns` on load*, before the shape check, so a malformed list costs only the
+    columns.
+  - *An anchor change drops path columns that no longer resolve*, so none disappears silently
+    from the round trip.
 - **Execution is unchanged:** full envelopes plus a merged nested selection, projected in the
   client. Sending `columns` to Mosaic for execution, and deleting the client projection, is the
   next step. The artifact does not change for it.

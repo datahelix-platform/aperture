@@ -681,11 +681,20 @@ export function QueryBuilderView({ source }: { source: MosaicSource }) {
   // while looking like it had.
   const anchorName = draft.anchor;
   const lastAnchor = useRef(anchorName);
+  // Path columns are the same: a path from the old anchor does not resolve
+  // from the new one, and left in place it would vanish from the round trip
+  // without a word (wireColumns drops what it cannot translate). Paths that
+  // DO resolve stay -- a proposal that moves the anchor seeds its own columns
+  // in the same update, and those must survive this effect.
   useEffect(() => {
     if (anchorName === lastAnchor.current) return;
     lastAnchor.current = anchorName;
     setHiddenFields(new Set());
-  }, [anchorName]);
+    const next = resolveAnchor(emptyQuerySpec(anchorName), collections);
+    setPathColumns((prev) =>
+      next ? prev.filter((c) => resolvePath(c.path, next, collections) != null) : [],
+    );
+  }, [anchorName, collections]);
 
   // Mirror the column choices into the URL. This is view state: `cols` is not
   // an input to the run effect, so a checkbox still never fetches.

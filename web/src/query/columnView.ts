@@ -1,7 +1,7 @@
 import type { CollectionModel, ColumnModel } from '../data/schemaModel';
 import { slotName } from '../data/schemaModel';
 import type { ManyMode, PathColumn } from '../data/selection';
-import { MAX_PATH_HOPS, normalizeExplode, pathLabel } from '../data/selection';
+import { MAX_PATH_HOPS, capExplode, pathLabel } from '../data/selection';
 import type { ColumnSpec, DroppedColumn, QueryEdge } from './querySpec';
 import { deriveEdges, translateColumns } from './querySpec';
 
@@ -174,9 +174,10 @@ export function decodeColumns(
     seen.add(key);
     pathColumns.push(toPathColumn(resolved, mode));
   }
-  // One exploded LINK at most (ADR-0041 v1 cap); every column through it
-  // explodes with it, so a hand-edited link cannot split a link's columns.
-  return { pathColumns: normalizeExplode(pathColumns), hiddenFields };
+  // One exploded LINK at most (ADR-0041 v1 cap). A sibling on that link keeps
+  // its own mode: `cols` may hold a proposal's mixed modes, which Mosaic
+  // accepts, and a reload must show the same table (aperture#89 review).
+  return { pathColumns: capExplode(pathColumns), hiddenFields };
 
 }
 
@@ -192,9 +193,11 @@ export function decodeColumns(
  * - Anything that does not resolve is returned in `dropped` with its reason,
  *   for the caller to show (ADR-0029: listed, never silent).
  *
- * The one-exploded-link cap is applied last (`normalizeExplode`), the same
- * way a hand-edited link is treated. Mosaic refuses a second exploded link
- * already, so on a validated proposal this changes nothing.
+ * The one-exploded-link cap is applied last (`capExplode`). It never
+ * promotes: Mosaic accepts `explode` beside `joinIds`/`count` on one link and
+ * its rules win, so each column keeps the proposal's mode. Mosaic refuses a
+ * second exploded link already, so on a validated proposal the cap changes
+ * nothing.
  */
 export function seedFromProposal(
   columns: ColumnSpec[],
@@ -238,7 +241,7 @@ export function seedFromProposal(
     }
     pathColumns.push(toPathColumn(resolved, spec.mode));
   }
-  return { pathColumns: normalizeExplode(pathColumns), showFields, dropped };
+  return { pathColumns: capExplode(pathColumns), showFields, dropped };
 }
 
 /**

@@ -144,6 +144,9 @@ Concretely:
   builder-lock/reset affordance) are implementation detail under this decision, not separate
   decisions — but the builder lock is load-bearing for correctness, not taste: Mosaic rejects a
   request whose wire `query_spec` disagrees with what it derives from `turns`.
+- Conversation-as-provenance (ADR-0020) is deliberately out of scope: a chat-produced saved view
+  keeps the resulting `QuerySpec` and loses the conversation that produced it. Revisit if
+  conversations become provenance events in practice.
 
 ## Note (2026-11-22): the round trip carries the reader's columns (aperture#89)
 
@@ -156,9 +159,13 @@ nothing was changed.
 
 That means the planner can no longer insist on exact equality with what it derives from `turns`
 (it was the planner, Reel, that enforced it, not Mosaic as written above). Relaxing that check is
-a Reel change, recorded as an amendment to Reel's turn contract (Decision 9). Aperture's side
-needs that Reel release before a reader's column edit can ride a refinement turn. Until then an
-unedited draft still matches exactly.
-- Conversation-as-provenance (ADR-0020) is deliberately out of scope: a chat-produced saved view
-  keeps the resulting `QuerySpec` and loses the conversation that produced it. Revisit if
-  conversations become provenance events in practice.
+a Reel change, recorded as Amendment 2 to Reel's turn contract (Decision 9,
+[reel#26](https://github.com/datahelix-platform/reel/pull/26)).
+
+**Release pairing (corrected 2026-11-23, review of aperture#103).** This note first said an
+unedited draft still matches exactly, so nothing breaks against an older Reel. That is wrong. The
+round trip sends the table's columns whenever the table has any traversal column, including
+columns restored from `cols` or added with the picker, not only a proposal's. Against a Reel
+without reel#26 (v0.2.0 and earlier), every refinement turn then answers 400. Aperture releases
+carrying aperture#89 (v0.8.0 on) must ship only alongside a Reel release that includes reel#26.
+The README's *Compatibility* section records the pairing.

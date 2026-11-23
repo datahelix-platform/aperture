@@ -43,6 +43,14 @@ pip install datahelix-aperture
 pip install "datahelix-aperture[local]"
 ```
 
+## Compatibility
+
+| Aperture | Needs |
+|---|---|
+| v0.8.0 and later | Mosaic ≥ 0.16.0. With the conversational panel on, a Reel release that includes [reel#26](https://github.com/datahelix-platform/reel/pull/26) (turn contract Amendment 2). Reel v0.2.0 and earlier answer 400 to every refinement turn once the result table holds a traversal column. |
+
+The control-plane recipe's own Mosaic constraint is in `recipes/aperture-control-plane/recipe.yaml`.
+
 ## Usage
 
 ```python

@@ -101,6 +101,23 @@ export function normalizeExplode(columns: PathColumn[], prefer?: string | null):
   });
 }
 
+/**
+ * The one-exploded-link cap WITHOUT promotion (aperture#89 review).
+ *
+ * For columns that arrive already moded — a proposal, or `cols` restored from
+ * a link — rather than chosen in the builder. Mosaic accepts `explode` and
+ * `joinIds`/`count` on the same link, and Mosaic's rules win, so a sibling
+ * keeps the mode it came with. Only an `explode` through a second link is
+ * demoted to `count` (the first exploded link wins).
+ */
+export function capExplode(columns: PathColumn[]): PathColumn[] {
+  const winner =
+    columns.map((c) => (c.many?.mode === 'explode' ? explodeKey(c) : null)).find((k) => k != null) ?? null;
+  return columns.map((c) =>
+    c.many?.mode === 'explode' && explodeKey(c) !== winner ? { ...c, many: { ...c.many, mode: 'count' } } : c,
+  );
+}
+
 /** Depth cap: 2 hops, well inside Mosaic's `DEFAULT_MAX_QUERY_DEPTH` of 10. */
 export const MAX_PATH_HOPS = 2;
 
@@ -320,9 +337,11 @@ export function flattenRows(
     slots.forEach((member, m) => {
       const values: Record<string, unknown> = {};
       for (const column of columns) {
-        // Every column through the exploded LINK reads from this member, so
-        // two columns on one link always describe the same related record.
-        const onExplodedPath = column.many != null && explodeKey(column) === explodeAt;
+        // Every EXPLODED column through the exploded link reads from this
+        // member, so two of them always describe the same related record. A
+        // `count`/`joinIds` column on the same link (a proposal may mix them,
+        // and Mosaic accepts it) keeps its own mode: the anchor's summary.
+        const onExplodedPath = column.many?.mode === 'explode' && explodeKey(column) === explodeAt;
         if (onExplodedPath) {
           const rest = column.path.slice(explodePath.length);
           values[pathKey(column.path)] =
