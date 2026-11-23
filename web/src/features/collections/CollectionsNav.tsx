@@ -67,12 +67,19 @@ export function CollectionsNav() {
             // The collection's identity colour, the same hue it wears as a
             // graph node and a type badge. CSS reads it off the element.
             style={typeColorStyle(c.typeName)}
-            title={`${c.label} → type: ${c.typeName}`}
+            title={navTitle(c)}
             aria-current={c.id === active}
             onClick={() => selectCollection(c.id)}
           >
             <span className="nav-item-chip">{initialFor(c.label)}</span>
             <span className="nav-item-label">{c.label}</span>
+            {/* Interim, flat (ADR-0042): a family is one entry, marked, until
+                the class-browser redesign settles how families nest. */}
+            {c.family && (
+              <span className="nav-item-family" data-testid={`nav-family-${c.id}`}>
+                family
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -175,4 +182,11 @@ export function CollectionsNav() {
       )}
     </>
   );
+}
+
+/** The nav entry's tooltip; a family's lists its kinds (ADR-0042). */
+function navTitle(c: CollectionModel): string {
+  if (!c.family) return `${c.label} → type: ${c.typeName}`;
+  const kinds = c.family.kinds.length > 0 ? c.family.kinds.join(', ') : 'none advertised';
+  return `${c.label} → family: ${c.typeName} (read-only). Kinds: ${kinds}`;
 }
